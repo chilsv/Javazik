@@ -2,10 +2,8 @@ package vue;
 import javax.swing.*;
 import java.awt.*;
 
-public class Fenetre1 {
-
-
-        public static void main(String[] args) {
+public class Fenetre {
+    public static void main(String[] args) {
 
         JFrame frame = new JFrame();
         frame.setSize(1392, 768); //Dimension du fond
