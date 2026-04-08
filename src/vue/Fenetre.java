@@ -12,29 +12,29 @@ public class Fenetre {
 
 
         // Mettre en place le background
-        ImageIcon background = new ImageIcon("C:/Users/Utilisateur/Desktop/Q.png");
+        ImageIcon background = new ImageIcon("assets/Q.png");
         JLabel backgroundLabel = new JLabel(background);
         backgroundLabel.setLayout(null);
         frame.setContentPane(backgroundLabel);
 
         // Inclusion du Logo
-        ImageIcon logo = new ImageIcon("C:/Users/Utilisateur/Desktop/logo.png");
+        ImageIcon logo = new ImageIcon("assets/logo.png");
         JLabel logoLabel = new JLabel(logo);
 
         //Inclusion du Bandeau
-        ImageIcon bandeau = new ImageIcon("C:/Users/Utilisateur/Desktop/bandeau.png");
+        ImageIcon bandeau = new ImageIcon("assets/bandeau.png");
         JLabel bandeauLabel = new JLabel(bandeau);
 
         //Inclusion du bouton Connexion/Creerun compte
-        ImageIcon btnConnexion = new ImageIcon("C:/Users/Utilisateur/Desktop/btn_connexion.png");
+        ImageIcon btnConnexion = new ImageIcon("assets/btn_connexion.png");
         JLabel btnConnexionLabel = new JLabel(btnConnexion);
 
         //Inclusion du bouton admin
-        ImageIcon btnAdmin = new ImageIcon("C:/Users/Utilisateur/Desktop/btn_admin.png");
+        ImageIcon btnAdmin = new ImageIcon("assets/btn_admin.png");
         JLabel btnAdminLabel = new JLabel(btnAdmin);
 
         //Inclusion du bouton quitter
-        ImageIcon btnQuitter = new ImageIcon("C:/Users/Utilisateur/Desktop/btn_quitter.png");
+        ImageIcon btnQuitter = new ImageIcon("assets/btn_quitter.png");
         JLabel btnQuitterLabel = new JLabel(btnQuitter);
 
         // Définir la position et la taille exactes des elements
