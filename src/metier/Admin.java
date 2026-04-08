@@ -3,8 +3,8 @@ package metier;
 public class Admin extends Personne {
     private int num;
 
-    public Admin(String nom, String mail, String mdp) {
+    public Admin(String nom, String mail, String mdp, int num) {
         super(nom, mail, mdp);
-        num = 0;
+        this.num = num;
     }
 }

@@ -16,15 +16,4 @@ public class Main {
         Evenements.ajouterEvenements(fenetre);
         fenetre.afficher();
     }
-
-    // Retourne le nombre d'abonnés (pour inscire un visiteur par exemple)
-    public int getNombreAbonnes() {
-        return abonnes.size();
-    }
-
-    // Retourne le nombre d'administrateurs (pour en ajouter un)
-    public int getNombreAdmins() {
-        return admins.size();
-    }
-
 }

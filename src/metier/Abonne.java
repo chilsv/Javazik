@@ -3,9 +3,9 @@ package metier;
 public class Abonne extends Personne {
     private int num;
 
-    public Abonne(String nom, String mail, String mdp) {
+    public Abonne(String nom, String mail, String mdp, int num) {
         super(nom, mail, mdp);
-        num = 0;
+        this.num = num;
     }
 
     
