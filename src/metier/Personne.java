@@ -26,6 +26,10 @@ public abstract class Personne {
         date_creation = LocalDate.now();
     }
 
+    public abstract String getAccueil(Console cons);
+
+    public abstract String getMenu(Console cons);
+
     public void visiter(Console cons) {
         cons.visiter(this);
     };

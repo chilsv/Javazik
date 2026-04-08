@@ -44,17 +44,7 @@ public class Console {
 
     public void visiter(Personne utilisateur) {
         System.out.println("-".repeat(40));
-        System.out.println("Bienvenue sur la page d'accueil !");
-    }
-
-    public void visiter(Abonne utilisateur) {
-        System.out.println("-".repeat(40));
-        System.out.println("Bienvenue sur la page d'accueil, " + utilisateur.getNom() + " !");
-    }
-
-    public void visiter(Admin utilisateur) {
-        System.out.println("-".repeat(40));
-        System.out.println("Bienvenue sur la page de gestion, " + utilisateur.getNom() + " !");
+        System.out.println(utilisateur.getAccueil(this));
     }
 
     public void quitter() {

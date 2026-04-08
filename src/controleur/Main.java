@@ -34,7 +34,7 @@ public class Main {
         saisie.nextLine();
         switch (choix) {
             case 1:
-                Personne visiteur = new Personne() {};
+                Visiteur visiteur = new Visiteur();
                 visiter(visiteur, cons);
                 break;
             case 2:
@@ -66,7 +66,7 @@ public class Main {
     }
 
     public static void inscription(Console cons, ArrayList<Abonne> abonnes, ArrayList<Admin> admins) throws UtilisateurDejaCreeException {
-        Personne utilisateur = new Personne() {};
+        Personne utilisateur;
         Scanner saisie = new Scanner(System.in);
 
         cons.inscription();
@@ -111,6 +111,10 @@ public class Main {
             case "2":
                 utilisateur = new Admin(nom, mail, mdp, admins.size());
                 ajouterAdmin(utilisateur, admins);
+                break;
+            // Ca n'arrive jamais mais au cas où, on instancie un visiteur
+            default:
+                utilisateur = new Visiteur();
                 break;
         }
         // Entrée dans l'application
