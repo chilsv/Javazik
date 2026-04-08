@@ -16,10 +16,16 @@ public abstract class Artiste {
         return nom;
     }
 
+    /**
+     * Ajoute un morceau à l'artiste
+     */
     public void ajouterMorceau(Morceau morceau) {
         morceaux.add(morceau);
     }
 
+    /**
+     * Vérifie si un morceau est déjà dans la liste de l'artiste
+     */
     public boolean contientMorceau(Morceau morceau) {
         for (Morceau m : morceaux) {
             if (m.getNum() == morceau.getNum()) {
@@ -29,6 +35,9 @@ public abstract class Artiste {
         return false;
     }
 
+    /**
+     * Ajoute à l'artiste un album et les morceaux dedans
+     */
     public void ajouterAlbum(Album album) {
         albums.add(album);
         for (Morceau morceau : album.getMorceaux()) {

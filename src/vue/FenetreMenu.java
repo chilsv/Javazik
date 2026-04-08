@@ -15,7 +15,7 @@ public class FenetreMenu {
         frame = new JFrame(); //Creation
         frame.setSize(1392, 768); //Taille de notre fenetre
         frame.setLocationRelativeTo(null); //mettre au milieu
-        frame.setUndecorated(true); //Enlever les bord de base de winows
+        frame.setUndecorated(true); //Enlever les bord de base de windows
 
 
         // Background

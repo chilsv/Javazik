@@ -17,6 +17,7 @@ public class Recherche implements Action {
             System.out.println("Recherche en cours...");
         }
     }
+    
     @Override
     public String getNom() {
         return "Effectuer une recherche";

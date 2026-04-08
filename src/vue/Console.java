@@ -1,9 +1,5 @@
 package vue;
 
-import metier.Personne;
-import metier.Abonne;
-import metier.Admin;
-
 public class Console {
     public Console() {
         System.out.println("-".repeat(40));
@@ -27,7 +23,7 @@ public class Console {
 
     public void connexion() {
         System.out.println("-".repeat(40));
-        System.out.println("Identifiants de connexion :");
+        System.out.println("-- Identifiants de connexion --");
     }
 
     public void nom() {
@@ -42,8 +38,9 @@ public class Console {
         System.out.print("Adresse e-mail : ");
     }
 
-    public void visiter(String[] actions) {
+    public void visiter(String accueil, String[] actions) {
         System.out.println("-".repeat(40));
+        System.out.println(accueil);
         for (int i = 0; i < actions.length; i++) {
             System.out.println((i + 1) + "- " + actions[i]);
         }
