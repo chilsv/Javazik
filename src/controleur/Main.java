@@ -34,11 +34,27 @@ public class Main {
         saisie.nextLine();
         switch (choix) {
             case 1:
+                Personne visiteur = new Personne() {};
+                visiter(visiteur, cons);
                 break;
             case 2:
+                try {
+                    connexion(cons, abonnes, admins);
+                } catch (UtilisateurIntrouvableException e) {
+                    cons.afficherErreur(e.getMessage());
+                    menu(cons, abonnes, admins);
+                } catch (MdpIncorrectException e) {
+                    cons.afficherErreur(e.getMessage());
+                    menu(cons, abonnes, admins);
+                }
                 break;
             case 3:
-                inscription(cons, abonnes, admins);
+                try {
+                    inscription(cons, abonnes, admins);
+                } catch (UtilisateurDejaCreeException e) {
+                    cons.afficherErreur(e.getMessage());
+                    menu(cons, abonnes, admins);
+                }
                 break;
             case 4:
                 cons.quitter();
@@ -49,7 +65,7 @@ public class Main {
         }
     }
 
-    public static void inscription(Console cons, ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {
+    public static void inscription(Console cons, ArrayList<Abonne> abonnes, ArrayList<Admin> admins) throws UtilisateurDejaCreeException {
         Personne utilisateur = new Personne() {};
         Scanner saisie = new Scanner(System.in);
 
@@ -66,13 +82,25 @@ public class Main {
         cons.nom();
         String nom = saisie.nextLine();
 
-        // Entrée du mot de passe
-        cons.mdp();
-        String mdp = saisie.nextLine();
-
         // Entrée du mail
         cons.mail();
         String mail = saisie.nextLine();
+
+        // On vérifie que le mail n'est pas déjà utilisé par un utilisateur
+        for (Abonne abonne : abonnes) {
+            if (abonne.getMail().equals(mail)) {
+                throw new UtilisateurDejaCreeException();
+            }
+        }
+        for (Admin admin : admins) {
+            if (admin.getMail().equals(mail)) {
+                throw new UtilisateurDejaCreeException();
+            }
+        }
+
+        // Entrée du mot de passe
+        cons.mdp();
+        String mdp = saisie.nextLine();
 
         // Instanciation du type d'utilisateur
         switch (type) {
@@ -87,6 +115,41 @@ public class Main {
         }
         // Entrée dans l'application
         utilisateur.visiter(cons);
+    }
+
+    public static void connexion(Console cons, ArrayList<Abonne> abonnes, ArrayList<Admin> admins) throws UtilisateurIntrouvableException, MdpIncorrectException {
+        Scanner saisie = new Scanner(System.in);
+        cons.connexion();
+
+        cons.mail();
+        String mail = saisie.nextLine();
+
+        cons.mdp();
+        String mdp = saisie.nextLine();
+        
+        // On parcourt les abonnés et les admins pour vérifier si les identifiants sont corrects
+        for (Abonne abonne : abonnes) {
+            if (abonne.getMail().equals(mail)) {
+                if (abonne.getMdp().equals(mdp)) {
+                    abonne.visiter(cons);
+                    return;
+                } else {
+                    throw new MdpIncorrectException();
+                }
+            }
+        }
+        for (Admin admin : admins) {
+            if (admin.getMail().equals(mail)) {
+                if (admin.getMdp().equals(mdp)) {
+                    admin.visiter(cons);
+                    return;
+                } else {
+                    throw new MdpIncorrectException();
+                }
+            }
+        }
+
+        throw new UtilisateurIntrouvableException();
     }
 
     public static void visiter(Personne utilisateur, Console cons) {

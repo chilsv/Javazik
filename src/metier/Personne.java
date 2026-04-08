@@ -34,4 +34,12 @@ public abstract class Personne {
         return nom;
     }
 
+    public String getMail() {
+        return mail;
+    }
+
+    public String getMdp() {
+        return mdp;
+    }
+
 }

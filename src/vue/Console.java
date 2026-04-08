@@ -7,12 +7,12 @@ import metier.Admin;
 public class Console {
 
     public Console() {
-        System.out.println("-".repeat(25));
+        System.out.println("-".repeat(40));
         System.out.println("Bienvenue dans Javazic !");
     }
 
     public void menu() {
-        System.out.println("-".repeat(25));
+        System.out.println("-".repeat(40));
         System.out.println("\t1- Visiter l'application");
         System.out.println("\t2- Se connecter");
         System.out.println("\t3- S'inscrire");
@@ -21,9 +21,14 @@ public class Console {
     }
 
     public void inscription() {
-        System.out.println("-".repeat(25));
+        System.out.println("-".repeat(40));
         System.out.println("Informations nécessaires :");
         System.out.print("Type (Abonné --> 1 ou Admin --> 2) : ");
+    }
+
+    public void connexion() {
+        System.out.println("-".repeat(40));
+        System.out.println("Identifiants de connexion :");
     }
 
     public void nom() {
@@ -39,17 +44,17 @@ public class Console {
     }
 
     public void visiter(Personne utilisateur) {
-        System.out.println("-".repeat(25));
+        System.out.println("-".repeat(40));
         System.out.println("Bienvenue sur la page d'accueil !");
     }
 
     public void visiter(Abonne utilisateur) {
-        System.out.println("-".repeat(25));
+        System.out.println("-".repeat(40));
         System.out.println("Bienvenue sur la page d'accueil, " + utilisateur.getNom() + " !");
     }
 
     public void visiter(Admin utilisateur) {
-        System.out.println("-".repeat(25));
+        System.out.println("-".repeat(40));
         System.out.println("Bienvenue sur la page de gestion, " + utilisateur.getNom() + " !");
     }
 
@@ -60,5 +65,11 @@ public class Console {
 
     public void choixInvalide() {
         System.out.println("Choix invalide, veuillez réessayer.");
+    }
+
+    public void afficherErreur(String message) {
+        System.out.println();
+        System.out.println(message);
+        System.out.println();
     }
 }

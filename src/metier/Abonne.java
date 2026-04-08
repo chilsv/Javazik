@@ -11,6 +11,6 @@ public class Abonne extends Personne {
     @Override
     public void visiter(vue.Console cons) {
         cons.visiter(this);
-    }    
+    }
 
 }
