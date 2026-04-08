@@ -3,6 +3,7 @@ package controleur;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import controleur.actions.Action;
 import vue.*;
 import metier.*;
 
@@ -118,7 +119,7 @@ public class Main {
                 break;
         }
         // Entrée dans l'application
-        utilisateur.visiter(cons);
+        visiter(utilisateur, cons);
     }
 
     public static void connexion(Console cons, ArrayList<Abonne> abonnes, ArrayList<Admin> admins) throws UtilisateurIntrouvableException, MdpIncorrectException {
@@ -135,7 +136,7 @@ public class Main {
         for (Abonne abonne : abonnes) {
             if (abonne.getMail().equals(mail)) {
                 if (abonne.getMdp().equals(mdp)) {
-                    abonne.visiter(cons);
+                    visiter(abonne, cons);
                     return;
                 } else {
                     throw new MdpIncorrectException();
@@ -145,7 +146,7 @@ public class Main {
         for (Admin admin : admins) {
             if (admin.getMail().equals(mail)) {
                 if (admin.getMdp().equals(mdp)) {
-                    admin.visiter(cons);
+                    visiter(admin, cons);
                     return;
                 } else {
                     throw new MdpIncorrectException();
@@ -157,7 +158,28 @@ public class Main {
     }
 
     public static void visiter(Personne utilisateur, Console cons) {
-        cons.visiter(utilisateur);
+        Scanner saisie = new Scanner(System.in);
+        // Chaque type d'utilisateur a un menu différent
+        String[] actions = utilisateur.getMenu(cons);
+
+        cons.visiter(actions);
+        int choix;
+        try {
+            choix = Integer.parseInt(saisie.nextLine());
+        } catch (NumberFormatException e) {
+            cons.choixInvalide();
+            visiter(utilisateur, cons);
+            return;
+        }
+
+        if (choix < 1 || choix > actions.length) {
+            cons.choixInvalide();
+            visiter(utilisateur, cons);
+            return;
+        }
+
+        Action actionChoisie = utilisateur.getActions().get(choix - 1);
+        utilisateur.executerAction(actionChoisie, cons);
     }
 
     public static void ajouterAbonne(Personne utilisateur, ArrayList<Abonne> abonnes) {
