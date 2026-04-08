@@ -2,6 +2,8 @@ package metier;
 
 import java.time.LocalDate;
 
+import vue.Console;
+
 public abstract class Personne {
     private String nom;
     private String mail;
@@ -22,6 +24,14 @@ public abstract class Personne {
         this.mail = mail;
         this.mdp = mdp;
         date_creation = LocalDate.now();
+    }
+
+    public void visiter(Console cons) {
+        cons.visiter(this);
+    };
+
+    public String getNom() {
+        return nom;
     }
 
 }

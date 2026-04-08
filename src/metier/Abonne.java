@@ -8,6 +8,9 @@ public class Abonne extends Personne {
         this.num = num;
     }
 
-    
+    @Override
+    public void visiter(vue.Console cons) {
+        cons.visiter(this);
+    }    
 
 }
