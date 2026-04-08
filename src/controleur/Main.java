@@ -206,7 +206,7 @@ public class Main {
         }
 
         Action actionChoisie = utilisateur.getActions().get(choix - 1);
-        utilisateur.executerAction(actionChoisie, cons);
+        utilisateur.executerAction(actionChoisie, cons, morceaux, artistes);
         visiter(utilisateur, cons);
     }
 

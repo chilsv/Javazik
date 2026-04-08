@@ -64,11 +64,19 @@ public abstract class Personne implements Serializable {
         return mdp;
     }
 
+    public LocalDate getDateCreation() {
+        return date_creation;
+     }
+
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
      */
     public void executerAction(Action action, Console cons) {
         action.executer(cons, this);
+    }
+
+    public void executerAction(Action action, Console cons, ArrayList<Morceau> morceaux, ArrayList<Artiste> artistes) {
+        action.executer(cons, this, morceaux, artistes);
     }
 
     /**

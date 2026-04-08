@@ -24,4 +24,8 @@ public class Morceau {
     public float getDuree() {
         return duree;
     }
+
+    public String getNom() {
+        return nom;
+    }
 }
