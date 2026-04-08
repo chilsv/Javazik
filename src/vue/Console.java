@@ -5,7 +5,6 @@ import metier.Abonne;
 import metier.Admin;
 
 public class Console {
-
     public Console() {
         System.out.println("-".repeat(40));
         System.out.println("Bienvenue dans Javazic !");
