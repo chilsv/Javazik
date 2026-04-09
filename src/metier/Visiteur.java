@@ -2,11 +2,8 @@ package metier;
 
 import java.util.ArrayList;
 
-import controleur.actions.Action;
-import controleur.actions.Deconnexion;
-import controleur.actions.Quitter;
-import controleur.actions.Recherche;
-import vue.Console;
+import controleur.actions.*;
+import vue.InterfaceVue;
 
 public class Visiteur extends Personne {
     // Liste des actions qu'un visiteur peut faire
@@ -16,11 +13,12 @@ public class Visiteur extends Personne {
         super();
         // Actions qu'un visiteur peut faire
         actions.add(new Recherche());
+        actions.add(new JouerMorceau());
         actions.add(new Deconnexion());
         actions.add(new Quitter());
     }
 
-    public String getAccueil(Console cons) {
+    public String getAccueil(InterfaceVue vue) {
         return "Bienvenue sur la page d'accueil !";
     }
 

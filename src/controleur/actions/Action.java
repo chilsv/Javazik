@@ -3,13 +3,13 @@ package controleur.actions;
 import java.io.Serializable;
 
 import metier.*;
-import vue.Console;
+import vue.InterfaceVue;
 
 public interface Action extends Serializable {
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
      */
-    public void executer(Console cons, Personne utilisateur, Catalogue catalogue);
+    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue);
 
     public String getNom();
 }

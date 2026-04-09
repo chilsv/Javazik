@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
-import vue.Console;
+import vue.InterfaceVue;
 
 public abstract class Personne implements Serializable {
     private String nom;
@@ -37,12 +37,12 @@ public abstract class Personne implements Serializable {
     /**
      * Message d'accueil personnalisé
      */
-    public abstract String getAccueil(Console cons);
+    public abstract String getAccueil(InterfaceVue vue);
 
     /**
      * Renvoie le menu personnalisé du type d'utilisateur
      */
-    public String[] getMenu(Console cons) {
+    public String[] getMenu(InterfaceVue vue) {
         ArrayList<Action> actions = getActions();
         // On recupère les noms des actions possibles
         String [] nomActions = new String[actions.size()];
@@ -71,8 +71,8 @@ public abstract class Personne implements Serializable {
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
      */
-    public void executerAction(Action action, Console cons, Catalogue catalogue) {
-        action.executer(cons, this, catalogue);
+    public void executerAction(Action action, InterfaceVue vue, Catalogue catalogue) {
+        action.executer(vue, this, catalogue);
     }
 
     /**

@@ -2,13 +2,13 @@ package controleur.actions;
 
 import metier.Personne;
 import metier.Catalogue;
-import vue.Console;
+import vue.InterfaceVue;
 import static controleur.Main.sauvegarder;
 
 public class Quitter implements Action {
     @Override
-    public void executer(Console cons, Personne utilisateur, Catalogue catalogue) {
-        System.out.println("A bientôt sur Javazic !");
+    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
+        vue.afficherMessage("A bientôt sur Javazic !");
         sauvegarder(catalogue.getMorceaux(), "morceaux.ser");
         sauvegarder(catalogue.getPlaylists(), "playlists.ser");
         sauvegarder(catalogue.getArtistes(), "artistes.ser");

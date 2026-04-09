@@ -2,12 +2,12 @@ package controleur.actions;
 
 import metier.Catalogue;
 import metier.Personne;
-import vue.Console;
+import vue.InterfaceVue;
 
 public class Deconnexion implements Action {
     @Override
-    public void executer(Console cons, Personne utilisateur, Catalogue catalogue) {
-        System.out.println("Déconnexion...");
+    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
+        vue.afficherMessage("Déconnexion...");
     }
 
     @Override

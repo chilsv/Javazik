@@ -3,7 +3,7 @@ package metier;
 import java.util.ArrayList;
 
 import controleur.actions.*;
-import vue.Console;
+import vue.InterfaceVue;
 
 public class Admin extends Personne {
     private int num;
@@ -17,11 +17,12 @@ public class Admin extends Personne {
         actions.add(new Recherche());
         actions.add(new AjouterMorceau());
         actions.add(new AjouterArtiste());
+        actions.add(new ConsulterProfil());
         actions.add(new Deconnexion());
         actions.add(new Quitter());
     }
 
-    public String getAccueil(Console cons) {
+    public String getAccueil(InterfaceVue vue) {
         return "Bienvenue sur la page de gestion, " + getNom() + " !";
     }
 

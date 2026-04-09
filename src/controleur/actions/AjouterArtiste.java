@@ -3,16 +3,16 @@ package controleur.actions;
 import controleur.Main;
 import metier.Artiste;
 import metier.Catalogue;
-import metier.Morceau;
 import metier.Personne;
-import vue.Console;
+import vue.InterfaceVue;
+import vue.ArtisteForm;
 
 public class AjouterArtiste implements Action {
     @Override
-    public void executer(Console cons, Personne utilisateur, Catalogue catalogue) {
-        Artiste artiste = cons.ajouterArtiste();
+    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
+        ArtisteForm formulaire = vue.demanderArtiste();
+        Artiste artiste = new metier.Solo(formulaire.nom);
         catalogue.ajouterArtiste(artiste);
-        Main.sauvegarder(catalogue.getArtistes(), "artistes.ser");
         Main.sauvegarder(catalogue.getArtistes(), "artistes.ser");
         Main.sauvegarder(catalogue.getAlbums(), "albums.ser");
     }

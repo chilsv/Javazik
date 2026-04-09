@@ -3,73 +3,97 @@ package vue;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import controleur.actions.Quitter;
-import metier.*;
+import controleur.actions.Action;
+import metier.Abonne;
+import metier.Admin;
+import metier.Album;
+import metier.Artiste;
+import metier.Filtre;
+import metier.Morceau;
+import metier.Playlist;
+import metier.ResultatRecherche;
+import metier.Solo;
 
-public class Console {
+public class Console implements InterfaceVue {
     public Console() {
         System.out.println("-".repeat(40));
         System.out.println("Bienvenue dans Javazic !");
     }
 
-    public int menu() {
-        int choix;
+    private String lireTexte(String invite) {
+        Scanner saisie = new Scanner(System.in);
+        System.out.print(invite);
+        return saisie.nextLine();
+    }
+
+    @Override
+    public int menuPrincipal() {
+        Scanner saisie = new Scanner(System.in);
         System.out.println("-".repeat(40));
         System.out.println("\t1- Visiter l'application");
         System.out.println("\t2- Se connecter");
         System.out.println("\t3- S'inscrire");
         System.out.println("\t4- Quitter");
         System.out.print("--> ");
-        Scanner saisie = new Scanner(System.in);
-        choix = saisie.nextInt();
+        int choix = saisie.nextInt();
         saisie.nextLine();
         return choix;
     }
 
-    public void inscription() {
-        System.out.println("-".repeat(40));
-        System.out.println("Informations nécessaires :");
-        System.out.print("Type (Abonné --> 1 ou Admin --> 2) : ");
-    }
-
-    public void connexion() {
-        System.out.println("-".repeat(40));
-        System.out.println("-- Identifiants de connexion --");
-    }
-
-    public void nom() {
-        System.out.print("Nom : ");
-    }
-
-    public void mdp() {
-        System.out.print("Mot de passe : ");
-    }
-    
-    public void mail() {
-        System.out.print("Adresse e-mail : ");
-    }
-
-    public void visiter(String accueil, String[] actions) {
+    @Override
+    public Action choisirAction(String accueil, ArrayList<Action> actions) {
+        Scanner saisie = new Scanner(System.in);
         System.out.println("-".repeat(40));
         System.out.println(accueil);
-        for (int i = 0; i < actions.length; i++) {
-            System.out.println((i + 1) + "- " + actions[i]);
+        for (int i = 0; i < actions.size(); i++) {
+            System.out.println((i + 1) + "- " + actions.get(i).getNom());
         }
         System.out.print("--> ");
+        String entree = saisie.nextLine();
+        try {
+            int choix = Integer.parseInt(entree);
+            if (choix < 1 || choix > actions.size()) {
+                return null;
+            }
+            return actions.get(choix - 1);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
-    public Filtre recherche(boolean filtrage) {
-        String recherche;
-        String choix = "";
-        boolean morceau = false;
-        boolean artiste = false;
-        boolean album = false;
-        boolean playlist = false;
-        boolean croissant = false;
-        int annee = 0;
-        Scanner saisie = new Scanner(System.in);
+    @Override
+    public void afficherMessage(String message) {
+        System.out.println(message);
+    }
 
-        // Filtrage pour les abonnés
+    @Override
+    public void afficherErreur(String message) {
+        System.out.println();
+        System.out.println(message);
+        System.out.println();
+    }
+
+    @Override
+    public ConnexionForm demanderConnexion() {
+        System.out.println("-".repeat(40));
+        System.out.println("-- Identifiants de connexion --");
+        return new ConnexionForm(lireTexte("Adresse e-mail : "), lireTexte("Mot de passe : "));
+    }
+
+    @Override
+    public InscriptionForm demanderInscription() {
+        System.out.println("-".repeat(40));
+        System.out.println("Informations nécessaires :");
+        return new InscriptionForm(
+                lireTexte("Type (Abonné --> 1 ou Admin --> 2) : "),
+                lireTexte("Nom : "),
+                lireTexte("Adresse e-mail : "),
+                lireTexte("Mot de passe : "));
+    }
+
+    @Override
+    public RechercheForm demanderRecherche(boolean filtrage) {
+        String choix = "";
         if (filtrage) {
             System.out.println("-".repeat(40));
             System.out.println("-------- exemple de filtre :     2AB       --------");
@@ -82,29 +106,33 @@ public class Console {
             System.out.println("B- Trier par ordre croissant");
             System.out.println("C- Trier par genre");
             System.out.println("D- Trier par zone géographique");
-            System.out.print("--> ");
-            choix = saisie.nextLine();
+            choix = lireTexte("--> ");
         }
 
-        System.out.println("-".repeat(40));
-        System.out.print("Recherche de : ");
-        recherche = saisie.nextLine();
+        String recherche = lireTexte("Recherche de : ");
+        boolean morceau = false;
+        boolean artiste = false;
+        boolean album = false;
+        boolean playlist = false;
+        boolean croissant = false;
+        int annee = 0;
 
-        // On parcourt la chaine pour déterminer les filtres choisis
         for (char c : choix.toUpperCase().toCharArray()) {
             if (c == '1') morceau = true;
             else if (c == '2') artiste = true;
             else if (c == '3') album = true;
             else if (c == '4') playlist = true;
             else if (c == 'A') {
-                System.out.print("Année : ");
-                annee = saisie.nextInt();
-                saisie.nextLine();
+                try {
+                    annee = Integer.parseInt(lireTexte("Année : "));
+                } catch (NumberFormatException e) {
+                    annee = 0;
+                }
+            } else if (c == 'B') {
+                croissant = true;
             }
-            else if (c == 'B') croissant = true;
         }
 
-        // Sans filtre explicie on recherche partout
         if (!morceau && !artiste && !album && !playlist) {
             morceau = true;
             artiste = true;
@@ -112,10 +140,10 @@ public class Console {
             playlist = true;
         }
 
-        Filtre filtre = new Filtre(recherche, morceau, artiste, album, playlist, croissant, annee);
-        return filtre;
+        return new RechercheForm(recherche, morceau, artiste, album, playlist, croissant, annee);
     }
 
+    @Override
     public void afficherRecherche(ResultatRecherche resultat) {
         System.out.println("-".repeat(40));
         System.out.println("Résultats de la recherche :");
@@ -141,45 +169,73 @@ public class Console {
         }
     }
 
-    public Morceau ajouterMorceau() {
-        Scanner saisie = new Scanner(System.in);
+    @Override
+    public MorceauForm demanderMorceau() {
         System.out.println("-".repeat(40));
-        System.out.print("Titre du morceau : ");
-        String titre = saisie.nextLine();
-        System.out.print("Nom de l'artiste : ");
-        String artiste = saisie.nextLine();
-        System.out.print("Nom de l'album (vide si aucun) : ");
-        String album = saisie.nextLine();
-        System.out.print("Durée (vide si aucune) : ");
-        String duree = saisie.nextLine();
-        Morceau morceau = new Morceau(titre, new Solo(artiste), duree.isEmpty() ? 0 : Integer.parseInt(duree));
-        if (!album.isEmpty()) {
-            morceau.setAlbum(album);
+        String titre = lireTexte("Titre du morceau : ");
+        String artiste = lireTexte("Nom de l'artiste : ");
+        String album = lireTexte("Nom de l'album (vide si aucun) : ");
+        String dureeTexte = lireTexte("Durée (vide si aucune) : ");
+        int duree;
+        try {
+            duree = dureeTexte == null || dureeTexte.isBlank() ? 180 : Integer.parseInt(dureeTexte);
+        } catch (NumberFormatException e) {
+            duree = 180;
         }
-        return morceau;
+        return new MorceauForm(titre, artiste, album, duree);
     }
 
-    public Artiste ajouterArtiste() {
-        Scanner saisie = new Scanner(System.in);
+    @Override
+    public ArtisteForm demanderArtiste() {
         System.out.println("-".repeat(40));
-        System.out.print("Nom de l'artiste : ");
-        String nom = saisie.nextLine();
-        Solo artiste = new Solo(nom);
-        return artiste;
-    }
-    
-    public void quitter(Catalogue catalogue) {
-        Quitter quitter = new Quitter();
-        quitter.executer(this, null, catalogue);
+        return new ArtisteForm(lireTexte("Nom de l'artiste : "));
     }
 
-    public void choixInvalide() {
-        System.out.println("Choix invalide, veuillez réessayer.");
+    @Override
+    public String choisirMorceau() {
+        return lireTexte("Morceau à jouer : ");
     }
 
-    public void afficherErreur(String message) {
-        System.out.println();
-        System.out.println(message);
-        System.out.println();
+    @Override
+    public void afficherLecture(Morceau morceau) {
+        final int largeurBarre = 30;
+        System.out.println("Lecture : " + morceau.getNom());
+
+        for (int seconde = 0; seconde <= morceau.getDuree(); seconde++) {
+            int remplissage = (int) Math.round((seconde / (double) morceau.getDuree()) * largeurBarre);
+            String barre = "#".repeat(remplissage) + "-".repeat(largeurBarre - remplissage);
+            System.out.print("\r[" + barre + "] " + seconde + "s / " + morceau.getDuree() + "s");
+            System.out.flush();
+
+            if (seconde < morceau.getDuree()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.out.println("\nLecture interrompue.");
+                    return;
+                }
+            }
+        }
+
+        System.out.println("\nLecture terminée.");
     }
+
+    public void afficherProfilAbonne(Abonne abonne) {
+        System.out.println("-".repeat(40));
+        System.out.println("Profil de "+ abonne.getNom() + " :");
+        System.out.println("Compte créé le " + abonne.getDateCreation());
+        System.out.println("E-mail : " + abonne.getMail());
+        System.out.println("Playlists créées :");
+        for (Playlist playlist : abonne.getPlaylists()) {
+            System.out.println("- " + playlist.getNom());
+        }
+    }
+
+    public void afficherProfilAdmin(Admin admin) {
+        System.out.println("-".repeat(40));
+        System.out.println("Profil de l'administrateur " + admin.getNom()  + " :");
+        System.out.println("Compte créé le " + admin.getDateCreation());
+    }
+
 }

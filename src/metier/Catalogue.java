@@ -75,8 +75,11 @@ public class Catalogue {
 
     public ResultatRecherche chercher(Filtre filtre) {
         ResultatRecherche resultat = new ResultatRecherche();
+        // on fait une recherche par rapport aux filtres choisis et on retourne le résultat
         String recherche = filtre.recherche == null ? "" : filtre.recherche.toLowerCase();
 
+        //flemme d'expliquer mais c'est un copier-coller
+        // pour chaque type (morceau, artiste...), on vérifie si c'est le filtre appliqué
         if (filtre.morceau) {
             for (Morceau morceau : morceaux) {
                 if (morceau.getNom().toLowerCase().contains(recherche)) {

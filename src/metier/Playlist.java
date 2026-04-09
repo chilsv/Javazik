@@ -1,19 +1,23 @@
 package metier;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Playlist implements TypeObjets {
     private int num;
     private String nom;
     private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
+    private LocalDate dateCreation;
 
     public Playlist(String nom) {
         this.nom = nom;
+        this.dateCreation = LocalDate.now();
     }
 
     public Playlist(String nom, ArrayList<Morceau> morceaux) {
         this.nom = nom;
         this.morceaux = morceaux;
+        this.dateCreation = LocalDate.now();
     }
 
     public void ajouterMorceau(Morceau morceau) {

@@ -1,7 +1,7 @@
 package vue;
 import javax.swing.*;
 
-public class FenetreMenu {
+public class Fenetre implements InterfaceVue {
 
     //defintion des elements qui vont composer notre fenetre
     private final JFrame frame;
@@ -11,7 +11,7 @@ public class FenetreMenu {
     private final JLabel logoLabel;
     private final JLabel bandeauLabel;
 
-    public FenetreMenu() {
+    public Fenetre() {
         frame = new JFrame(); //Creation
         frame.setSize(1392, 768); //Taille de notre fenetre
         frame.setLocationRelativeTo(null); //mettre au milieu

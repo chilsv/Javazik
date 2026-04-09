@@ -1,33 +1,33 @@
 package controleur.actions;
 
-import java.util.ArrayList;
-import java.util.Scanner;
-
 import metier.*;
-import vue.Console;
+import vue.InterfaceVue;
+import vue.RechercheForm;
 
 public class Recherche implements Action {
     @Override
-    public void executer(Console cons, Personne utilisateur, Catalogue catalogue) {
+    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         // Pour chaque dype d'utilisateur, on a des possibilités de recherche différentes
+        RechercheForm formulaire = vue.demanderRecherche(utilisateur instanceof Abonne);
+        Filtre filtre = new Filtre(
+                formulaire.recherche,
+                formulaire.morceau,
+                formulaire.artiste,
+                formulaire.album,
+                formulaire.playlist,
+                formulaire.croissant,
+                formulaire.annee);
+
         if (utilisateur instanceof Visiteur) {
-            // On définit le filtre
-            Filtre filtre = cons.recherche(false);
-            // On fait la recherche avec le filtre
             ResultatRecherche resultat = catalogue.chercher(filtre);
-            // On affiche le résultat de la recherche
-            cons.afficherRecherche(resultat);
+            vue.afficherRecherche(resultat);
 
         } else if (utilisateur instanceof Abonne) {
-            // On définit le filtre
-            Filtre filtre = cons.recherche(true);
-            // On fait la recherche avec le filtre
             ResultatRecherche resultat = catalogue.chercher(filtre);
-            // On affiche le résultat de la recherche
-            cons.afficherRecherche(resultat);
+            vue.afficherRecherche(resultat);
             
         } else if (utilisateur instanceof Admin) {
-            System.out.println("Recherche en cours...");
+            // à implémeneter : peut chercher des abonnés et tout
         }
     }
     
