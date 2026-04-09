@@ -11,13 +11,18 @@ public class Console {
         System.out.println("Bienvenue dans Javazic !");
     }
 
-    public void menu() {
+    public int menu() {
+        int choix;
         System.out.println("-".repeat(40));
         System.out.println("\t1- Visiter l'application");
         System.out.println("\t2- Se connecter");
         System.out.println("\t3- S'inscrire");
         System.out.println("\t4- Quitter");
         System.out.print("--> ");
+        Scanner saisie = new Scanner(System.in);
+        choix = saisie.nextInt();
+        saisie.nextLine();
+        return choix;
     }
 
     public void inscription() {
@@ -52,8 +57,9 @@ public class Console {
         System.out.print("--> ");
     }
 
-    public Filtre recherche() {
+    public Filtre recherche(boolean filtrage) {
         String recherche;
+        String choix = "";
         boolean morceau = false;
         boolean artiste = false;
         boolean album = false;
@@ -62,17 +68,22 @@ public class Console {
         int annee = 0;
         Scanner saisie = new Scanner(System.in);
 
-        System.out.println("-".repeat(40));
-        System.out.println("-------- exemple de filtre :     2AB       --------");
-        System.out.println("Filtres disponibles (choisir UN chiffre) :");
-        System.out.println("1- Morceaux");
-        System.out.println("2- Artistes");
-        System.out.println("3- Albums");
-        System.out.println("4- Playlists");
-        System.out.println("A- Une année");
-        System.out.println("B- Trier par ordre croissant");
-        System.out.print("--> ");
-        String choix = saisie.nextLine();
+        // Filtrage pour les abonnés
+        if (filtrage) {
+            System.out.println("-".repeat(40));
+            System.out.println("-------- exemple de filtre :     2AB       --------");
+            System.out.println("Filtres disponibles (choisir UN chiffre) :");
+            System.out.println("1- Morceaux");
+            System.out.println("2- Artistes");
+            System.out.println("3- Albums");
+            System.out.println("4- Playlists");
+            System.out.println("A- Une année");
+            System.out.println("B- Trier par ordre croissant");
+            System.out.println("C- Trier par genre");
+            System.out.println("D- Trier par zone géographique");
+            System.out.print("--> ");
+            choix = saisie.nextLine();
+        }
 
         System.out.println("-".repeat(40));
         System.out.print("Recherche de : ");
@@ -87,9 +98,9 @@ public class Console {
             else if (c == 'A') {
                 System.out.print("Année : ");
                 annee = saisie.nextInt();
-                saisie.nextLine(); // Consomme le retour à la ligne
+                saisie.nextLine();
             }
-            else if (c == 'B') croissant = true;  // B = croissant
+            else if (c == 'B') croissant = true;
         }
 
         Filtre filtre = new Filtre(recherche, morceau, artiste, album, playlist, croissant, annee);

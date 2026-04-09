@@ -24,11 +24,7 @@ public class ConsoleMain extends Main {
      */
     public static void menu(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {
         Console cons = new Console();
-        cons.menu();
-        int choix;
-        Scanner saisie = new Scanner(System.in);
-        choix = saisie.nextInt();
-        saisie.nextLine();
+        int choix = cons.menu();
         switch (choix) {
             case 1:
                 Visiteur visiteur = new Visiteur();

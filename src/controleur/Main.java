@@ -43,6 +43,7 @@ public class Main {
             fenetre.afficher();
         }
     }
+    
     public static <T> void charger(ArrayList<T> arrayList, String nomFichier) {
         File fichier = new File("donnees/" + nomFichier);
 
