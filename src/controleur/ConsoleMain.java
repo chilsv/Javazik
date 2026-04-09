@@ -10,18 +10,12 @@ import vue.Console;
 public class ConsoleMain extends Main {
     private static ArrayList<Abonne> abonnes = new ArrayList<Abonne>();
     private static ArrayList<Admin> admins = new ArrayList<Admin>();
-    private static ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
-    private static ArrayList<Playlist> playlists = new ArrayList<Playlist>();
-    private static ArrayList<Artiste> artistes = new ArrayList<Artiste>();
-    private static ArrayList<Album> albums = new ArrayList<Album>();
+    private static Catalogue catalogue;
 
-    public ConsoleMain(ArrayList<Abonne> abonnes, ArrayList<Admin> admins, ArrayList<Morceau> morceaux, ArrayList<Playlist> playlists, ArrayList<Artiste> artistes, ArrayList<Album> albums) {
+    public ConsoleMain(ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue) {
         ConsoleMain.abonnes = abonnes;
         ConsoleMain.admins = admins;
-        ConsoleMain.morceaux = morceaux;
-        ConsoleMain.playlists = playlists;
-        ConsoleMain.artistes = artistes;
-        ConsoleMain.albums = albums;
+        ConsoleMain.catalogue = catalogue;
         menu(abonnes, admins);
     }
 
@@ -190,7 +184,7 @@ public class ConsoleMain extends Main {
         }
 
         Action actionChoisie = utilisateur.getActions().get(choix - 1);
-        utilisateur.executerAction(actionChoisie, cons, morceaux, artistes);
+        utilisateur.executerAction(actionChoisie, cons, catalogue);
         visiter(utilisateur, cons);
     }
 }

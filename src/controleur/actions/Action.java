@@ -1,7 +1,6 @@
 package controleur.actions;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import metier.*;
 import vue.Console;
@@ -12,7 +11,7 @@ public interface Action extends Serializable {
      */
     public void executer(Console cons, Personne utilisateur);
 
-    public void executer(Console cons, Personne utilisateur, ArrayList<Morceau> morceaux, ArrayList<Artiste> artistes);
+    public void executer(Console cons, Personne utilisateur, Catalogue catalogue);
 
     public String getNom();
 }

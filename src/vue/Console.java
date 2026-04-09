@@ -1,5 +1,10 @@
 package vue;
 
+import java.util.ArrayList;
+
+import metier.Artiste;
+import metier.Morceau;
+
 public class Console {
     public Console() {
         System.out.println("-".repeat(40));
@@ -45,6 +50,22 @@ public class Console {
             System.out.println((i + 1) + "- " + actions[i]);
         }
         System.out.print("--> ");
+    }
+
+    public void rechercheMorceaux(ArrayList<Morceau> trouvesMorceaux) {
+        System.out.println("-".repeat(40));
+        System.out.println("Morceaux :");
+        for (Morceau morceau : trouvesMorceaux) {
+            System.out.println("- " + morceau.getNom());
+        }
+    }
+
+    public void rechercheArtistes(ArrayList<Artiste> trouvesArtistes) {
+        System.out.println("-".repeat(40));
+        System.out.println("Artistes :");
+        for (Artiste artiste : trouvesArtistes) {
+            System.out.println("- " + artiste.getNom());
+        }
     }
 
     public void quitter() {

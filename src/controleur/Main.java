@@ -18,7 +18,6 @@ public class Main {
     private static ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private static ArrayList<Artiste> artistes = new ArrayList<Artiste>();
     private static ArrayList<Album> albums = new ArrayList<Album>();
-    
 
     // Après la connexion d'un utilisateur, on définit une variable de type Personne qui contiendra soit un Abonné, soit un Admin, soit un Visiteur
     // Ca permet ensuite de vérifier les droits de l'utilisateur connecté
@@ -32,11 +31,12 @@ public class Main {
         charger(playlists, "playlists.ser");
         charger(artistes, "artistes.ser");
         charger(albums, "albums.ser");
+        Catalogue catalogue = new Catalogue(morceaux, playlists, artistes, albums);
 
         int mode = 1;
 
         if (mode == 1) {
-            ConsoleMain consoleMain = new ConsoleMain(abonnes, admins, morceaux, playlists, artistes, albums);
+            ConsoleMain consoleMain = new ConsoleMain(abonnes, admins, catalogue);
         } else {
             FenetreMenu fenetre = new FenetreMenu();
             Evenements.ajouterEvenements(fenetre);

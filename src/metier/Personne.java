@@ -75,8 +75,8 @@ public abstract class Personne implements Serializable {
         action.executer(cons, this);
     }
 
-    public void executerAction(Action action, Console cons, ArrayList<Morceau> morceaux, ArrayList<Artiste> artistes) {
-        action.executer(cons, this, morceaux, artistes);
+    public void executerAction(Action action, Console cons, Catalogue catalogue) {
+        action.executer(cons, this, catalogue);
     }
 
     /**

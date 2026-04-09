@@ -1,10 +1,7 @@
 package controleur.actions;
 
-import java.util.ArrayList;
-
 import metier.Personne;
-import metier.Morceau;
-import metier.Artiste;
+import metier.Catalogue;
 import vue.Console;
 
 public class Quitter implements Action {
@@ -14,7 +11,7 @@ public class Quitter implements Action {
     }
 
     @Override
-    public void executer(Console cons, Personne utilisateur, ArrayList<Morceau> morceaux, ArrayList<Artiste> artistes) {
+    public void executer(Console cons, Personne utilisateur, Catalogue catalogue) {
         System.exit(0);
     }
 
