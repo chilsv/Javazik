@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import metier.*;
+import vue.FenetreMenu;
 
 public class Main {
     private static ArrayList<Abonne> abonnes = new ArrayList<Abonne>();
@@ -32,10 +33,15 @@ public class Main {
         charger(artistes, "artistes.ser");
         charger(albums, "albums.ser");
 
-        ConsoleMain consoleMain = new ConsoleMain(abonnes, admins, morceaux, playlists, artistes, albums);
-        //FenetreMenu fenetre = new FenetreMenu();
-        //Evenements.ajouterEvenements(fenetre);
-        //fenetre.afficher();
+        int mode = 1;
+
+        if (mode == 1) {
+            ConsoleMain consoleMain = new ConsoleMain(abonnes, admins, morceaux, playlists, artistes, albums);
+        } else {
+            FenetreMenu fenetre = new FenetreMenu();
+            Evenements.ajouterEvenements(fenetre);
+            fenetre.afficher();
+        }
     }
     public static <T> void charger(ArrayList<T> arrayList, String nomFichier) {
         File fichier = new File("donnees/" + nomFichier);
