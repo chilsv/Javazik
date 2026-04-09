@@ -2,7 +2,7 @@ package metier;
 
 import java.util.ArrayList;
 
-public class Playlist {
+public class Playlist implements TypeObjets {
     private int num;
     private String nom;
     private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
@@ -18,5 +18,14 @@ public class Playlist {
 
     public void ajouterMorceau(Morceau morceau) {
         morceaux.add(morceau);
+    }
+
+    public int getAnnee() {
+        // On ne peut dire qu'une playlist a une année, du coup on renvoie celle du morceau n°1
+        return morceaux.get(0).getAnnee();
+    }
+
+    public String getNom() {
+        return nom;
     }
 }

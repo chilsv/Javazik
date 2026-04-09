@@ -1,9 +1,9 @@
 package vue;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
-import metier.Artiste;
-import metier.Morceau;
+import metier.*;
 
 public class Console {
     public Console() {
@@ -52,19 +52,72 @@ public class Console {
         System.out.print("--> ");
     }
 
-    public void rechercheMorceaux(ArrayList<Morceau> trouvesMorceaux) {
+    public Filtre recherche() {
+        String recherche;
+        boolean morceau = false;
+        boolean artiste = false;
+        boolean album = false;
+        boolean playlist = false;
+        boolean croissant = false;
+        int annee = 0;
+        Scanner saisie = new Scanner(System.in);
+
         System.out.println("-".repeat(40));
-        System.out.println("Morceaux :");
-        for (Morceau morceau : trouvesMorceaux) {
-            System.out.println("- " + morceau.getNom());
+        System.out.println("-------- exemple de filtre :     2AB       --------");
+        System.out.println("Filtres disponibles (choisir UN chiffre) :");
+        System.out.println("1- Morceaux");
+        System.out.println("2- Artistes");
+        System.out.println("3- Albums");
+        System.out.println("4- Playlists");
+        System.out.println("A- Une année");
+        System.out.println("B- Trier par ordre croissant");
+        System.out.print("--> ");
+        String choix = saisie.nextLine();
+
+        System.out.println("-".repeat(40));
+        System.out.print("Recherche de : ");
+        recherche = saisie.nextLine();
+
+        // On parcourt la chaine pour déterminer les filtres choisis
+        for (char c : choix.toUpperCase().toCharArray()) {
+            if (c == '1') morceau = true;
+            else if (c == '2') artiste = true;
+            else if (c == '3') album = true;
+            else if (c == '4') playlist = true;
+            else if (c == 'A') {
+                System.out.print("Année : ");
+                annee = saisie.nextInt();
+                saisie.nextLine(); // Consomme le retour à la ligne
+            }
+            else if (c == 'B') croissant = true;  // B = croissant
         }
+
+        Filtre filtre = new Filtre(recherche, morceau, artiste, album, playlist, croissant, annee);
+        return filtre;
     }
 
-    public void rechercheArtistes(ArrayList<Artiste> trouvesArtistes) {
+    public void afficherRecherche(ResultatRecherche resultat) {
+        System.out.println("-".repeat(40));
+        System.out.println("Résultats de la recherche :");
+        System.out.println("-".repeat(40));
+        System.out.println("Morceaux :");
+        for (Morceau morceau : resultat.morceaux) {
+            System.out.println("- " + morceau.getNom());
+        }
         System.out.println("-".repeat(40));
         System.out.println("Artistes :");
-        for (Artiste artiste : trouvesArtistes) {
+        for (Artiste artiste : resultat.artistes) {
             System.out.println("- " + artiste.getNom());
+        }
+        System.out.println("-".repeat(40));
+        System.out.println("Albums :");
+        for (Album album : resultat.albums) {
+            System.out.println("- " + album.getNom());
+        }
+        System.out.println("-".repeat(40));
+        System.out.println("Playlists :");
+        for (Playlist playlist : resultat.playlists) {
+            System.out.println("- " + playlist.getNom());
         }
     }
 

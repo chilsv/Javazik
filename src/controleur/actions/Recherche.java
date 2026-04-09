@@ -13,21 +13,12 @@ public class Recherche implements Action {
     @Override
     public void executer(Console cons, Personne utilisateur, Catalogue catalogue) {
         if (utilisateur instanceof Visiteur) {
-            System.out.print("Recherche de : ");
-            Scanner saisie = new Scanner(System.in);
-            String recherche = saisie.nextLine();
-
-            ArrayList<Morceau> trouvesMorceaux = new ArrayList<Morceau>();
-            ArrayList<Artiste> trouvesArtistes = new ArrayList<Artiste>();
-            
-            catalogue.chercherMorceaux(recherche, trouvesMorceaux);
-            cons.rechercheMorceaux(trouvesMorceaux);
-
-            catalogue.chercherArtistes(recherche, trouvesArtistes);
-            cons.rechercheArtistes(trouvesArtistes);
+            Filtre filtre = cons.recherche();
+            ResultatRecherche resultat = catalogue.chercher(filtre);
+            cons.afficherRecherche(resultat);
 
         } else if (utilisateur instanceof Abonne) {
-            System.out.println("Recherche en cours...");
+            
         } else if (utilisateur instanceof Admin) {
             System.out.println("Recherche en cours...");
         }

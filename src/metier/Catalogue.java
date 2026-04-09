@@ -15,32 +15,26 @@ public class Catalogue {
         this.albums = albums;
     }
 
-    public ArrayList<Morceau> chercherMorceaux(String recherche, ArrayList<Morceau> trouvesMorceaux) {
-        for (Morceau morceau : this.morceaux) {
-            if (morceau.getNom().toLowerCase().contains(recherche.toLowerCase())) {
-                trouvesMorceaux.add(morceau);
-            }
-        }
-        return trouvesMorceaux;
-    }
-
-    public ArrayList<Morceau> chercherMorceauxFiltre(String recherche, ArrayList<Morceau> trouvesMorceaux) {
-        // Mettre une condition et implémenter les conditions en paramètre
-        return trouvesMorceaux;
-    }
-
-    public ArrayList<Artiste> chercherArtistes(String recherche, ArrayList<Artiste> trouvesArtistes) {
-        for (Artiste artiste : this.artistes) {
-                if (artiste.getNom().toLowerCase().contains(recherche.toLowerCase())) {
-                    trouvesArtistes.add(artiste);
+    public ResultatRecherche chercher(Filtre filtre) {
+        ResultatRecherche resultat = new ResultatRecherche();
+        // Si on cherche un morceau
+            if (filtre.morceau) {
+                for (Morceau morceau : morceaux) {
+                    if (morceau.getNom().toLowerCase().contains(filtre.recherche.toLowerCase())) {
+                        resultat.morceaux.add(morceau);
+                    }
                 }
+                resultat.morceaux = filtre.trier(resultat.morceaux);
+            // Si on cherche un artiste
+            } else if (filtre.artiste) {
+                
+            // Si on cherche un album
+            } else if (filtre.album) {
+            
+            // Si on cherche une playlist
+            } else if (filtre.playlist) {
+                
             }
-        return trouvesArtistes;
+        return resultat;
     }
-
-    public ArrayList<Artiste> chercherArtistesFiltre(String recherche, ArrayList<Artiste> trouvesArtistes) {
-        // Mettre une condition et implémenter les conditions en paramètre
-        return trouvesArtistes;
-    }
-
 }

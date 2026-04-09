@@ -1,18 +1,19 @@
 package metier;
 
-public class Morceau {
+public class Morceau implements TypeObjets {
     private int num;
-    private String nom;
+    private String Titre;
     private float duree;
     private Artiste artiste;
+    private int annee;
 
-    public Morceau(String nom, Artiste artiste) {
-        this.nom = nom;
+    public Morceau(String titre, Artiste artiste) {
+        this.Titre = titre;
         this.artiste = artiste;
     }
 
-    public Morceau(String nom, Artiste artiste, float duree) {
-        this.nom = nom;
+    public Morceau(String titre, Artiste artiste, float duree) {
+        this.Titre = titre;
         this.artiste = artiste;
         this.duree = duree;
     }
@@ -26,6 +27,10 @@ public class Morceau {
     }
 
     public String getNom() {
-        return nom;
+        return Titre;
+    }
+
+    public int getAnnee() {
+        return annee;
     }
 }

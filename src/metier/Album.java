@@ -2,9 +2,9 @@ package metier;
 
 import java.util.ArrayList;
 
-public class Album {
+public class Album implements TypeObjets {
     private int num;
-    private String nom;
+    private String Titre;
     private Artiste artiste;
     private int annee;
     private ArrayList<Morceau> morceaux;
@@ -13,4 +13,11 @@ public class Album {
         return morceaux;
     }
 
+    public int getAnnee() {
+        return annee;
+    }
+
+    public String getNom() {
+        return Titre;
+    }
 }
