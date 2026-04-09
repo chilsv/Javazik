@@ -15,6 +15,7 @@ public class Abonne extends Personne {
         this.num = num;
         // Actions qu'un abonné peut faire
         actions.add(new Recherche());
+        actions.add(new Deconnexion());
         actions.add(new Quitter());
     }
 

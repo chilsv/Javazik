@@ -3,6 +3,7 @@ package vue;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import controleur.actions.Quitter;
 import metier.*;
 
 public class Console {
@@ -103,6 +104,14 @@ public class Console {
             else if (c == 'B') croissant = true;
         }
 
+        // Sans filtre explicie on recherche partout
+        if (!morceau && !artiste && !album && !playlist) {
+            morceau = true;
+            artiste = true;
+            album = true;
+            playlist = true;
+        }
+
         Filtre filtre = new Filtre(recherche, morceau, artiste, album, playlist, croissant, annee);
         return filtre;
     }
@@ -132,9 +141,36 @@ public class Console {
         }
     }
 
-    public void quitter() {
-        System.out.println("A bientôt sur Javazic !");
-        System.exit(0);
+    public Morceau ajouterMorceau() {
+        Scanner saisie = new Scanner(System.in);
+        System.out.println("-".repeat(40));
+        System.out.print("Titre du morceau : ");
+        String titre = saisie.nextLine();
+        System.out.print("Nom de l'artiste : ");
+        String artiste = saisie.nextLine();
+        System.out.print("Nom de l'album (vide si aucun) : ");
+        String album = saisie.nextLine();
+        System.out.print("Durée (vide si aucune) : ");
+        String duree = saisie.nextLine();
+        Morceau morceau = new Morceau(titre, new Solo(artiste), duree.isEmpty() ? 0 : Integer.parseInt(duree));
+        if (!album.isEmpty()) {
+            morceau.setAlbum(album);
+        }
+        return morceau;
+    }
+
+    public Artiste ajouterArtiste() {
+        Scanner saisie = new Scanner(System.in);
+        System.out.println("-".repeat(40));
+        System.out.print("Nom de l'artiste : ");
+        String nom = saisie.nextLine();
+        Solo artiste = new Solo(nom);
+        return artiste;
+    }
+    
+    public void quitter(Catalogue catalogue) {
+        Quitter quitter = new Quitter();
+        quitter.executer(this, null, catalogue);
     }
 
     public void choixInvalide() {

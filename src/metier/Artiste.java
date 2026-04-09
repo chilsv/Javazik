@@ -5,10 +5,10 @@ import java.util.ArrayList;
 public abstract class Artiste implements TypeObjets {
     private int num;
     private String nom;
-    private ArrayList<Morceau> morceaux;
-    private ArrayList<Album> albums;
-    private ArrayList<String> genres;
-    private ArrayList<String> zone_geo;
+    private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
+    private ArrayList<Album> albums = new ArrayList<Album>();
+    private ArrayList<String> genres = new ArrayList<String>();
+    private ArrayList<String> zone_geo = new ArrayList<String>();
 
     public Artiste(String nom) {
         this.nom = nom;
@@ -60,5 +60,9 @@ public abstract class Artiste implements TypeObjets {
 
     public ArrayList<String> getGenres() {
         return genres;
+    }
+
+    public ArrayList<Album> getAlbums() {
+        return albums;
     }
 }

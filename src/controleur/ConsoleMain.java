@@ -16,13 +16,13 @@ public class ConsoleMain extends Main {
         ConsoleMain.abonnes = abonnes;
         ConsoleMain.admins = admins;
         ConsoleMain.catalogue = catalogue;
-        menu(abonnes, admins);
+        menu(abonnes, admins, catalogue);
     }
 
     /**
      * Affiche le menu principal et gère les choix de l'utilisateur
      */
-    public static void menu(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {
+    public static void menu(ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue) {
         Console cons = new Console();
         int choix = cons.menu();
         switch (choix) {
@@ -35,10 +35,10 @@ public class ConsoleMain extends Main {
                     connexion(cons, abonnes, admins);
                 } catch (UtilisateurIntrouvableException e) {
                     cons.afficherErreur(e.getMessage());
-                    menu(abonnes, admins);
+                    menu(abonnes, admins, catalogue);
                 } catch (MdpIncorrectException e) {
                     cons.afficherErreur(e.getMessage());
-                    menu(abonnes, admins);
+                    menu(abonnes, admins, catalogue);
                 }
                 break;
             case 3:
@@ -46,15 +46,21 @@ public class ConsoleMain extends Main {
                     inscription(cons, abonnes, admins);
                 } catch (UtilisateurDejaCreeException e) {
                     cons.afficherErreur(e.getMessage());
-                    menu(abonnes, admins);
+                    menu(abonnes, admins, catalogue);
                 }
                 break;
             case 4:
-                cons.quitter();
+                sauvegarder(admins, "admins.ser");
+                sauvegarder(abonnes, "abonnes.ser");
+                sauvegarder(catalogue.getMorceaux(), "morceaux.ser");
+                sauvegarder(catalogue.getPlaylists(), "playlists.ser");
+                sauvegarder(catalogue.getArtistes(), "artistes.ser");
+                sauvegarder(catalogue.getAlbums(), "albums.ser");
+                cons.quitter(catalogue);
                 break;
             default:
                 cons.choixInvalide();
-                menu(abonnes, admins);
+                menu(abonnes, admins, catalogue);
         }
     }
 
@@ -181,6 +187,12 @@ public class ConsoleMain extends Main {
 
         Action actionChoisie = utilisateur.getActions().get(choix - 1);
         utilisateur.executerAction(actionChoisie, cons, catalogue);
+
+        if (actionChoisie instanceof controleur.actions.Deconnexion) {
+            menu(abonnes, admins, catalogue);
+            return;
+        }
+
         visiter(utilisateur, cons);
     }
 }

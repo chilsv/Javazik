@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Morceau implements TypeObjets {
     private int num;
     private String Titre;
-    private float duree;
+    private int duree = 180;
     private ArrayList<Artiste> artistes;
     private int annee;
     private ArrayList<String> genres;
@@ -22,14 +22,14 @@ public class Morceau implements TypeObjets {
         this.artistes.addAll(artistes);
     }
 
-    public Morceau(String titre, Artiste artiste, float duree) {
+    public Morceau(String titre, Artiste artiste, int duree) {
         this.Titre = titre;
         this.artistes = new ArrayList<>();
         this.artistes.add(artiste);
         this.duree = duree;
     }
 
-    public Morceau(String titre, ArrayList<Artiste> artistes, float duree) {
+    public Morceau(String titre, ArrayList<Artiste> artistes, int duree) {
         this.Titre = titre;
         this.artistes = new ArrayList<>();
         this.artistes.addAll(artistes);
@@ -40,7 +40,7 @@ public class Morceau implements TypeObjets {
         return num;
     }
 
-    public float getDuree() {
+    public int getDuree() {
         return duree;
     }
 
@@ -50,5 +50,23 @@ public class Morceau implements TypeObjets {
 
     public int getAnnee() {
         return annee;
+    }
+
+    public ArrayList<Artiste> getArtistes() {
+        return artistes;
+    }
+
+    public void setAlbum(String nomAlbum) {
+        for (Artiste artiste : artistes) {
+            for (Album album : artiste.getAlbums()) {
+                // On vérifie que kl'album est pas déjà là
+                if (album.getNom().equals(nomAlbum)) {
+                    return;
+                }
+            }
+            Album album = new Album(nomAlbum, artiste);
+            album.ajouterMorceau(this);
+            artiste.ajouterAlbum(album);
+        }
     }
 }

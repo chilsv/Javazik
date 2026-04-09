@@ -60,6 +60,7 @@ public class Main {
             ArrayList<T> chargement = (ArrayList<T>) ois.readObject();
             arrayList.addAll(chargement);
         } catch (Exception e) {
+            System.err.println("Erreur lors du chargement de " + nomFichier + " : " + e.getClass().getSimpleName() + " - " + e.getMessage());
         }
     }
 
@@ -73,6 +74,7 @@ public class Main {
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(arrayList);
         } catch (IOException e) {
+            System.err.println("Erreur lors de la sauvegarde de " + nomFichier + " : " + e.getMessage());
         }
     }
 

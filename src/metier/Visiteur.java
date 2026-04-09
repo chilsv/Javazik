@@ -3,6 +3,7 @@ package metier;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
+import controleur.actions.Deconnexion;
 import controleur.actions.Quitter;
 import controleur.actions.Recherche;
 import vue.Console;
@@ -15,6 +16,7 @@ public class Visiteur extends Personne {
         super();
         // Actions qu'un visiteur peut faire
         actions.add(new Recherche());
+        actions.add(new Deconnexion());
         actions.add(new Quitter());
     }
 

@@ -2,14 +2,12 @@ package metier;
 
 import java.util.ArrayList;
 
-import controleur.actions.Action;
-import controleur.actions.Quitter;
-import controleur.actions.Recherche;
+import controleur.actions.*;
 import vue.Console;
 
 public class Admin extends Personne {
     private int num;
-    // Liste des actions qu'un admin peut faire
+    // liste des actions qu'un admin peut faire
     private final ArrayList<Action> actions = new ArrayList<Action>();
 
     public Admin(String nom, String mail, String mdp, int num) {
@@ -17,6 +15,9 @@ public class Admin extends Personne {
         this.num = num;
         // Actions qu'un admin peut faire
         actions.add(new Recherche());
+        actions.add(new AjouterMorceau());
+        actions.add(new AjouterArtiste());
+        actions.add(new Deconnexion());
         actions.add(new Quitter());
     }
 

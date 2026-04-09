@@ -71,10 +71,6 @@ public abstract class Personne implements Serializable {
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
      */
-    public void executerAction(Action action, Console cons) {
-        action.executer(cons, this);
-    }
-
     public void executerAction(Action action, Console cons, Catalogue catalogue) {
         action.executer(cons, this, catalogue);
     }

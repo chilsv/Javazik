@@ -7,9 +7,6 @@ import metier.*;
 import vue.Console;
 
 public class Recherche implements Action {
-    public void executer(Console cons, Personne utilisateur) {
-    }
-
     @Override
     public void executer(Console cons, Personne utilisateur, Catalogue catalogue) {
         // Pour chaque dype d'utilisateur, on a des possibilités de recherche différentes

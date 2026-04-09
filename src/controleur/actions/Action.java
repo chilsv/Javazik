@@ -9,8 +9,6 @@ public interface Action extends Serializable {
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
      */
-    public void executer(Console cons, Personne utilisateur);
-
     public void executer(Console cons, Personne utilisateur, Catalogue catalogue);
 
     public String getNom();
