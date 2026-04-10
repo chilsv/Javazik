@@ -49,8 +49,11 @@ public class Abonne extends Personne {
         return playlists;
     }
 
+    public int getAimes() {
+        return playlistDefaut;
+    }
+
     public void ajouterPlaylist(int numPlaylist) {
-        System.out.println("Playlist " + numPlaylist + " ajoutée à l'abonné " + getNom());
         playlists.add(numPlaylist);
     }
 }

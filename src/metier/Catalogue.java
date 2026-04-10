@@ -79,6 +79,11 @@ public class Catalogue {
         }
     }
 
+    public void ajouterMorceauPlaylist(Morceau morceau, int numPlaylist) {
+        Playlist playlist = getPlaylist(numPlaylist);
+        playlist.ajouterMorceau(morceau);
+    }
+
     public void ajouterPlaylist(Playlist playlist) {
         playlists.add(playlist);
         // ajouter la playlist chez son createur
