@@ -153,14 +153,15 @@ public class Main {
         }
 
         String mdp = formulaire.mdp;
+        int nbUtilisateurs = abonnes.size() + admins.size();
 
         switch (type) {
             case "1":
-                utilisateur = new Abonne(nom, mail, mdp, abonnes.size());
+                utilisateur = new Abonne(nom, mail, mdp, nbUtilisateurs, catalogue);
                 ajouterAbonne(utilisateur, abonnes);
                 break;
             case "2":
-                utilisateur = new Admin(nom, mail, mdp, admins.size());
+                utilisateur = new Admin(nom, mail, mdp, nbUtilisateurs);
                 ajouterAdmin(utilisateur, admins);
                 break;
             default:
