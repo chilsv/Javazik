@@ -48,10 +48,12 @@ public class Main {
     public static void initialiser() {
         if (admins.size() == 0) {
             Admin defaut = new Admin("Defaut", "defaut", "", 0);
+            Admin Gab = new Admin("Gab", "gabriel.jamet@edu.ece.fr", "gab", 1);
             admins.add(defaut);
+            admins.add(Gab);
         }
     }
-    
+
     public static <T> void charger(ArrayList<T> arrayList, String nomFichier) {
         File fichier = new File("donnees/" + nomFichier);
 
