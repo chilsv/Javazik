@@ -1,9 +1,6 @@
 package vue;
 import controleur.actions.Action;
-import metier.Abonne;
-import metier.Admin;
-import metier.Morceau;
-import metier.ResultatRecherche;
+import metier.*;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -67,7 +64,7 @@ public class Fenetre implements InterfaceVue {
     public Action choisirAction(String accueil, ArrayList<Action> actions){return null;};
     public void afficherMessage(String message){};
     public void afficherErreur(String message){};
-    public void afficherProfilAbonne(Abonne abonne){};
+    public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue){};
     public void afficherProfilAdmin(Admin admin){};
 
     public ConnexionForm demanderConnexion(){return null;};
@@ -77,6 +74,7 @@ public class Fenetre implements InterfaceVue {
 
     public MorceauForm demanderMorceau(){return null;};
     public ArtisteForm demanderArtiste(){return null;};
+    public PlaylistForm demanderPlaylist(){return null;};
 
     public void afficher() {
         frame.setVisible(true); //afficher la fenetre
