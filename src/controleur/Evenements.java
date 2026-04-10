@@ -3,11 +3,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import vue.Fenetre;
+import vue.FenetreMenu;
 
 public class Evenements {
 
-    public static void ajouterEvenements(Fenetre fenetre) {
+    public static void ajouterEvenements(FenetreMenu fenetre) {
         JFrame frame = fenetre.getFrame();
         JLabel btnQuitter = fenetre.getBtnQuitterLabel();
         JLabel btnAdmin = fenetre.getBtnAdminLabel();
@@ -42,7 +42,8 @@ public class Evenements {
         // Logo
         logo.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {  }
+            public void mouseClicked(MouseEvent e) {
+            }
             @Override
             public void mouseEntered(MouseEvent e) { logo.setCursor(new Cursor(Cursor.HAND_CURSOR)); }
         });
