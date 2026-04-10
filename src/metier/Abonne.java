@@ -7,8 +7,8 @@ import vue.InterfaceVue;
 
 public class Abonne extends Personne {
     private int num;
-    private ArrayList<Morceau> historique = new ArrayList<Morceau>();
-    private int playlistDefaut;
+    private ArrayList<Integer> historique = new ArrayList<Integer>();
+    private int playlistDefaut; // Playlist des morceaux aimés créée par défaut
     private ArrayList<Integer> playlists = new ArrayList<Integer>(); // playlists sauvegardées par l'abonné
     // On liste les actions possibles pour un abonné ici
     private final ArrayList<Action> actions = new ArrayList<Action>();
@@ -37,12 +37,12 @@ public class Abonne extends Personne {
         return actions;
     }
 
-    public ArrayList<Morceau> getHistorique() {
+    public ArrayList<Integer> getHistorique() {
         return historique;
     }
 
-    public void ajouterHistorique(Morceau morceau) {
-        historique.add(morceau);
+    public void ajouterHistorique(int numMorceau) {
+        historique.add(numMorceau);
     }
 
     public ArrayList<Integer> getPlaylists() {
