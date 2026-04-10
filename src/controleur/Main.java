@@ -39,8 +39,8 @@ public class Main {
         Catalogue catalogue = new Catalogue(morceaux, playlists, artistes, albums);
 
         // Définition de la vue qu'on utilise
-        InterfaceVue vue = new Console();
-        //InterfaceVue vue = new Fenetre();
+        //InterfaceVue vue = new Console();
+        InterfaceVue vue = new Fenetre();
 
         menu(vue, abonnes, admins, catalogue);
     }

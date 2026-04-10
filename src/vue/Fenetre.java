@@ -1,5 +1,8 @@
 package vue;
+import controleur.Evenements;
 import controleur.actions.Action;
+import controleur.Evenements;
+
 import metier.*;
 
 import javax.swing.*;
@@ -10,13 +13,11 @@ public class Fenetre implements InterfaceVue {
 
 
 
-    public int menuPrincipal(){//ce que j'avais fait
+    public int menuPrincipal(){ //ce que j'avais fait
 
         FenetreMenu fenetreMenu = new FenetreMenu();
-
-        int choix;
-
-
+        Evenements.ajouterEvenements(fenetreMenu);
+        int choix = 0;
         return choix;
     };
 

@@ -15,12 +15,14 @@ public class Evenements {
         JLabel logo = fenetre.getLogoLabel();
         JLabel bandeau = fenetre.getBandeauLabel();
 
+
+
         // Quitter
         btnQuitter.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) { frame.dispose(); }
             @Override
-            public void mouseEntered(MouseEvent e) { btnQuitter.setCursor(new Cursor(Cursor.HAND_CURSOR)); }
+            public void mouseEntered(MouseEvent e) { btnQuitter.setCursor(new Cursor(Cursor.HAND_CURSOR));}
         });
 
         // Admin

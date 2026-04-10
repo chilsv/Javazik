@@ -1,7 +1,7 @@
 package vue;
 import controleur.actions.Action;
 import metier.*;
-import controleur.Evenements;
+
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -53,6 +53,11 @@ public class FenetreMenu {
         backgroundLabel.add(btnConnexionLabel);
         backgroundLabel.add(btnAdminLabel);
         backgroundLabel.add(btnQuitterLabel);
+
+
+
+
+        frame.setVisible(true);
 
     }
 
