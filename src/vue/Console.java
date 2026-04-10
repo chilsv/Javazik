@@ -3,11 +3,14 @@ package vue;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.xml.catalog.Catalog;
+
 import controleur.actions.Action;
 import metier.Abonne;
 import metier.Admin;
 import metier.Album;
 import metier.Artiste;
+import metier.Catalogue;
 import metier.Filtre;
 import metier.Morceau;
 import metier.Playlist;
@@ -221,13 +224,16 @@ public class Console implements InterfaceVue {
         System.out.println("\nLecture terminée.");
     }
 
-    public void afficherProfilAbonne(Abonne abonne) {
+    @Override
+    public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue) {
         System.out.println("-".repeat(40));
         System.out.println("Profil de "+ abonne.getNom() + " :");
         System.out.println("Compte créé le " + abonne.getDateCreation());
         System.out.println("E-mail : " + abonne.getMail());
         System.out.println("Playlists créées :");
-        for (Playlist playlist : abonne.getPlaylists()) {
+        for (int i = 0; i < abonne.getPlaylists().size(); i++) {
+            int numPlaylist = abonne.getPlaylists().get(i);
+            Playlist playlist = catalogue.getPlaylist(numPlaylist);
             System.out.println("- " + playlist.getNom());
         }
     }
@@ -237,5 +243,4 @@ public class Console implements InterfaceVue {
         System.out.println("Profil de l'administrateur " + admin.getNom()  + " :");
         System.out.println("Compte créé le " + admin.getDateCreation());
     }
-
 }

@@ -44,6 +44,13 @@ public class Main {
 
         menu(vue, abonnes, admins, catalogue);
     }
+
+    public static void initialiser() {
+        if (admins.size() == 0) {
+            Admin defaut = new Admin("Defaut", "defaut", "", 0);
+            admins.add(defaut);
+        }
+    }
     
     public static <T> void charger(ArrayList<T> arrayList, String nomFichier) {
         File fichier = new File("donnees/" + nomFichier);
@@ -51,6 +58,7 @@ public class Main {
         if (!fichier.exists()) {
             try (FileOutputStream fos = new FileOutputStream(fichier)) {
             } catch (IOException e) {
+                initialiser();
                 return;
             }
         }
@@ -60,6 +68,7 @@ public class Main {
             ArrayList<T> chargement = (ArrayList<T>) ois.readObject();
             arrayList.addAll(chargement);
         } catch (EOFException e) {
+            initialiser();
         } catch (InvalidClassException e) {
             // si la classe a chanté entre temps, on réinitialise le fichier
             sauvegarder(new ArrayList<>(), nomFichier);
