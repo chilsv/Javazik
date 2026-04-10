@@ -2,9 +2,13 @@ package metier;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
+import controleur.actions.ActionArguments;
+import controleur.exceptions.ActionException;
+import controleur.exceptions.MorceauIntrouvableException;
 import vue.InterfaceVue;
 
 public abstract class Personne implements Serializable {
@@ -64,15 +68,25 @@ public abstract class Personne implements Serializable {
         return mdp;
     }
 
+    public int getAge() {
+        // trouvé sur google
+        return (int) ChronoUnit.DAYS.between(this.getDateCreation(), LocalDate.now());
+    }
+    
     public LocalDate getDateCreation() {
         return date_creation;
      }
 
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
+     * @params arguments vue, catalogue
      */
-    public void executerAction(Action action, InterfaceVue vue, Catalogue catalogue) {
-        action.executer(vue, this, catalogue);
+    public void executerAction(Action action, InterfaceVue vue, Catalogue catalogue) throws ActionException {
+        try {
+            action.executer(new ActionArguments(vue, this, catalogue));
+        } catch (MorceauIntrouvableException e) {
+            throw e;
+        }
     }
 
     /**

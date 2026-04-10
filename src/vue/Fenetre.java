@@ -101,6 +101,7 @@ public class Fenetre implements InterfaceVue {
         return "0";
     }
 
+    public void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {}
 
-
+    public void afficherAimer(String nom) {}
 }

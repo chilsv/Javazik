@@ -19,6 +19,7 @@ public class Admin extends Personne {
         actions.add(new AjouterArtiste());
         actions.add(new AjouterPlaylist());
         actions.add(new ConsulterProfil());
+        actions.add(new ConsulterUtilisateurs());
         actions.add(new Deconnexion());
         actions.add(new Quitter());
     }
@@ -29,5 +30,9 @@ public class Admin extends Personne {
 
     public ArrayList<Action> getActions() {
         return actions;
+    }
+
+    public int getNum() {
+        return num;
     }
 }

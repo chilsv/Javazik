@@ -253,4 +253,24 @@ public class Console implements InterfaceVue {
         String nom = lireTexte("Nom de la playlist : ");
         return new PlaylistForm(nom);
     }
+
+    @Override
+    public void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {
+        System.out.println("-".repeat(40));
+        System.out.println("Liste des abonnés :");
+        for (Abonne abonne : abonnes) {
+            System.out.println(abonne.getNom() + " (@" + abonne.getMail() + ") : " + abonne.getAge() + " jours.");
+        }
+        System.out.println("-".repeat(40));
+        System.out.println("Liste des admins :");
+        for (Admin admin : admins) {
+            System.out.println(admin.getNom() + " (@" + admin.getMail() + ") : " + admin.getAge() + " jours.");
+        }
+        System.out.println();
+    }
+
+    @Override
+    public void afficherAimer(String nom) {
+        System.out.println("Vous avez aimé " + nom + " !");
+    }
 }

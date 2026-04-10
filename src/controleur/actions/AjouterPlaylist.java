@@ -3,21 +3,22 @@ package controleur.actions;
 import controleur.formulaires.PlaylistForm;
 import metier.Abonne;
 import metier.Catalogue;
-import metier.Personne;
 import metier.Playlist;
-import vue.InterfaceVue;
 
 public class AjouterPlaylist implements Action {
+    /**
+     * @param arguments vue, utilisateur, catalogue
+     */
     @Override
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        PlaylistForm formulaire = vue.demanderPlaylist();
-        Playlist playlist = new Playlist(formulaire.nom, formulaire.morceaux, catalogue);
-        if (!catalogue.playlistExiste(playlist.getNum())) {
-            if (utilisateur instanceof Abonne) {
-                Abonne abonne = (Abonne) utilisateur;
+    public void executer(ActionArguments arguments) {
+        PlaylistForm formulaire = arguments.vue.demanderPlaylist();
+        Playlist playlist = new Playlist(formulaire.nom, formulaire.morceaux, arguments.catalogue);
+        if (!arguments.catalogue.playlistExiste(playlist.getNum())) {
+            if (arguments.utilisateur instanceof Abonne) {
+                Abonne abonne = (Abonne) arguments.utilisateur;
                 abonne.ajouterPlaylist(playlist.getNum());
             }
-            catalogue.ajouterPlaylist(playlist);
+            arguments.catalogue.ajouterPlaylist(playlist);
         }
     }
 

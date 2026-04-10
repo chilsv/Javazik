@@ -2,23 +2,23 @@ package controleur.actions;
 
 import controleur.Main;
 import controleur.formulaires.MorceauForm;
-import metier.Catalogue;
 import metier.Morceau;
-import metier.Personne;
-import vue.InterfaceVue;
 
 public class AjouterMorceau implements Action {
+    /**
+     * @param arguments vue, catalogue
+     */
     @Override
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        MorceauForm formulaire = vue.demanderMorceau();
+    public void executer(ActionArguments arguments) {
+        MorceauForm formulaire = arguments.vue.demanderMorceau();
         Morceau morceau = new Morceau(formulaire.titre, new metier.Solo(formulaire.artiste), formulaire.duree);
         if (formulaire.album != null && !formulaire.album.isBlank()) {
             morceau.setAlbum(formulaire.album);
         }
-        catalogue.ajouterMorceau(morceau);
-        Main.sauvegarder(catalogue.getMorceaux(), "morceaux.ser");
-        Main.sauvegarder(catalogue.getArtistes(), "artistes.ser");
-        Main.sauvegarder(catalogue.getAlbums(), "albums.ser");
+        arguments.catalogue.ajouterMorceau(morceau);
+        Main.sauvegarder(arguments.catalogue.getMorceaux(), "morceaux.ser");
+        Main.sauvegarder(arguments.catalogue.getArtistes(), "artistes.ser");
+        Main.sauvegarder(arguments.catalogue.getAlbums(), "albums.ser");
     }
 
     @Override

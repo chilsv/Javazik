@@ -3,18 +3,18 @@ package controleur.actions;
 import controleur.Main;
 import controleur.formulaires.ArtisteForm;
 import metier.Artiste;
-import metier.Catalogue;
-import metier.Personne;
-import vue.InterfaceVue;
 
 public class AjouterArtiste implements Action {
+    /**
+     * @param arguments vue, catalogue
+     */
     @Override
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        ArtisteForm formulaire = vue.demanderArtiste();
+    public void executer(ActionArguments arguments) {
+        ArtisteForm formulaire = arguments.vue.demanderArtiste();
         Artiste artiste = new metier.Solo(formulaire.nom);
-        catalogue.ajouterArtiste(artiste);
-        Main.sauvegarder(catalogue.getArtistes(), "artistes.ser");
-        Main.sauvegarder(catalogue.getAlbums(), "albums.ser");
+        arguments.catalogue.ajouterArtiste(artiste);
+        Main.sauvegarder(arguments.catalogue.getArtistes(), "artistes.ser");
+        Main.sauvegarder(arguments.catalogue.getAlbums(), "albums.ser");
     }
 
     @Override

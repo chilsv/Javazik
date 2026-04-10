@@ -11,10 +11,12 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
+import controleur.actions.ActionArguments;
 import controleur.actions.Deconnexion;
 import controleur.actions.Quitter;
 import controleur.formulaires.ConnexionForm;
 import controleur.formulaires.InscriptionForm;
+import controleur.exceptions.*;
 import metier.*;
 import vue.*;
 
@@ -41,8 +43,8 @@ public class Main {
         Catalogue catalogue = new Catalogue(morceaux, playlists, artistes, albums);
 
         // Définition de la vue qu'on utilise
-        //InterfaceVue vue = new Console();
-        InterfaceVue vue = new Fenetre();
+        InterfaceVue vue = new Console();
+        //InterfaceVue vue = new Fenetre();
 
         menu(vue, abonnes, admins, catalogue);
     }
@@ -51,8 +53,11 @@ public class Main {
         if (admins.size() == 0) {
             Admin defaut = new Admin("Defaut", "defaut", "", 0);
             Admin Gab = new Admin("Gab", "gabriel.jamet@edu.ece.fr", "gab", 1);
+            Admin ilan = new Admin("Ilan", "ilan.bide", "", 2);
             admins.add(defaut);
             admins.add(Gab);
+            admins.add(ilan);
+            sauvegarder(admins, "admins.ser");
         }
     }
 
@@ -132,7 +137,7 @@ public class Main {
                 }
                 break;
             case 4: // quitter
-                new Quitter().executer(vue, null, catalogue);
+                new Quitter().executer(new ActionArguments(vue, null, catalogue));
                 break;
             default:
                 vue.afficherErreur("Choix invalide.");
@@ -227,7 +232,7 @@ public class Main {
         try {
             // on fait l'action choisie
             utilisateur.executerAction(actionChoisie, vue, catalogue);
-        } catch (MorceauIntrouvableException e) {
+        } catch (ActionException e) { // très probablement MorceauIntrouvableException
             vue.afficherErreur(e.getMessage());
             visiter(utilisateur, vue, abonnes, admins, catalogue);
             return;
@@ -240,5 +245,4 @@ public class Main {
 
         visiter(utilisateur, vue, abonnes, admins, catalogue);
     }
-
 }

@@ -3,15 +3,9 @@ package vue;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
-import controleur.formulaires.ArtisteForm;
-import controleur.formulaires.ConnexionForm;
-import controleur.formulaires.InscriptionForm;
-import controleur.formulaires.MorceauForm;
-import controleur.formulaires.PlaylistForm;
-import controleur.formulaires.RechercheForm;
+import controleur.formulaires.*;
 import metier.Abonne;
 import metier.Admin;
-import metier.Artiste;
 import metier.Catalogue;
 import metier.Morceau;
 import metier.ResultatRecherche;
@@ -31,6 +25,8 @@ public interface InterfaceVue {
     InscriptionForm demanderInscription();
     RechercheForm demanderRecherche(boolean filtrage);
     void afficherRecherche(ResultatRecherche resultat);
+    void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins);
+    void afficherAimer(String nom);
 
     MorceauForm demanderMorceau();
     ArtisteForm demanderArtiste();
