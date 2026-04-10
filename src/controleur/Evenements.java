@@ -3,11 +3,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import vue.FenetreMenu;
+import vue.Fenetre;
 
 public class Evenements {
 
-    public static void ajouterEvenements(FenetreMenu fenetre) {
+    public static void ajouterEvenements(Fenetre fenetre) {
         JFrame frame = fenetre.getFrame();
         JLabel btnQuitter = fenetre.getBtnQuitterLabel();
         JLabel btnAdmin = fenetre.getBtnAdminLabel();

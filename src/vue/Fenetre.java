@@ -1,7 +1,14 @@
 package vue;
-import javax.swing.*;
+import controleur.actions.Action;
+import metier.Abonne;
+import metier.Admin;
+import metier.Morceau;
+import metier.ResultatRecherche;
 
-public class FenetreMenu {
+import javax.swing.*;
+import java.util.ArrayList;
+
+public class Fenetre implements InterfaceVue {
 
     //defintion des elements qui vont composer notre fenetre
     private final JFrame frame;
@@ -11,11 +18,11 @@ public class FenetreMenu {
     private final JLabel logoLabel;
     private final JLabel bandeauLabel;
 
-    public FenetreMenu() {
+    public Fenetre() {
         frame = new JFrame(); //Creation
         frame.setSize(1392, 768); //Taille de notre fenetre
         frame.setLocationRelativeTo(null); //mettre au milieu
-        frame.setUndecorated(true); //Enlever les bord de base de winows
+        frame.setUndecorated(true); //Enlever les bord de base de windows
 
 
         // Background
@@ -48,6 +55,28 @@ public class FenetreMenu {
         backgroundLabel.add(btnAdminLabel);
         backgroundLabel.add(btnQuitterLabel);
     }
+
+    public String choisirMorceau(){
+        return "0";
+    }
+    @Override
+    public void afficherLecture(Morceau morceau){};
+    public int menuPrincipal(){
+        return 0;
+    };
+    public Action choisirAction(String accueil, ArrayList<Action> actions){return null;};
+    public void afficherMessage(String message){};
+    public void afficherErreur(String message){};
+    public void afficherProfilAbonne(Abonne abonne){};
+    public void afficherProfilAdmin(Admin admin){};
+
+    public ConnexionForm demanderConnexion(){return null;};
+    public InscriptionForm demanderInscription(){return null;};
+    public RechercheForm demanderRecherche(boolean filtrage){return null;};
+    public void afficherRecherche(ResultatRecherche resultat){};
+
+    public MorceauForm demanderMorceau(){return null;};
+    public ArtisteForm demanderArtiste(){return null;};
 
     public void afficher() {
         frame.setVisible(true); //afficher la fenetre
