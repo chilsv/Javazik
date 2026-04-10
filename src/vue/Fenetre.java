@@ -13,14 +13,65 @@ public class Fenetre implements InterfaceVue {
 
 
 
-    public int menuPrincipal(){ //ce que j'avais fait
+
+
+    /*public void menuPrincipal(){
 
         FenetreMenu fenetreMenu = new FenetreMenu();
-        Evenements.ajouterEvenements(fenetreMenu);
-        int choix = 0;
-        return choix;
-    };
 
+        Evenements.ajouterEvenements(fenetreMenu, choix -> {
+
+            if (choix == 1) {
+                System.out.println("Admin");
+            }
+            else if (choix == 2) {
+                System.out.println("Connexion");
+            }
+            else if (choix == 0) {
+                System.out.println("Quitter");
+            }
+
+        });
+        //return a;
+    }*/
+
+    public int menuPrincipal() {
+        // Tableau pour capturer le choix depuis le listener asynchrone
+        final int[] resultat = {-1};
+        final Object verrou = new Object();
+
+        // Lancer Swing sur l'EDT correctement
+        SwingUtilities.invokeLater(() -> {
+            FenetreMenu fenetreMenu = new FenetreMenu();
+
+            Evenements.ajouterEvenements(fenetreMenu, choix -> {
+                synchronized (verrou) {
+                    if (choix == 1) {
+                        System.out.println("Admin");
+                    } else if (choix == 2) {
+                        System.out.println("Connexion");
+                    } else if (choix == 0) {
+                        System.out.println("Quitter");
+                    }
+                    resultat[0] = choix;
+                    verrou.notify(); // réveille le thread principal
+                }
+            });
+        });
+
+        // Attendre que l'utilisateur fasse un choix
+        synchronized (verrou) {
+            while (resultat[0] == -1) {
+                try {
+                    verrou.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        return resultat[0];
+    }
 
     //barre de lecture
     public void afficherLecture(Morceau morceau){};

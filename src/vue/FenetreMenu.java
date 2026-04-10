@@ -1,20 +1,16 @@
 package vue;
-import controleur.actions.Action;
-import metier.*;
-
-
 import javax.swing.*;
-import java.util.ArrayList;
 
 public class FenetreMenu {
 
     //defintion des elements qui vont composer notre fenetre
-    private JFrame frame;
-    private JLabel btnQuitterLabel;
-    private JLabel btnAdminLabel;
-    private JLabel btnConnexionLabel;
-    private JLabel logoLabel;
-    private JLabel bandeauLabel;
+    private final JFrame frame;
+    private final JLabel btnQuitterLabel;
+    private final JLabel btnAdminLabel;
+    private final JLabel btnConnexionLabel;
+    private final JLabel logoLabel;
+    private final JLabel bandeauLabel;
+
 
     public FenetreMenu (){
 
@@ -54,9 +50,6 @@ public class FenetreMenu {
         backgroundLabel.add(btnAdminLabel);
         backgroundLabel.add(btnQuitterLabel);
 
-
-
-
         frame.setVisible(true);
 
     }
@@ -68,6 +61,8 @@ public class FenetreMenu {
     public JLabel getBtnConnexionLabel() { return btnConnexionLabel; }
     public JLabel getLogoLabel() { return logoLabel; }
     public JLabel getBandeauLabel() { return bandeauLabel; }
+
+
 
 
 }
