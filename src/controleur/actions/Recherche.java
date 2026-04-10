@@ -1,8 +1,8 @@
 package controleur.actions;
 
+import controleur.formulaires.RechercheForm;
 import metier.*;
 import vue.InterfaceVue;
-import vue.RechercheForm;
 
 public class Recherche implements Action {
     @Override

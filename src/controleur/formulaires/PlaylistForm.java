@@ -1,4 +1,4 @@
-package vue;
+package controleur.formulaires;
 
 import java.util.ArrayList;
 

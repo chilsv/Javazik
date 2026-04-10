@@ -1,4 +1,4 @@
-package vue;
+package controleur.formulaires;
 
 // Formulaire pour créer un artiste
 public final class ArtisteForm {

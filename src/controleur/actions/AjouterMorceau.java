@@ -1,11 +1,11 @@
 package controleur.actions;
 
 import controleur.Main;
+import controleur.formulaires.MorceauForm;
 import metier.Catalogue;
 import metier.Morceau;
 import metier.Personne;
 import vue.InterfaceVue;
-import vue.MorceauForm;
 
 public class AjouterMorceau implements Action {
     @Override

@@ -1,4 +1,4 @@
-package vue;
+package controleur.formulaires;
 
 // Formulaire pour créer un compte
 public final class InscriptionForm {

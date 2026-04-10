@@ -3,6 +3,12 @@ package vue;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
+import controleur.formulaires.ArtisteForm;
+import controleur.formulaires.ConnexionForm;
+import controleur.formulaires.InscriptionForm;
+import controleur.formulaires.MorceauForm;
+import controleur.formulaires.PlaylistForm;
+import controleur.formulaires.RechercheForm;
 import metier.Abonne;
 import metier.Admin;
 import metier.Artiste;

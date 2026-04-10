@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import controleur.actions.Action;
 import controleur.actions.Deconnexion;
 import controleur.actions.Quitter;
+import controleur.formulaires.ConnexionForm;
+import controleur.formulaires.InscriptionForm;
 import metier.*;
 import vue.*;
 

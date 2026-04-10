@@ -1,13 +1,17 @@
 package vue;
-import controleur.Evenements;
-import controleur.actions.Action;
-import controleur.Evenements;
-
-import metier.*;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Scanner;
+
+import controleur.Evenements;
+import controleur.actions.Action;
+import controleur.formulaires.ArtisteForm;
+import controleur.formulaires.ConnexionForm;
+import controleur.formulaires.InscriptionForm;
+import controleur.formulaires.MorceauForm;
+import controleur.formulaires.PlaylistForm;
+import controleur.formulaires.RechercheForm;
+import metier.*;
 
 public class Fenetre implements InterfaceVue {
 

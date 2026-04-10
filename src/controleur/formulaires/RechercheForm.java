@@ -1,4 +1,4 @@
-package vue;
+package controleur.formulaires;
 
 // formulaire pour faire une recherche
 public final class RechercheForm {

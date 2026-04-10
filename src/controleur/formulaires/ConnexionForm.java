@@ -1,4 +1,4 @@
-package vue;
+package controleur.formulaires;
 
 // Formulaire pour se connecter
 public final class ConnexionForm {

@@ -1,11 +1,11 @@
 package controleur.actions;
 
+import controleur.formulaires.PlaylistForm;
 import metier.Abonne;
 import metier.Catalogue;
 import metier.Personne;
 import metier.Playlist;
 import vue.InterfaceVue;
-import vue.PlaylistForm;
 
 public class AjouterPlaylist implements Action {
     @Override

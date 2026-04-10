@@ -1,11 +1,11 @@
 package controleur.actions;
 
 import controleur.Main;
+import controleur.formulaires.ArtisteForm;
 import metier.Artiste;
 import metier.Catalogue;
 import metier.Personne;
 import vue.InterfaceVue;
-import vue.ArtisteForm;
 
 public class AjouterArtiste implements Action {
     @Override
