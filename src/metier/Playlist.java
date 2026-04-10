@@ -39,4 +39,8 @@ public class Playlist implements TypeObjets {
     public String getNom() {
         return nom;
     }
+
+    public int getNum() {
+        return num;
+    }
 }

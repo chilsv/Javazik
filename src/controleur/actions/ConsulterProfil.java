@@ -11,7 +11,7 @@ public class ConsulterProfil implements Action {
     public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         if (utilisateur instanceof Abonne) {
             Abonne abonne = (Abonne) utilisateur;
-            vue.afficherProfilAbonne(abonne);
+            vue.afficherProfilAbonne(abonne, catalogue);
         } else if (utilisateur instanceof Admin) {
             Admin admin = (Admin) utilisateur;
             vue.afficherProfilAdmin(admin);

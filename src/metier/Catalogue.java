@@ -31,6 +31,15 @@ public class Catalogue {
         return albums;
     }
 
+    public Playlist getPlaylist(int num) {
+        for (Playlist playlist : playlists) {
+            if (playlist.getNum() == num) {
+                return playlist;
+            }
+        }
+        return null;
+    }
+
     public void ajouterMorceau(Morceau morceau) {
         morceaux.add(morceau);
         // Permet de mettre à jour le reste
@@ -63,6 +72,7 @@ public class Catalogue {
 
     public void ajouterPlaylist(Playlist playlist) {
         playlists.add(playlist);
+        // ajouter la playlist chez son createur
     }
 
     public void ajouterArtiste(Artiste artiste) {

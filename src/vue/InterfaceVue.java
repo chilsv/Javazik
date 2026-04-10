@@ -6,6 +6,7 @@ import controleur.actions.Action;
 import metier.Abonne;
 import metier.Admin;
 import metier.Artiste;
+import metier.Catalogue;
 import metier.Morceau;
 import metier.ResultatRecherche;
 
@@ -17,7 +18,7 @@ public interface InterfaceVue {
     Action choisirAction(String accueil, ArrayList<Action> actions);
     void afficherMessage(String message);
     void afficherErreur(String message);
-    void afficherProfilAbonne(Abonne abonne);
+    void afficherProfilAbonne(Abonne abonne, Catalogue catalogue);
     void afficherProfilAdmin(Admin admin);
 
     ConnexionForm demanderConnexion();
@@ -27,4 +28,5 @@ public interface InterfaceVue {
 
     MorceauForm demanderMorceau();
     ArtisteForm demanderArtiste();
+    PlaylistForm demanderPlaylist();
 }
