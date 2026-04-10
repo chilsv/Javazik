@@ -17,8 +17,9 @@ public class Abonne extends Personne {
         super(nom, mail, mdp);
         this.num = num;
         Playlist defaut = new Playlist("Morceaux aimés", 0);
+        playlistDefaut = defaut.getNum();
         // on ajoute à tous une playlist par défaut, générée par l'"utilisateur 0", l'Admin par défaut
-        catalogue.ajouterPlaylist(defaut);
+        new AjouterPlaylist().executerDefaut(this, catalogue, defaut);
         // Actions qu'un abonné peut faire
         actions.add(new Recherche());
         actions.add(new JouerMorceau());
@@ -47,4 +48,7 @@ public class Abonne extends Personne {
         return playlists;
     }
 
+    public void ajouterPlaylist(int numPlaylist) {
+        playlists.add(numPlaylist);
+    }
 }

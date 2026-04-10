@@ -72,6 +72,7 @@ public class Catalogue {
 
     public void ajouterPlaylist(Playlist playlist) {
         playlists.add(playlist);
+        // ajouter la playlist chez son createur
     }
 
     public void ajouterArtiste(Artiste artiste) {

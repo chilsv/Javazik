@@ -28,4 +28,5 @@ public interface InterfaceVue {
 
     MorceauForm demanderMorceau();
     ArtisteForm demanderArtiste();
+    PlaylistForm demanderPlaylist();
 }
