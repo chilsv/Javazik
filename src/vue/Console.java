@@ -220,10 +220,17 @@ public class Console implements InterfaceVue {
         System.out.println("Compte créé le " + abonne.getDateCreation());
         System.out.println("E-mail : " + abonne.getMail());
         System.out.println("Playlists sauvegardées :");
+        if (abonne.getPlaylists().isEmpty()) {
+            System.out.println("- Aucune playlist");
+            return;
+        }
+
         for (int i = 0; i < abonne.getPlaylists().size(); i++) {
             int numPlaylist = abonne.getPlaylists().get(i);
             Playlist playlist = catalogue.getPlaylist(numPlaylist);
-            System.out.println("- " + playlist.getNom());
+            if (playlist != null) {
+                System.out.println("- " + playlist.getNom());
+            }
         }
     }
 
@@ -235,7 +242,9 @@ public class Console implements InterfaceVue {
 
     @Override
     public PlaylistForm demanderPlaylist() {
-        // à implémenter
-        return new PlaylistForm(null);
+        Scanner saisie = new Scanner(System.in);
+        System.out.println("-".repeat(40));
+        String nom = lireTexte("Nom de la playlist : ");
+        return new PlaylistForm(nom);
     }
 }

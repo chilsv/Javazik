@@ -16,13 +16,14 @@ public class Abonne extends Personne {
     public Abonne(String nom, String mail, String mdp, int num, Catalogue catalogue) {
         super(nom, mail, mdp);
         this.num = num;
-        Playlist defaut = new Playlist("Morceaux aimés", 0);
+        Playlist defaut = new Playlist("Morceaux aimés", 0, catalogue);
         playlistDefaut = defaut.getNum();
         // on ajoute à tous une playlist par défaut, générée par l'"utilisateur 0", l'Admin par défaut
         new AjouterPlaylist().executerDefaut(this, catalogue, defaut);
         // Actions qu'un abonné peut faire
         actions.add(new Recherche());
         actions.add(new JouerMorceau());
+        actions.add(new AjouterPlaylist());
         actions.add(new ConsulterProfil());
         actions.add(new Deconnexion());
         actions.add(new Quitter());
@@ -49,6 +50,7 @@ public class Abonne extends Personne {
     }
 
     public void ajouterPlaylist(int numPlaylist) {
+        System.out.println("Playlist " + numPlaylist + " ajoutée à l'abonné " + getNom());
         playlists.add(numPlaylist);
     }
 }

@@ -10,21 +10,24 @@ public class Playlist implements TypeObjets {
     private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
     private LocalDate dateCreation;
 
-    public Playlist(String nom) {
+    public Playlist(String nom, Catalogue catalogue) {
         this.nom = nom;
+        this.num = catalogue.getPlaylists().size() + 1;
         this.dateCreation = LocalDate.now();
     }
 
-    public Playlist(String nom, ArrayList<Morceau> morceaux) {
+    public Playlist(String nom, ArrayList<Morceau> morceaux, Catalogue catalogue) {
         this.nom = nom;
         this.morceaux = morceaux;
+        this.num = catalogue.getPlaylists().size() + 1;
         this.dateCreation = LocalDate.now();
     }
 
-    public Playlist(String nom, int numUtilisateur) {
+    public Playlist(String nom, int numUtilisateur, Catalogue catalogue) {
         this.nom = nom;
         this.numUtilisateur = numUtilisateur;
-        dateCreation = LocalDate.now();
+        this.num = catalogue.getPlaylists().size() + 1;
+        this.dateCreation = LocalDate.now();
     }
 
     public void ajouterMorceau(Morceau morceau) {

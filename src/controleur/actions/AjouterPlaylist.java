@@ -10,11 +10,13 @@ import vue.PlaylistForm;
 public class AjouterPlaylist implements Action {
     @Override
     public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        if (utilisateur instanceof Abonne) {
-            PlaylistForm formulaire = vue.demanderPlaylist();
-            Playlist playlist = new Playlist(formulaire.nom, formulaire.morceaux);
-            Abonne abonne = (Abonne) utilisateur;
-            abonne.ajouterPlaylist(playlist.getNum());
+        PlaylistForm formulaire = vue.demanderPlaylist();
+        Playlist playlist = new Playlist(formulaire.nom, formulaire.morceaux, catalogue);
+        if (!catalogue.playlistExiste(playlist.getNum())) {
+            if (utilisateur instanceof Abonne) {
+                Abonne abonne = (Abonne) utilisateur;
+                abonne.ajouterPlaylist(playlist.getNum());
+            }
             catalogue.ajouterPlaylist(playlist);
         }
     }

@@ -17,6 +17,7 @@ public class Admin extends Personne {
         actions.add(new Recherche());
         actions.add(new AjouterMorceau());
         actions.add(new AjouterArtiste());
+        actions.add(new AjouterPlaylist());
         actions.add(new ConsulterProfil());
         actions.add(new Deconnexion());
         actions.add(new Quitter());

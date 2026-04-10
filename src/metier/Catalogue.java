@@ -40,6 +40,15 @@ public class Catalogue {
         return null;
     }
 
+    public boolean playlistExiste(int num) {
+        for (Playlist playlist : playlists) {
+            if (playlist.getNum() == num) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void ajouterMorceau(Morceau morceau) {
         morceaux.add(morceau);
         // Permet de mettre à jour le reste
