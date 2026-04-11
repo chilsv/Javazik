@@ -1,7 +1,10 @@
 package vue;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import controleur.EvenementsConnexion;
 import controleur.EvenementsInscription;
@@ -14,6 +17,54 @@ import controleur.formulaires.*;
 import metier.*;
 
 public class Fenetre implements InterfaceVue {
+
+    private static final String CARTE_MENU = "menu";
+    private static final String CARTE_CONNEXION = "connexion";
+    private static final String CARTE_INSCRIPTION = "inscription";
+    private static final String CARTE_VISITE = "visite";
+
+    private final JFrame frame;
+    private final CardLayout cardLayout;
+    private final JPanel cartes;
+    private final Map<String, JPanel> cartesParNom;
+
+    public Fenetre() {
+        frame = new JFrame(); //Creation
+        frame.setSize(1392, 768); //Taille de notre fenetre
+        frame.setLocationRelativeTo(null); //mettre au milieu
+        frame.setUndecorated(true); //Enlever les bord de base de windows
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        cardLayout = new CardLayout();
+        cartes = new JPanel(cardLayout);
+        cartesParNom = new HashMap<>();
+
+        frame.setContentPane(cartes);
+        frame.setVisible(true);
+    }
+
+    private void afficherCarte(String nomCarte, JPanel panel) {
+        JPanel ancienneCarte = cartesParNom.put(nomCarte, panel);
+        if (ancienneCarte != null) {
+            cartes.remove(ancienneCarte);
+        }
+        cartes.add(panel, nomCarte);
+        cartes.revalidate();
+        cartes.repaint();
+        cardLayout.show(cartes, nomCarte);
+    }
+
+    private void executerSurEdtEtAttendre(Runnable action) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            action.run();
+            return;
+        }
+        try {
+            SwingUtilities.invokeAndWait(action);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /*public void menuPrincipal(){
 
@@ -41,8 +92,10 @@ public class Fenetre implements InterfaceVue {
         final Object verrou = new Object();
 
         // Lancer Swing sur l'EDT correctement
-        SwingUtilities.invokeLater(() -> {
+        executerSurEdtEtAttendre(() -> {
             FenetreMenu fenetreMenu = new FenetreMenu();
+            fenetreMenu.setFrame(frame);
+            afficherCarte(CARTE_MENU, fenetreMenu.getPanel());
 
             EvenementsMenu.ajouterEvenements(fenetreMenu, choix -> {
                 synchronized (verrou) {
@@ -85,10 +138,13 @@ public class Fenetre implements InterfaceVue {
 
     public ConnexionForm demanderConnexion() {
         final ConnexionForm[] resultat = {null};
+        final boolean[] termine = {false};
         final Object verrou = new Object();
 
-        SwingUtilities.invokeLater(() -> {
+        executerSurEdtEtAttendre(() -> {
             FenetreConnexion fenetreConnexion = new FenetreConnexion();
+            fenetreConnexion.setFrame(frame);
+            afficherCarte(CARTE_CONNEXION, fenetreConnexion.getPanel());
 
             EvenementsConnexion.ajouterEvenements(fenetreConnexion, choix -> {
                 synchronized (verrou) {
@@ -96,10 +152,12 @@ public class Fenetre implements InterfaceVue {
                         String mail = fenetreConnexion.getChampMail().getText();
                         String mdp = new String(fenetreConnexion.getChampMdp().getPassword());
                         resultat[0] = new ConnexionForm(mail, mdp);
+                        termine[0] = true;
                     } else if (choix == 2) {
                         System.out.println("Retour au menu");
+                        termine[0] = true;
                     } else {
-                        resultat[0] = null;
+                        termine[0] = true;
                     }
                     verrou.notify();
                 }
@@ -107,7 +165,7 @@ public class Fenetre implements InterfaceVue {
         });
 
         synchronized (verrou) {
-            while (resultat[0] == null) {
+            while (!termine[0]) {
                 try {
                     verrou.wait();
                 } catch (InterruptedException e) {
@@ -124,8 +182,10 @@ public class Fenetre implements InterfaceVue {
         final Action[] resultat = {null};
         final Object verrou = new Object();
 
-        SwingUtilities.invokeLater(() -> {
+        executerSurEdtEtAttendre(() -> {
             FenetreVisite fenetre = new FenetreVisite();
+            fenetre.setFrame(frame);
+            afficherCarte(CARTE_VISITE, fenetre.getPanel());
 
             EvenementsVisite.ajouterEvenements(fenetre, choix -> {
                 synchronized (verrou) {
@@ -156,10 +216,13 @@ public class Fenetre implements InterfaceVue {
 
     public InscriptionForm demanderInscription() {
         final InscriptionForm[] resultat = {null};
+        final boolean[] termine = {false};
         final Object verrou = new Object();
 
-        SwingUtilities.invokeLater(() -> {
+        executerSurEdtEtAttendre(() -> {
             FenetreInscription fenetre = new FenetreInscription();
+            fenetre.setFrame(frame);
+            afficherCarte(CARTE_INSCRIPTION, fenetre.getPanel());
             EvenementsInscription.ajouterEvenements(fenetre, choix -> {
             synchronized (verrou) {
                 if (choix == 1) {
@@ -167,10 +230,12 @@ public class Fenetre implements InterfaceVue {
                     String mail = fenetre.getChampMail().getText();
                     String mdp = new String(fenetre.getChampMdp().getPassword());
                     resultat[0] = new InscriptionForm("abonne", nom, mail, mdp);
+                    termine[0] = true;
                 } else if (choix == 2) {
                     System.out.println("Retour au menu");
+                    termine[0] = true;
                 } else {
-                    resultat[0] = null;
+                    termine[0] = true;
                 }
                 verrou.notify();
             }
@@ -178,7 +243,7 @@ public class Fenetre implements InterfaceVue {
         });
 
         synchronized (verrou) {
-            while (resultat[0] == null) {
+            while (!termine[0]) {
                 try {
                     verrou.wait();
                 } catch (InterruptedException e) {

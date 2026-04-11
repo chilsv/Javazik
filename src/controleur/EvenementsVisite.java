@@ -13,7 +13,6 @@ public class EvenementsVisite {
     }
 
     public static void ajouterEvenements(FenetreVisite fenetre, VisiteListener listener) {
-        JFrame frame = fenetre.getFrame();
         JLabel profil = fenetre.getProfil();
         JLabel librairie = fenetre.getLibrairie();
 
@@ -22,8 +21,6 @@ public class EvenementsVisite {
             @Override
             public void mouseClicked(MouseEvent e) {
                 listener.onChoix(1);
-                frame.dispose();
-
             }
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -36,7 +33,6 @@ public class EvenementsVisite {
             @Override
             public void mouseClicked(MouseEvent e) {
                 listener.onChoix(2);
-                frame.dispose();
             }
             @Override
             public void mouseEntered(MouseEvent e) {

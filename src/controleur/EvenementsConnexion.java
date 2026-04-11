@@ -13,7 +13,6 @@ public class EvenementsConnexion {
     }
 
     public static void ajouterEvenements(FenetreConnexion fenetre, ConnexionListener listener) {
-        JFrame frame = fenetre.getFrame();
         JButton btnValider = fenetre.getBtnValider();
         JLabel btnRetour = fenetre.getBtnRetourLabel();
 
@@ -22,7 +21,6 @@ public class EvenementsConnexion {
             @Override
             public void mouseClicked(MouseEvent e) {
                 listener.onChoix(1);
-                frame.dispose();
             }
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -35,7 +33,6 @@ public class EvenementsConnexion {
             @Override
             public void mouseClicked(MouseEvent e) {
                 listener.onChoix(2);
-                frame.dispose();
             }
             @Override
             public void mouseEntered(MouseEvent e) {

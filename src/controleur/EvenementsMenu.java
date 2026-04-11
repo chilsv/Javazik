@@ -24,8 +24,6 @@ public class EvenementsMenu {
             @Override
             public void mouseClicked(MouseEvent e) {
                 listener.onChoix(4);
-                frame.dispose();
-
             }
             @Override
             public void mouseEntered(MouseEvent e) {

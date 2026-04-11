@@ -135,7 +135,12 @@ public class Main {
                 break;
             case 2: // connexion
                 try {
-                    connexion(vue, abonnes, admins, catalogue, vue.demanderConnexion());
+                    ConnexionForm connexionForm = vue.demanderConnexion();
+                    if (connexionForm == null) {
+                        menu(vue, abonnes, admins, catalogue);
+                        break;
+                    }
+                    connexion(vue, abonnes, admins, catalogue, connexionForm);
                 } catch (UtilisateurIntrouvableException e) {
                     vue.afficherErreur(e.getMessage());
                     menu(vue, abonnes, admins, catalogue);
@@ -146,7 +151,12 @@ public class Main {
                 break;
             case 3: // inscription
                 try {
-                    Personne utilisateur = inscription(abonnes, admins, catalogue, vue.demanderInscription());
+                    InscriptionForm inscriptionForm = vue.demanderInscription();
+                    if (inscriptionForm == null) {
+                        menu(vue, abonnes, admins, catalogue);
+                        break;
+                    }
+                    Personne utilisateur = inscription(abonnes, admins, catalogue, inscriptionForm);
                     visiter(utilisateur, vue, abonnes, admins, catalogue);
                 } catch (UtilisateurDejaCreeException e) {
                     vue.afficherErreur(e.getMessage());

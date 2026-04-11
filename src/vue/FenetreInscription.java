@@ -3,7 +3,8 @@ package vue;
 import javax.swing.*;
 
 public class FenetreInscription {
-    private final JFrame frame;
+    private JFrame frame;
+    private final JPanel panel;
     private final JTextField champNom;
     private final JTextField champMail;
     private final JPasswordField champMdp;
@@ -11,13 +12,10 @@ public class FenetreInscription {
     private final JLabel btnRetourLabel;
 
     public FenetreInscription() {
-        frame = new JFrame();
-        frame.setSize(1392, 768);
-        frame.setLocationRelativeTo(null); //mettre au milieu
-        frame.setUndecorated(true); //Enlever les bord de base de windows
+        panel = new JPanel(null);
+        panel.setPreferredSize(new java.awt.Dimension(1392, 768));
 
-        frame.getContentPane().setBackground(java.awt.Color.BLUE);
-        frame.getContentPane().setLayout(null);
+        panel.setBackground(java.awt.Color.BLUE);
 
         // Composants bouton ect
         champNom = new JTextField();
@@ -34,16 +32,23 @@ public class FenetreInscription {
         btnValider.setBounds(506, 420, 380, 40);
         btnRetourLabel.setBounds(100, 100, 100, 100);
 
-        frame.add(btnRetourLabel);
-        frame.add(btnValider);
-        frame.add(champMdp);
-        frame.add(champMail);
-        frame.add(champNom);
-        frame.setVisible(true);
+        panel.add(btnRetourLabel);
+        panel.add(btnValider);
+        panel.add(champMdp);
+        panel.add(champMail);
+        panel.add(champNom);
     }
 
     public JFrame getFrame() {
         return frame;
+    }
+
+    public void setFrame(JFrame frame) {
+        this.frame = frame;
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     public JButton getBtnValider() {

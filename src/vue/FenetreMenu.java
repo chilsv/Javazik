@@ -6,7 +6,8 @@ import java.awt.geom.RoundRectangle2D;
 public class FenetreMenu {
 
     //defintion des elements qui vont composer notre fenetre
-    private final JFrame frame;
+    private JFrame frame;
+    private final JPanel panel;
     private final JLabel btnQuitterLabel;
     private final JLabel btnAdminLabel;
     private final JLabel btnConnexionLabel;
@@ -16,16 +17,15 @@ public class FenetreMenu {
 
     public FenetreMenu (){
 
-        frame = new JFrame(); //Creation
-        frame.setSize(1392, 768); //Taille de notre fenetre
-        frame.setLocationRelativeTo(null); //mettre au milieu
-        frame.setUndecorated(true); //Enlever les bord de base de windows
+        panel = new JPanel(null);
+        panel.setPreferredSize(new Dimension(1392, 768));
 
         // Background
         ImageIcon background = new ImageIcon("assets/Q.png");
         JLabel backgroundLabel = new JLabel(background);
         backgroundLabel.setLayout(null);
-        frame.setContentPane(backgroundLabel);
+        backgroundLabel.setBounds(0, 0, 1392, 768);
+        panel.add(backgroundLabel);
 
 
         // Composants bouton ect
@@ -53,16 +53,12 @@ public class FenetreMenu {
 
 
 
-
-        frame.setVisible(true);
-
-
-
-
     }
 
     // Getters pour accéder aux composants, notamment car on a besoins de leur taille
     public JFrame getFrame() { return frame; }
+    public void setFrame(JFrame frame) { this.frame = frame; }
+    public JPanel getPanel() { return panel; }
     public JLabel getBtnQuitterLabel() { return btnQuitterLabel; }
     public JLabel getBtnAdminLabel() { return btnAdminLabel; }
     public JLabel getBtnConnexionLabel() { return btnConnexionLabel; }

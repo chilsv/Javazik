@@ -13,7 +13,11 @@ import java.awt.event.FocusEvent;
 
 public class FenetreConnexion {
 
-    private final JFrame frame;
+    private static final String PLACEHOLDER_MAIL = "Mail";
+    private static final String PLACEHOLDER_MDP = "Mot de passe";
+
+    private JFrame frame;
+    private final JPanel panel;
     private final JTextField champMail;
     private final JPasswordField champMdp;
     private final JButton btnValider;
@@ -21,16 +25,15 @@ public class FenetreConnexion {
 
     public FenetreConnexion() {
 
-        frame = new JFrame();
-        frame.setSize(1392, 768);
-        frame.setLocationRelativeTo(null);
-        frame.setUndecorated(true);
+        panel = new JPanel(null);
+        panel.setPreferredSize(new Dimension(1392, 768));
 
         // Background
         ImageIcon background = new ImageIcon("assets/Q.png");
         JLabel backgroundLabel = new JLabel(background);
         backgroundLabel.setLayout(null);
-        frame.setContentPane(backgroundLabel);
+        backgroundLabel.setBounds(0, 0, 1392, 768);
+        panel.add(backgroundLabel);
 
         // ── Carte centrale (panneau semi-transparent) ──
         // Dimensions de la carte
@@ -63,12 +66,12 @@ public class FenetreConnexion {
         // creation du champ username
         champMail = new JTextField();
         champMail.setBounds(30, 80, carteLongeur - 60, 40); //placement
-        styliserChamp(champMail, "Username");//ce qu'il y'a ecrit dans le champs a remplir avec un efocntion defini en dessous
+        styliserChamp(champMail, PLACEHOLDER_MAIL);//ce qu'il y'a ecrit dans le champs a remplir avec un efocntion defini en dessous
 
         // creation du champ password
         champMdp = new JPasswordField();
         champMdp.setBounds(30, 135, carteLongeur - 60, 40);//placement
-        styliserChampPassword(champMdp, "Password");//ce qu'il y'a ecrit dans le champs a remplir avec un efocntion defini en dessous
+        styliserChampPassword(champMdp, PLACEHOLDER_MDP);//ce qu'il y'a ecrit dans le champs a remplir avec un efocntion defini en dessous
 
         // creation du bouton se connecter
         btnValider = new JButton("Se connecter") {
@@ -120,9 +123,6 @@ public class FenetreConnexion {
 
         //ajouter la carte sur le fond
         backgroundLabel.add(card);
-
-        frame.setVisible(true); //afficher la fenetre
-        frame.requestFocusInWindow();//enelevr le curseur de conteneur 1
 
     }
 
@@ -201,6 +201,8 @@ public class FenetreConnexion {
 
 
     public JFrame getFrame() { return frame; }  //GETTERS pour la taille
+    public void setFrame(JFrame frame) { this.frame = frame; }
+    public JPanel getPanel() { return panel; }
     public JButton getBtnValider() { return btnValider; }  //GETTERS pour la taille
     public JLabel getBtnRetourLabel() { return btnRetourLabel; }  //GETTERS pour la taille
     public JTextField getChampMail() { return champMail; }  //GETTERS pour la taille

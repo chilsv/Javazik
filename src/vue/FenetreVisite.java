@@ -3,15 +3,14 @@ package vue;
 import javax.swing.*;
 
 public class FenetreVisite {
-    private final JFrame frame;
+    private JFrame frame;
+    private final JPanel panel;
     private final JLabel profil;
     private final JLabel librairie;
 
     public FenetreVisite() {
-        frame = new JFrame("Fenêtre de visite");
-        frame.setSize(1392, 768);
-        frame.setLocationRelativeTo(null); //mettre au milieu
-        frame.setUndecorated(true); //Enlever les bord de base de windows
+        panel = new JPanel(null);
+        panel.setPreferredSize(new java.awt.Dimension(1392, 768));
 
         profil = new JLabel(new ImageIcon("assets/profil.png"));
         librairie = new JLabel(new ImageIcon("assets/librairie.png"));
@@ -19,14 +18,20 @@ public class FenetreVisite {
         profil.setBounds(100, 100, 10, 10);
         librairie.setBounds(200, 100, 10, 10);
 
-        frame.add(profil);
-        frame.add(librairie);
-
-        frame.setVisible(true);
+        panel.add(profil);
+        panel.add(librairie);
     }
 
     public JFrame getFrame() {
         return frame;
+    }
+
+    public void setFrame(JFrame frame) {
+        this.frame = frame;
+    }
+
+    public JPanel getPanel() {
+        return panel;
     }
 
     public JLabel getProfil() {
