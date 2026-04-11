@@ -69,10 +69,6 @@ public class FenetreMenu {
     public JLabel getBtnConnexionLabel() { return btnConnexionLabel; }
     public JLabel getLogoLabel() { return logoLabel; }
     public JLabel getBandeauLabel() { return bandeauLabel; }
-
-
-
-
 }
 
 
