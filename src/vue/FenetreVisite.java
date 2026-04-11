@@ -21,13 +21,16 @@ public class FenetreVisite {
     private final JPanel panel;
     private final JLayeredPane coucheContenu;
     private final JPanel base;
+    private final JPanel central; // tout le reste
+
     private final JPanel bandeSelection; // Bande à gauche : compte, librairie, etc
     private final JPanel lecture; // bande en bas : play pause like et tout
+
     private final JPanel zoneRecherche;
     private final JPanel ligneRecherche;
     private final JTextField barreRecherche;
-    private final JPanel central; // tout le reste
     private final FenetreFiltre panneauFiltre;
+    
     private final JLabel profil;
     private final JLabel librairie;
     private final JLabel loupe;

@@ -17,9 +17,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 public class FenetreInscription {
-    private static final String PLACEHOLDER_NOM = "Username";
-    private static final String PLACEHOLDER_MAIL = "Mail address";
-    private static final String PLACEHOLDER_MDP = "Password";
+    private static final String PLACEHOLDER_NOM = "Nom";
+    private static final String PLACEHOLDER_MAIL = "Mail";
+    private static final String PLACEHOLDER_MDP = "Mot de passe";
 
     private JFrame frame;
     private final JPanel panel;
@@ -57,7 +57,7 @@ public class FenetreInscription {
         card.setOpaque(false);
         card.setBounds(carteX, carteY, carteLongueur, carteLargeur);
 
-        JLabel titre = new JLabel("Sign Up", SwingConstants.CENTER);
+        JLabel titre = new JLabel("S'inscrire", SwingConstants.CENTER);
         titre.setFont(new Font("Segoe UI", Font.PLAIN, 26));
         titre.setForeground(Color.WHITE);
         titre.setBounds(0, 20, carteLongueur, 40);

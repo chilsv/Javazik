@@ -23,7 +23,7 @@ import metier.Filtre;
 public class FenetreFiltre extends JPanel {
     private static final int ANNEE_SPINNER_MIN = 0;
     private static final int ANNEE_MIN = 1920;
-    private static final int ANNEE_MAX = LocalDate.now().getYear() + 1;
+    private static final int ANNEE_MAX = LocalDate.now().getYear();
 
     private final JCheckBox morceau;
     private final JCheckBox artiste;
