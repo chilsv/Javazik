@@ -7,12 +7,7 @@ import controleur.EvenementsConnexion;
 import controleur.EvenementsMenu;
 import controleur.EvenementsVisite;
 import controleur.actions.Action;
-import controleur.formulaires.ArtisteForm;
-import controleur.formulaires.ConnexionForm;
-import controleur.formulaires.InscriptionForm;
-import controleur.formulaires.MorceauForm;
-import controleur.formulaires.PlaylistForm;
-import controleur.formulaires.RechercheForm;
+import controleur.formulaires.*;
 import metier.*;
 
 public class Fenetre implements InterfaceVue {
@@ -131,8 +126,30 @@ public class Fenetre implements InterfaceVue {
 
              EvenementsVisite.ajouterEvenements(fenetre, choix -> {
                 synchronized (verrou) {
-                    // Ici, vous pouvez mapper les choix à des actions spécifiques
-                    // Par exemple :
+                    /*
+                    if (choix == 1) {
+                        resultat[0] = actions.get(0); // Action 1
+                    } else if (choix == 2) {
+                        resultat[0] = actions.get(1); // Action 2
+                    }
+                     */
+                    verrou.notify();
+                }
+            });
+        });
+
+        return resultat[0];
+    }
+
+    public InscriptionForm demanderInscription() {
+        final InscriptionForm[] resultat = {null};
+        final Object verrou = new Object();
+
+        SwingUtilities.invokeLater(() -> {
+            FenetreVisite fenetre = new FenetreVisite();
+
+             EvenementsVisite.ajouterEvenements(fenetre, choix -> {
+                synchronized (verrou) {
                     /*
                     if (choix == 1) {
                         resultat[0] = actions.get(0); // Action 1
@@ -151,13 +168,11 @@ public class Fenetre implements InterfaceVue {
     //barre de lecture
     public void afficherLecture(Morceau morceau){};
 
-
     public void afficherMessage(String message){}; //erreur
     public void afficherErreur(String message){}; //message d'erreur
     public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue){};
     public void afficherProfilAdmin(Admin admin){};
 
-    public InscriptionForm demanderInscription(){return null;};
     public RechercheForm demanderRecherche(boolean filtrage){return null;};
 
     public void afficherRecherche(ResultatRecherche resultat){}; //reuslata rehcerche
