@@ -8,6 +8,7 @@ import metier.Abonne;
 import metier.Admin;
 import metier.Catalogue;
 import metier.Morceau;
+import metier.Personne;
 import metier.ResultatRecherche;
 
 public interface InterfaceVue {
@@ -30,5 +31,5 @@ public interface InterfaceVue {
 
     MorceauForm demanderMorceau();
     ArtisteForm demanderArtiste();
-    PlaylistForm demanderPlaylist(); // pour créer une playlist
+    PlaylistForm demanderPlaylist(int numUtilisateur); // pour créer une playlist
 }

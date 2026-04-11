@@ -15,6 +15,7 @@ public abstract class Personne implements Serializable {
     private String nom;
     private String mail;
     private String mdp;
+    private int num;
     private LocalDate date_creation;
     private final ArrayList<Action> actions = new ArrayList<Action>();
 
@@ -31,7 +32,7 @@ public abstract class Personne implements Serializable {
     /**
      * Instanciation d'un abonné ou d'un administrateur
      */
-    public Personne(String nom, String mail, String mdp) {
+    public Personne(String nom, String mail, String mdp, int num) {
         this.nom = nom;
         this.mail = mail;
         this.mdp = mdp;
@@ -60,6 +61,10 @@ public abstract class Personne implements Serializable {
         return nom;
     }
 
+    public int getNum() {
+        return num;
+    }
+
     public String getMail() {
         return mail;
     }
@@ -80,14 +85,14 @@ public abstract class Personne implements Serializable {
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
      * @params arguments vue, catalogue
-     */
-    public void executerAction(Action action, InterfaceVue vue, Catalogue catalogue) throws ActionException {
+     
+    public void executerAction(Action action, ActionArguments arguments) throws ActionException {
         try {
-            action.executer(new ActionArguments(vue, this, catalogue));
+            action.executer(arguments);
         } catch (MorceauIntrouvableException e) {
             throw e;
         }
-    }
+    }*/
 
     /**
      * Renvoie la liste des actions possibles

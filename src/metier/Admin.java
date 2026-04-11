@@ -6,13 +6,11 @@ import controleur.actions.*;
 import vue.InterfaceVue;
 
 public class Admin extends Personne {
-    private int num;
     // liste des actions qu'un admin peut faire
     private final ArrayList<Action> actions = new ArrayList<Action>();
 
     public Admin(String nom, String mail, String mdp, int num) {
-        super(nom, mail, mdp);
-        this.num = num;
+        super(nom, mail, mdp, num);
         // Actions qu'un admin peut faire
         actions.add(new Recherche());
         actions.add(new AjouterMorceau());
@@ -30,9 +28,5 @@ public class Admin extends Personne {
 
     public ArrayList<Action> getActions() {
         return actions;
-    }
-
-    public int getNum() {
-        return num;
     }
 }

@@ -94,7 +94,7 @@ public class Fenetre implements InterfaceVue {
     public void afficherRecherche(ResultatRecherche resultat){}; //reuslata rehcerche
     public MorceauForm demanderMorceau(){return null;}; //admin ajouter
     public ArtisteForm demanderArtiste(){return null;}; //admin
-    public PlaylistForm demanderPlaylist(){return null;}; //abonéé
+    public PlaylistForm demanderPlaylist(int numUtilisateur){return null;}; //abonéé
 
 
     public String choisirMorceau(){

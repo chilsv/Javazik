@@ -1,30 +1,31 @@
 package controleur.actions;
 
-import controleur.formulaires.PlaylistForm;
+import controleur.exceptions.ActionException;
+import controleur.exceptions.PlaylistDejaExistanteException;
 import metier.Abonne;
-import metier.Catalogue;
 import metier.Playlist;
 
 public class AjouterPlaylist implements Action {
     /**
-     * @param arguments vue, utilisateur, catalogue
+     * @param arguments utilisateur, catalogue, playlistForm
      */
     @Override
-    public void executer(ActionArguments arguments) {
-        PlaylistForm formulaire = arguments.vue.demanderPlaylist();
-        Playlist playlist = new Playlist(formulaire.nom, formulaire.morceaux, arguments.catalogue);
+    public void executer(ActionArguments arguments) throws PlaylistDejaExistanteException{   
+        Playlist playlist = new Playlist(arguments.playlistForm.nom, arguments.playlistForm.morceaux, arguments.catalogue, arguments.playlistForm.numCreateur);
         if (!arguments.catalogue.playlistExiste(playlist.getNum())) {
             if (arguments.utilisateur instanceof Abonne) {
                 Abonne abonne = (Abonne) arguments.utilisateur;
+                if (playlist.getNom().equals("Morceaux aimés")) {
+                    abonne.setPlaylistDefaut(playlist.getNum());
+                }
                 abonne.ajouterPlaylist(playlist.getNum());
             }
-            arguments.catalogue.ajouterPlaylist(playlist);
+            try {
+                arguments.catalogue.ajouterPlaylist(playlist);
+            } catch (PlaylistDejaExistanteException e) {
+                throw new PlaylistDejaExistanteException();
+            }
         }
-    }
-
-    public void executerDefaut(Abonne abonne, Catalogue catalogue, Playlist playlist) {
-        abonne.ajouterPlaylist(playlist.getNum());
-        catalogue.ajouterPlaylist(playlist);
     }
 
     @Override

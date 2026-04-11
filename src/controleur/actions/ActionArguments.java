@@ -2,6 +2,7 @@ package controleur.actions;
 
 import java.util.ArrayList;
 
+import controleur.formulaires.*;
 import metier.Abonne;
 import metier.Admin;
 import metier.Catalogue;
@@ -18,6 +19,13 @@ public class ActionArguments {
     public Playlist playlist;
     public ArrayList<Abonne> abonnes;
     public ArrayList<Admin> admins;
+    public PlaylistForm playlistForm;
+    public RechercheForm rechercheForm;
+    public InscriptionForm inscriptionForm;
+    public ArtisteForm artisteForm;
+    public MorceauForm morceauForm;
+    public String nomMorceau;
+    public Morceau morceauTrouve;
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         this.vue = vue;
@@ -39,5 +47,31 @@ public class ActionArguments {
         this(vue, utilisateur, catalogue);
         this.abonnes = abonnes;
         this.admins = admins;
+    }
+
+    public ActionArguments(Personne utilisateur, Catalogue catalogue, PlaylistForm playlistForm) {
+        this(utilisateur, catalogue);
+        this.playlistForm = playlistForm;
+    }
+
+    public ActionArguments(Personne utilisateur, Catalogue catalogue) {
+        this.utilisateur = utilisateur;
+        this.catalogue = catalogue;
+    }
+
+    public ActionArguments(Catalogue catalogue, ArtisteForm artisteForm) {
+        this.catalogue = catalogue;
+        this.artisteForm = artisteForm;
+    }
+
+    public ActionArguments(Catalogue catalogue, MorceauForm morceauForm) {
+        this.catalogue = catalogue;
+        this.morceauForm = morceauForm;
+    }
+
+    public ActionArguments(Catalogue catalogue, String nomMorceau, Morceau morceauTrouve) {
+        this.catalogue = catalogue;
+        this.nomMorceau = nomMorceau;
+        this.morceauTrouve = morceauTrouve;
     }
 }

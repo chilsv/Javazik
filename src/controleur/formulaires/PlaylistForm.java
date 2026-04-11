@@ -8,13 +8,16 @@ import metier.Morceau;
 public final class PlaylistForm {
     public final String nom;
     public ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
+    public int numCreateur;
 
-    public PlaylistForm(String nom, ArrayList<Morceau> morceaux) {
+    public PlaylistForm(String nom, int numCreateur) {
         this.nom = nom;
-        this.morceaux = morceaux;
+        this.numCreateur = numCreateur;
     }
 
-    public PlaylistForm(String nom) {
+    public PlaylistForm(String nom, ArrayList<Morceau> morceaux, int numCreateur) {
         this.nom = nom;
+        this.morceaux = morceaux;
+        this.numCreateur = numCreateur;
     }
 }
