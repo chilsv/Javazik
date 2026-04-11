@@ -9,6 +9,7 @@ import metier.Catalogue;
 import metier.Morceau;
 import metier.Personne;
 import metier.Playlist;
+import metier.Filtre;
 import vue.InterfaceVue;
 
 public class ActionArguments {
@@ -26,6 +27,7 @@ public class ActionArguments {
     public MorceauForm morceauForm;
     public String nomMorceau;
     public Morceau morceauTrouve;
+    public Filtre filtre;
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         this.vue = vue;
@@ -73,5 +75,20 @@ public class ActionArguments {
         this.catalogue = catalogue;
         this.nomMorceau = nomMorceau;
         this.morceauTrouve = morceauTrouve;
+    }
+
+    public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, RechercheForm rechercheForm) {
+        this(vue, utilisateur, catalogue);
+        this.rechercheForm = rechercheForm;
+    }
+
+    public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, Filtre filtre) {
+        this(vue, utilisateur, catalogue);
+        this.filtre = filtre;
+    }
+
+    public ActionArguments(InterfaceVue vue, Personne utilisateur) {
+        this.vue = vue;
+        this.utilisateur = utilisateur;
     }
 }

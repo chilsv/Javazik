@@ -1,6 +1,7 @@
 package vue;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,26 +12,34 @@ import controleur.EvenementsInscription;
 import controleur.EvenementsMenu;
 import controleur.EvenementsVisite;
 import controleur.actions.Action;
+import controleur.actions.ChoisirFiltre;
 import controleur.actions.ConsulterLibrairie;
 import controleur.actions.ConsulterProfil;
+import controleur.actions.Deconnexion;
+import controleur.actions.Recherche;
+import controleur.exceptions.ActionException;
 import controleur.formulaires.*;
 import metier.*;
 
 public class Fenetre implements InterfaceVue {
-
     private static final String CARTE_MENU = "menu";
     private static final String CARTE_CONNEXION = "connexion";
     private static final String CARTE_INSCRIPTION = "inscription";
     private static final String CARTE_VISITE = "visite";
+    private static final int DUREE_TOAST_MS = 2800;
 
     private final JFrame frame;
     private final CardLayout cardLayout;
     private final JPanel cartes;
     private final Map<String, JPanel> cartesParNom;
+    private FenetreVisite visiteCourante;
+    private JWindow toastFenetre;
+    private Timer toastTimer;
 
     public Fenetre() {
-        frame = new JFrame(); //Creation
+        frame = new JFrame("Javazic"); //Creation
         frame.setSize(1392, 768); //Taille de notre fenetre
+        frame.setIconImage(Toolkit.getDefaultToolkit().getImage("assets/logo.png"));
         frame.setLocationRelativeTo(null); //mettre au milieu
         frame.setUndecorated(true); //Enlever les bord de base de windows
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -65,26 +74,6 @@ public class Fenetre implements InterfaceVue {
             throw new RuntimeException(e);
         }
     }
-
-    /*public void menuPrincipal(){
-
-        FenetreMenu fenetreMenu = new FenetreMenu();
-
-        Evenements.ajouterEvenements(fenetreMenu, choix -> {
-
-            if (choix == 1) {
-                System.out.println("Admin");
-            }
-            else if (choix == 2) {
-                System.out.println("Connexion");
-            }
-            else if (choix == 0) {
-                System.out.println("Quitter");
-            }
-
-        });
-        //return a;
-    }*/
 
     public int menuPrincipal() {
         // Tableau pour capturer le choix depuis le listener asynchrone
@@ -178,27 +167,35 @@ public class Fenetre implements InterfaceVue {
     }
 
     //quelle bouton on clique
-    public Action choisirAction(String accueil, ArrayList<Action> actions) {
+    public Action choisirAction(String accueil, Personne utilisateur) {
         final Action[] resultat = {null};
         final Object verrou = new Object();
 
         executerSurEdtEtAttendre(() -> {
             FenetreVisite fenetre = new FenetreVisite();
             fenetre.setFrame(frame);
+            visiteCourante = fenetre;
             afficherCarte(CARTE_VISITE, fenetre.getPanel());
 
+            boolean filtreVisible = !(utilisateur instanceof Visiteur);
             EvenementsVisite.ajouterEvenements(fenetre, choix -> {
                 synchronized (verrou) {
                     if (choix == 1) {
                         resultat[0] = new ConsulterProfil();
                     } else if (choix == 2) {
                         resultat[0] = new ConsulterLibrairie();
+                    } else if (choix == 3) {
+                        resultat[0] = new Deconnexion();
+                    } else if (choix == 4) {
+                        resultat[0] = new ChoisirFiltre();
+                    } else if (choix == 5) {
+                        resultat[0] = new Recherche();
                     } else {
                         resultat[0] = null;
                     }
                     verrou.notify();
                 }
-            });
+            }, filtreVisible);
         });
 
         synchronized (verrou) {
@@ -258,18 +255,77 @@ public class Fenetre implements InterfaceVue {
     //barre de lecture
     public void afficherLecture(Morceau morceau){};
 
-    public void afficherMessage(String message){}; //erreur
-    public void afficherErreur(String message){}; //message d'erreur
+    public void afficherMessage(String message) {
+    }
+
+    public void afficherErreur(Exception e) {
+        if (e == null) {
+            return;
+        }
+        String message = e.getMessage();
+        afficherMessage(e.getMessage());
+        String texte = (message == null || message.isBlank()) ? "Une erreur est survenue." : message;
+
+        if (toastTimer != null && toastTimer.isRunning()) {
+            toastTimer.stop();
+        }
+        if (toastFenetre != null) {
+            toastFenetre.dispose();
+        }
+
+        toastFenetre = new JWindow(frame);
+        toastFenetre.setBackground(new Color(0, 0, 0, 0));
+
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBorder(new EmptyBorder(10, 14, 10, 14));
+        contenu.setBackground(new Color(210, 20, 20, 185));
+
+        JLabel label = new JLabel(texte, SwingConstants.CENTER);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("SansSerif", Font.BOLD, 14));
+        contenu.add(label, BorderLayout.CENTER);
+
+        toastFenetre.setContentPane(contenu);
+        toastFenetre.pack();
+
+        Point posFenetre = frame.getLocationOnScreen();
+        int x = posFenetre.x + (frame.getWidth() - toastFenetre.getWidth()) / 2;
+        int y = posFenetre.y + 28;
+        toastFenetre.setLocation(x, y);
+        toastFenetre.setAlwaysOnTop(true);
+        toastFenetre.setVisible(true);
+
+        toastTimer = new Timer(DUREE_TOAST_MS, evt -> {
+            if (toastFenetre != null) {
+                toastFenetre.dispose();
+                toastFenetre = null;
+            }
+        });
+        toastTimer.setRepeats(false);
+        toastTimer.start();
+    }
+   
     public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue){};
     public void afficherProfilAdmin(Admin admin){};
 
-    public RechercheForm demanderRecherche(boolean filtrage){return null;};
+    public RechercheForm demanderRecherche(Filtre filtre) {
+        if (visiteCourante == null) {
+            return null;
+        }
+        return new RechercheForm(visiteCourante.getBarreRecherche().getText(), filtre);
+    }
+
+    public Filtre afficherFiltres() {
+        if (visiteCourante == null) {
+            return null;
+        }
+        return visiteCourante.getFiltreSelectionne();
+    }
 
     public void afficherRecherche(ResultatRecherche resultat){}; //reuslata rehcerche
     public MorceauForm demanderMorceau(){return null;}; //admin ajouter
     public ArtisteForm demanderArtiste(){return null;}; //admin
     public PlaylistForm demanderPlaylist(int numUtilisateur){return null;}; //abonéé
-
 
     public String choisirMorceau(){
         return "0";

@@ -102,10 +102,10 @@ public class Catalogue {
         albums.add(album);
     }
 
-    public ResultatRecherche chercher(Filtre filtre) {
+    public ResultatRecherche chercher(Filtre filtre, String recherche) {
         ResultatRecherche resultat = new ResultatRecherche();
         // on fait une recherche par rapport aux filtres choisis et on retourne le résultat
-        String recherche = filtre.recherche == null ? "" : filtre.recherche.toLowerCase();
+        recherche = recherche == null ? "" : recherche.toLowerCase();
 
         //flemme d'expliquer mais c'est un copier-coller
         // pour chaque type (morceau, artiste...), on vérifie si c'est le filtre appliqué

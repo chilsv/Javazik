@@ -39,7 +39,8 @@ public class Console implements InterfaceVue {
     }
 
     @Override
-    public Action choisirAction(String accueil, ArrayList<Action> actions) {
+    public Action choisirAction(String accueil, Personne utilisateur) {
+        ArrayList<Action> actions = utilisateur.getActions();
         Scanner saisie = new Scanner(System.in);
         System.out.println("-".repeat(40));
         System.out.println(accueil);
@@ -65,9 +66,9 @@ public class Console implements InterfaceVue {
     }
 
     @Override
-    public void afficherErreur(String message) {
+    public void afficherErreur(Exception e) {
         System.out.println();
-        System.out.println(message);
+        System.out.println(e.getMessage());
         System.out.println();
     }
 
@@ -89,31 +90,26 @@ public class Console implements InterfaceVue {
                 lireTexte("Mot de passe : "));
     }
 
-    @Override
-    public RechercheForm demanderRecherche(boolean filtrage) {
+    public Filtre afficherFiltres() {
         String choix = "";
-        if (filtrage) {
-            System.out.println("-".repeat(40));
-            System.out.println("-------- exemple de filtre :     2AB       --------");
-            System.out.println("Filtres disponibles (choisir UN chiffre) :");
-            System.out.println("1- Morceaux");
-            System.out.println("2- Artistes");
-            System.out.println("3- Albums");
-            System.out.println("4- Playlists");
-            System.out.println("A- Une année");
-            System.out.println("B- Trier par ordre croissant");
-            System.out.println("C- Trier par genre");
-            System.out.println("D- Trier par zone géographique");
-            choix = lireTexte("--> ");
-        }
+        System.out.println("-".repeat(40));
+        System.out.println("Filtres disponibles (choisir UN chiffre) :");
+        System.out.println("1- Morceaux");
+        System.out.println("2- Artistes");
+        System.out.println("3- Albums");
+        System.out.println("4- Playlists");
+        System.out.println("A- Une année");
+        System.out.println("B- Trier par ordre croissant");
+        System.out.println("C- Trier par genre");
+        System.out.println("D- Trier par zone géographique");
+        choix = lireTexte("--> ");
 
-        String recherche = lireTexte("Recherche de : ");
         boolean morceau = false;
         boolean artiste = false;
         boolean album = false;
         boolean playlist = false;
         boolean croissant = false;
-        int annee = 0;
+        int[] annee = new int[] {0, 0};
 
         for (char c : choix.toUpperCase().toCharArray()) {
             if (c == '1') morceau = true;
@@ -122,9 +118,10 @@ public class Console implements InterfaceVue {
             else if (c == '4') playlist = true;
             else if (c == 'A') {
                 try {
-                    annee = Integer.parseInt(lireTexte("Année : "));
+                    int valeur = Integer.parseInt(lireTexte("Année : "));
+                    annee = new int[] {valeur, valeur};
                 } catch (NumberFormatException e) {
-                    annee = 0;
+                    annee = new int[] {0, 0};
                 }
             } else if (c == 'B') {
                 croissant = true;
@@ -138,7 +135,13 @@ public class Console implements InterfaceVue {
             playlist = true;
         }
 
-        return new RechercheForm(recherche, morceau, artiste, album, playlist, croissant, annee);
+        return new Filtre(morceau, artiste, album, playlist, croissant, annee);
+    }
+
+    @Override
+    public RechercheForm demanderRecherche(Filtre filtre) {
+        String recherche = lireTexte("Recherche de : ");
+        return new RechercheForm(recherche, filtre);
     }
 
     @Override

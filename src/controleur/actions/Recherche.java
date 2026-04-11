@@ -1,6 +1,5 @@
 package controleur.actions;
 
-import controleur.formulaires.RechercheForm;
 import metier.Abonne;
 import metier.Admin;
 import metier.Filtre;
@@ -9,19 +8,17 @@ import metier.Visiteur;
 
 public class Recherche implements Action {
     /**
-     * @param arguments vue, utilisateur, catalogue
+     * @param arguments vue, utilisateur, catalogue, rechercheForm
      */
     @Override
     public void executer(ActionArguments arguments) {
-        // Pour chaque dype d'utilisateur, on a des possibilités de recherche différentes
-        RechercheForm formulaire = arguments.vue.demanderRecherche(arguments.utilisateur instanceof Abonne);
-        Filtre filtre = new Filtre(formulaire.recherche, formulaire.morceau, formulaire.artiste, formulaire.album, formulaire.playlist, formulaire.croissant, formulaire.annee);
+        if (arguments.rechercheForm == null) {
+            return;
+        }
 
-        if (arguments.utilisateur instanceof Visiteur) {
-            ResultatRecherche resultat = arguments.catalogue.chercher(filtre);
-            arguments.vue.afficherRecherche(resultat);
-        } else if (arguments.utilisateur instanceof Abonne) {
-            ResultatRecherche resultat = arguments.catalogue.chercher(filtre);
+        Filtre filtre = new Filtre(arguments.rechercheForm.morceau, arguments.rechercheForm.artiste, arguments.rechercheForm.album, arguments.rechercheForm.playlist, arguments.rechercheForm.croissant, arguments.rechercheForm.annee);
+        if (arguments.utilisateur instanceof Visiteur || arguments.utilisateur instanceof Abonne) {
+            ResultatRecherche resultat = arguments.catalogue.chercher(filtre, arguments.rechercheForm.recherche);
             arguments.vue.afficherRecherche(resultat);
         } else if (arguments.utilisateur instanceof Admin) {
             // à implémeneter : peut chercher des abonnés et tout

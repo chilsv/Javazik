@@ -1,7 +1,6 @@
 package vue;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
 
 public class FenetreMenu {
 
@@ -18,13 +17,13 @@ public class FenetreMenu {
     public FenetreMenu (){
 
         panel = new JPanel(null);
-        panel.setPreferredSize(new Dimension(1392, 768));
+        panel.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
 
         // Background
         ImageIcon background = new ImageIcon("assets/Q.png");
         JLabel backgroundLabel = new JLabel(background);
         backgroundLabel.setLayout(null);
-        backgroundLabel.setBounds(0, 0, 1392, 768);
+        backgroundLabel.setBounds(0, 0, Ecran.LONGUEUR, Ecran.HAUTEUR);
         panel.add(backgroundLabel);
 
 

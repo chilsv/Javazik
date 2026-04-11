@@ -73,4 +73,8 @@ public class Morceau implements TypeObjets {
     public ArrayList<String> getGenres() {
         return genres;
     }
+
+    public boolean estAimePar(Abonne abonne, Catalogue catalogue) {
+        return catalogue.getPlaylist(abonne.getAimes()).morceauDedans(this);
+    }
 }

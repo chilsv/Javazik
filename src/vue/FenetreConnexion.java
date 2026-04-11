@@ -1,5 +1,3 @@
-
-
 package vue;
 
 import javax.swing.*;
@@ -8,11 +6,7 @@ import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-
-
-
 public class FenetreConnexion {
-
     private static final String PLACEHOLDER_MAIL = "Mail";
     private static final String PLACEHOLDER_MDP = "Mot de passe";
 
@@ -26,21 +20,21 @@ public class FenetreConnexion {
     public FenetreConnexion() {
 
         panel = new JPanel(null);
-        panel.setPreferredSize(new Dimension(1392, 768));
+        panel.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
 
         // Background
         ImageIcon background = new ImageIcon("assets/Q.png");
         JLabel backgroundLabel = new JLabel(background);
         backgroundLabel.setLayout(null);
-        backgroundLabel.setBounds(0, 0, 1392, 768);
+        backgroundLabel.setBounds(0, 0, Ecran.LONGUEUR, Ecran.HAUTEUR);
         panel.add(backgroundLabel);
 
         // ── Carte centrale (panneau semi-transparent) ──
         // Dimensions de la carte
         int carteLongeur = 340;
         int carteLargeur = 380;
-        int carteX = (1392 - carteLongeur) / 2; // centré horizontalement
-        int CarteY = (768 - carteLargeur) / 2;  // centré verticalement
+        int carteX = (Ecran.LONGUEUR - carteLongeur) / 2; // centré horizontalement
+        int CarteY = (Ecran.HAUTEUR - carteLargeur) / 2;  // centré verticalement
 
         //Creation d'une carte ou l'on va afficher nom d'utilisateur password bouton valider et retour
         JPanel card = new JPanel(null) { //mettre le panel a NULL pour pouvoir placer les elemnts nous meme avec des coordoones
@@ -101,15 +95,10 @@ public class FenetreConnexion {
 
 
         btnRetourLabel = new JLabel(new ImageIcon("assets/btn_retour.png"));
-        int btnRetourLargeur = btnRetourLabel.getIcon() != null
-                ? btnRetourLabel.getIcon().getIconWidth()  : 80;
-        int btnRetourHauteur = btnRetourLabel.getIcon() != null
-                ? btnRetourLabel.getIcon().getIconHeight() : 40;
         // X : centré dans la carte    Y : 10px au dessus du bas de la carte
-        int btnRetourX = (carteLongeur - btnRetourLargeur) / 2;
-        //btnRetourLabel.setBounds((carteLongueur - btnRetourLargeur) / 2, carteLargeur - btnRetourHauteur - 10, btnRetourLargeur, btnRetourHauteur);
-        int btnRetourY = carteLargeur - btnRetourHauteur - 15;
-        btnRetourLabel.setBounds(btnRetourX, btnRetourY, btnRetourLargeur, btnRetourHauteur);
+        int btnRetourX = (carteLongeur - 80) / 2;
+        int btnRetourY = carteLargeur - 40 - 15;
+        btnRetourLabel.setBounds(btnRetourX, btnRetourY, 80, 40);
         btnRetourLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
 
@@ -162,6 +151,7 @@ public class FenetreConnexion {
             }
         });
     }
+
     private void styliserChampPassword(JPasswordField champ, String placeholder) {
         // Style visuel
         champ.setBackground(new Color(40, 50, 80, 200));
@@ -198,13 +188,17 @@ public class FenetreConnexion {
         });
     }
 
-
-
     public JFrame getFrame() { return frame; }  //GETTERS pour la taille
     public void setFrame(JFrame frame) { this.frame = frame; }
     public JPanel getPanel() { return panel; }
     public JButton getBtnValider() { return btnValider; }  //GETTERS pour la taille
     public JLabel getBtnRetourLabel() { return btnRetourLabel; }  //GETTERS pour la taille
     public JTextField getChampMail() { return champMail; }  //GETTERS pour la taille
-    public JPasswordField getChampMdp() { return champMdp; }  //GETTERS pour la taille
+    
+    public JPasswordField getChampMdp() {
+        if (String.valueOf(champMdp.getPassword()).equals(PLACEHOLDER_MDP)) {
+            champMdp.setText("");
+        }
+        return champMdp;
+    }
 }
