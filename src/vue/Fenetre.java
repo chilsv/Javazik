@@ -3,7 +3,9 @@ package vue;
 import javax.swing.*;
 import java.util.ArrayList;
 
+import controleur.EvenementsConnexion;
 import controleur.EvenementsMenu;
+import controleur.EvenementsVisite;
 import controleur.actions.Action;
 import controleur.formulaires.ArtisteForm;
 import controleur.formulaires.ConnexionForm;
@@ -14,10 +16,6 @@ import controleur.formulaires.RechercheForm;
 import metier.*;
 
 public class Fenetre implements InterfaceVue {
-
-
-
-
 
     /*public void menuPrincipal(){
 
@@ -87,17 +85,78 @@ public class Fenetre implements InterfaceVue {
         return resultat[0];
     }
 
+    public ConnexionForm demanderConnexion() {
+        final ConnexionForm[] resultat = {null};
+        final Object verrou = new Object();
+
+        SwingUtilities.invokeLater(() -> {
+            FenetreConnexion fenetreConnexion = new FenetreConnexion();
+
+            EvenementsConnexion.ajouterEvenements(fenetreConnexion, choix -> {
+                synchronized (verrou) {
+                    if (choix == 1) {
+                        String mail = fenetreConnexion.getChampMail().getText();
+                        String mdp = new String(fenetreConnexion.getChampMdp().getPassword());
+                        resultat[0] = new ConnexionForm(mail, mdp);
+                    } else if (choix == 2) {
+                        System.out.println("Retour au menu");
+                    } else {
+                        resultat[0] = null;
+                    }
+                    verrou.notify();
+                }
+            });
+        });
+
+        synchronized (verrou) {
+            while (resultat[0] == null) {
+                try {
+                    verrou.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        return resultat[0];
+    }
+
+    //quelle bouton on clique
+    public Action choisirAction(String accueil, ArrayList<Action> actions) {
+        final Action[] resultat = {null};
+        final Object verrou = new Object();
+
+        SwingUtilities.invokeLater(() -> {
+            FenetreVisite fenetre = new FenetreVisite();
+
+             EvenementsVisite.ajouterEvenements(fenetre, choix -> {
+                synchronized (verrou) {
+                    // Ici, vous pouvez mapper les choix à des actions spécifiques
+                    // Par exemple :
+                    /*
+                    if (choix == 1) {
+                        resultat[0] = actions.get(0); // Action 1
+                    } else if (choix == 2) {
+                        resultat[0] = actions.get(1); // Action 2
+                    }
+                     */
+                    verrou.notify();
+                }
+            });
+        });
+
+        return resultat[0];
+    }
+
     //barre de lecture
     public void afficherLecture(Morceau morceau){};
 
 
-    public Action choisirAction(String accueil, ArrayList<Action> actions){return null;}; //quelle bouton on clique
     public void afficherMessage(String message){}; //erreur
     public void afficherErreur(String message){}; //message d'erreur
     public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue){};
     public void afficherProfilAdmin(Admin admin){};
 
-    public ConnexionForm demanderConnexion(){return null;};
     public InscriptionForm demanderInscription(){return null;};
     public RechercheForm demanderRecherche(boolean filtrage){return null;};
 
