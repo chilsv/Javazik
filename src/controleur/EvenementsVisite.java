@@ -102,6 +102,7 @@ public class EvenementsVisite {
             }
         });
 
+        // pour effacer le panneau où sont les filtres
         barreRecherche.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {

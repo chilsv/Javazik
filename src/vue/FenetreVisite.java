@@ -30,7 +30,7 @@ public class FenetreVisite {
     private final JPanel ligneRecherche;
     private final JTextField barreRecherche;
     private final FenetreFiltre panneauFiltre;
-    
+
     private final JLabel profil;
     private final JLabel librairie;
     private final JLabel loupe;
@@ -38,16 +38,20 @@ public class FenetreVisite {
     private final JLabel btnRetour;
 
     public FenetreVisite() {
+        // On crée le panel princiapl qui contient tout
         panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
 
+        // lui aussi contient tout. en gros panel contient coucheContenu, et ça permet d'afficher des trucs au-dessus de coucheContenu (ex: panneau de filtre)
         coucheContenu = new JLayeredPane();
         coucheContenu.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
         coucheContenu.setLayout(null);
 
+        // base contient tout sauf la barre de recherche
         base = new JPanel(new BorderLayout());
         base.setBounds(0, 0, Ecran.LONGUEUR, Ecran.HAUTEUR);
 
+        // contient tout ce qui concerne la recherche
         zoneRecherche = new JPanel(null);
         zoneRecherche.setOpaque(false);
         zoneRecherche.setBounds(ZONE_RECHERCHE_X, ZONE_RECHERCHE_Y, ZONE_RECHERCHE_LARGEUR, ZONE_RECHERCHE_HAUTEUR + PANNEAU_FILTRE_Y + PANNEAU_FILTRE_HAUTEUR);
@@ -55,11 +59,13 @@ public class FenetreVisite {
         central = new JPanel(new BorderLayout());
         central.setBackground(Color.WHITE);
 
+        // bande à gauche
         bandeSelection = new JPanel();
         bandeSelection.setLayout(new BoxLayout(bandeSelection, BoxLayout.Y_AXIS));
         bandeSelection.setPreferredSize(new Dimension(BANDE_SELECTION_LARGEUR, Ecran.HAUTEUR));
         bandeSelection.setBackground(new Color(220, 240, 250));
 
+        // bande de lecture en bas
         lecture = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 10));
         lecture.setPreferredSize(new Dimension(Ecran.LONGUEUR, 70));
         lecture.setBackground(Color.LIGHT_GRAY);
@@ -72,6 +78,7 @@ public class FenetreVisite {
         panneauFiltre = new FenetreFiltre();
         panneauFiltre.setVisible(false);
 
+        // là ou on écrit
         barreRecherche = new JTextField();
         barreRecherche.setPreferredSize(new Dimension(200, 32));
 
@@ -92,6 +99,7 @@ public class FenetreVisite {
         panneauFiltre.setBounds(Math.max(0, xPanneau), PANNEAU_FILTRE_Y, PANNEAU_FILTRE_LARGEUR, PANNEAU_FILTRE_HAUTEUR);
         panneauFiltre.setVisible(false);
         zoneRecherche.add(panneauFiltre);
+
         bandeSelection.add(Box.createVerticalStrut(20));
         bandeSelection.add(profil);
         bandeSelection.add(Box.createVerticalStrut(20));
@@ -113,6 +121,9 @@ public class FenetreVisite {
         panel.add(coucheContenu, BorderLayout.CENTER);
     }
 
+    /*
+     * Pour créer un JLabel 
+     */
     private JLabel creerLabel(String cheminIcone, String texte, int cibleLargeur, int cibleHauteur) {
         ImageIcon icon = new ImageIcon(cheminIcone);
         JLabel label;
@@ -182,6 +193,7 @@ public class FenetreVisite {
         return ligneRecherche;
     }
 
+    /* pour afficher les filtres quand on passe la souris dessus */
     public void afficherPanneauFiltre() {
         panneauFiltre.setVisible(true);
         zoneRecherche.revalidate();
@@ -189,6 +201,7 @@ public class FenetreVisite {
         coucheContenu.repaint();
     }
 
+    /* pour enlever les filtres quand la souris est pas dessu */
     public void basculerPanneauFiltre() {
         panneauFiltre.setVisible(!panneauFiltre.isVisible());
         zoneRecherche.revalidate();
@@ -196,6 +209,7 @@ public class FenetreVisite {
         coucheContenu.repaint();
     }
 
+    /* ça cache les filtres */
     public void masquerPanneauFiltre() {
         panneauFiltre.setVisible(false);
         zoneRecherche.revalidate();
