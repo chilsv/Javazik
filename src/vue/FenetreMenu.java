@@ -19,7 +19,6 @@ public class FenetreMenu {
         frame.setLocationRelativeTo(null); //mettre au milieu
         frame.setUndecorated(true); //Enlever les bord de base de windows
 
-
         // Background
         ImageIcon background = new ImageIcon("assets/Q.png");
         JLabel backgroundLabel = new JLabel(background);

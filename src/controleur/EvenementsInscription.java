@@ -4,35 +4,34 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import vue.FenetreVisite;
+import vue.FenetreInscription;
 
-public class EvenementsVisite {
+public class EvenementsInscription {
 
-    public interface VisiteListener {
+    public interface ConnexionListener {
         void onChoix(int choix);
     }
 
-    public static void ajouterEvenements(FenetreVisite fenetre, VisiteListener listener) {
+    public static void ajouterEvenements(FenetreInscription fenetre, ConnexionListener listener) {
         JFrame frame = fenetre.getFrame();
-        JLabel profil = fenetre.getProfil();
-        JLabel librairie = fenetre.getLibrairie();
+        JButton btnValider = fenetre.getBtnValider();
+        JLabel btnRetour = fenetre.getBtnRetourLabel();
 
-        // Profil choix 1
-        profil.addMouseListener(new MouseAdapter() {
+        // Valider → choix 1
+        btnValider.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 listener.onChoix(1);
                 frame.dispose();
-
             }
             @Override
             public void mouseEntered(MouseEvent e) {
-                profil.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnValider.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
         });
 
-        // Librairie choix 2
-        librairie.addMouseListener(new MouseAdapter() {
+        // Retour → choix 2
+        btnRetour.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 listener.onChoix(2);
@@ -40,8 +39,9 @@ public class EvenementsVisite {
             }
             @Override
             public void mouseEntered(MouseEvent e) {
-                librairie.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnRetour.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
         });
     }
+
 }

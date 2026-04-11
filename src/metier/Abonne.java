@@ -26,6 +26,7 @@ public class Abonne extends Personne {
         actions.add(new Recherche());
         actions.add(new JouerMorceau());
         actions.add(new AjouterPlaylist());
+        actions.add(new ConsulterLibrairie());
         actions.add(new ConsulterProfil());
         actions.add(new Deconnexion());
         actions.add(new Quitter());

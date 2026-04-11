@@ -4,9 +4,12 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 import controleur.EvenementsConnexion;
+import controleur.EvenementsInscription;
 import controleur.EvenementsMenu;
 import controleur.EvenementsVisite;
 import controleur.actions.Action;
+import controleur.actions.ConsulterLibrairie;
+import controleur.actions.ConsulterProfil;
 import controleur.formulaires.*;
 import metier.*;
 
@@ -124,19 +127,29 @@ public class Fenetre implements InterfaceVue {
         SwingUtilities.invokeLater(() -> {
             FenetreVisite fenetre = new FenetreVisite();
 
-             EvenementsVisite.ajouterEvenements(fenetre, choix -> {
+            EvenementsVisite.ajouterEvenements(fenetre, choix -> {
                 synchronized (verrou) {
-                    /*
                     if (choix == 1) {
-                        resultat[0] = actions.get(0); // Action 1
+                        resultat[0] = new ConsulterProfil();
                     } else if (choix == 2) {
-                        resultat[0] = actions.get(1); // Action 2
+                        resultat[0] = new ConsulterLibrairie();
+                    } else {
+                        resultat[0] = null;
                     }
-                     */
                     verrou.notify();
                 }
             });
         });
+
+        synchronized (verrou) {
+            while (resultat[0] == null) {
+                try {
+                    verrou.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
 
         return resultat[0];
     }
@@ -146,21 +159,33 @@ public class Fenetre implements InterfaceVue {
         final Object verrou = new Object();
 
         SwingUtilities.invokeLater(() -> {
-            FenetreVisite fenetre = new FenetreVisite();
-
-             EvenementsVisite.ajouterEvenements(fenetre, choix -> {
-                synchronized (verrou) {
-                    /*
-                    if (choix == 1) {
-                        resultat[0] = actions.get(0); // Action 1
-                    } else if (choix == 2) {
-                        resultat[0] = actions.get(1); // Action 2
-                    }
-                     */
-                    verrou.notify();
+            FenetreInscription fenetre = new FenetreInscription();
+            EvenementsInscription.ajouterEvenements(fenetre, choix -> {
+            synchronized (verrou) {
+                if (choix == 1) {
+                    String nom = fenetre.getChampNom().getText();
+                    String mail = fenetre.getChampMail().getText();
+                    String mdp = new String(fenetre.getChampMdp().getPassword());
+                    resultat[0] = new InscriptionForm("abonne", nom, mail, mdp);
+                } else if (choix == 2) {
+                    System.out.println("Retour au menu");
+                } else {
+                    resultat[0] = null;
                 }
+                verrou.notify();
+            }
             });
         });
+
+        synchronized (verrou) {
+            while (resultat[0] == null) {
+                try {
+                    verrou.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
 
         return resultat[0];
     }

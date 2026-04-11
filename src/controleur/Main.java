@@ -64,7 +64,7 @@ public class Main {
         File fichier = new File("donnees/" + nomFichier);
 
         if (!fichier.exists()) {
-            try (FileOutputStream _ = new FileOutputStream(fichier)) {
+            try (FileOutputStream fos = new FileOutputStream(fichier)) {
                 if ("admins.ser".equals(nomFichier)) {
                     initialiser();
                 }
@@ -248,6 +248,8 @@ public class Main {
                 vue.afficherErreur(e.getMessage());
             }
         } else if (actionChoisie instanceof ConsulterProfil) {
+            consulter_profil(utilisateur, vue, catalogue);
+        } else if (actionChoisie instanceof ConsulterLibrairie) {
         } else if (actionChoisie instanceof Recherche) {
         } else if (actionChoisie instanceof ConsulterUtilisateurs) {
             new ConsulterUtilisateurs().executer(new ActionArguments(vue, utilisateur, catalogue, abonnes, admins));
@@ -256,6 +258,16 @@ public class Main {
         }
         visiter(utilisateur, vue, abonnes, admins, catalogue);
         return;
+    }
+
+    public static void consulter_profil(Personne utilisateur, InterfaceVue vue, Catalogue catalogue) {
+        if (utilisateur instanceof Abonne) {
+            Abonne abonne = (Abonne) utilisateur;
+            vue.afficherProfilAbonne(abonne, catalogue);
+        } else if (utilisateur instanceof Admin) {
+            Admin admin = (Admin) utilisateur;
+            vue.afficherProfilAdmin(admin);
+        }
     }
 
     public static void supprimerAbonne(Abonne abonne) {

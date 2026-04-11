@@ -1,6 +1,6 @@
 package controleur.actions;
 
-public class ConsulterProfil implements Action {
+public class ConsulterLibrairie implements Action {
     /**
      * @param arguments aucun
      */
@@ -10,7 +10,6 @@ public class ConsulterProfil implements Action {
 
     @Override
     public String getNom() {
-        return "Consulter le profil";
+        return "Consulter la librairie";
     }
-
 }
