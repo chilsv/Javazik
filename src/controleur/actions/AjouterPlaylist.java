@@ -1,6 +1,5 @@
 package controleur.actions;
 
-import controleur.exceptions.ActionException;
 import controleur.exceptions.PlaylistDejaExistanteException;
 import metier.Abonne;
 import metier.Playlist;

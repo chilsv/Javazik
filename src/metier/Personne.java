@@ -6,9 +6,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
-import controleur.actions.ActionArguments;
-import controleur.exceptions.ActionException;
-import controleur.exceptions.MorceauIntrouvableException;
 import vue.InterfaceVue;
 
 public abstract class Personne implements Serializable {

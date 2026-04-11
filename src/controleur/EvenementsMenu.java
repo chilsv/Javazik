@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import vue.FenetreMenu;
 
-public class Evenements {
+public class EvenementsMenu {
 
     public interface MenuListener {
         void onChoix(int choix);

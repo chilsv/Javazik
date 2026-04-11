@@ -3,7 +3,7 @@ package vue;
 import javax.swing.*;
 import java.util.ArrayList;
 
-import controleur.Evenements;
+import controleur.EvenementsMenu;
 import controleur.actions.Action;
 import controleur.formulaires.ArtisteForm;
 import controleur.formulaires.ConnexionForm;
@@ -48,7 +48,7 @@ public class Fenetre implements InterfaceVue {
         SwingUtilities.invokeLater(() -> {
             FenetreMenu fenetreMenu = new FenetreMenu();
 
-            Evenements.ajouterEvenements(fenetreMenu, choix -> {
+            EvenementsMenu.ajouterEvenements(fenetreMenu, choix -> {
                 synchronized (verrou) {
                     if (choix == 1) {
                         System.out.println("Admin");

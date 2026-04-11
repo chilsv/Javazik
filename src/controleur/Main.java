@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import controleur.actions.*;
 import controleur.formulaires.ConnexionForm;
 import controleur.formulaires.InscriptionForm;
-import controleur.formulaires.PlaylistForm;
 import controleur.exceptions.*;
 import metier.*;
 import vue.*;
@@ -65,7 +64,7 @@ public class Main {
         File fichier = new File("donnees/" + nomFichier);
 
         if (!fichier.exists()) {
-            try (FileOutputStream fos = new FileOutputStream(fichier)) {
+            try (FileOutputStream _ = new FileOutputStream(fichier)) {
                 if ("admins.ser".equals(nomFichier)) {
                     initialiser();
                 }

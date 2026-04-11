@@ -69,4 +69,8 @@ public class Morceau implements TypeObjets {
             artiste.ajouterAlbum(album);
         }
     }
+
+    public ArrayList<String> getGenres() {
+        return genres;
+    }
 }

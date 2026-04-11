@@ -51,4 +51,12 @@ public class Album implements TypeObjets {
     public String getNom() {
         return Titre;
     }
+
+    public Artiste getArtiste() {
+        return artiste;
+    }
+
+    public int getNum() {
+        return num;
+    }
 }
