@@ -2,6 +2,8 @@ package metier;
 
 import java.util.ArrayList;
 
+import controleur.exceptions.PlaylistDejaExistanteException;
+
 public class Catalogue {
     private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
@@ -84,7 +86,10 @@ public class Catalogue {
         playlist.ajouterMorceau(morceau);
     }
 
-    public void ajouterPlaylist(Playlist playlist) {
+    public void ajouterPlaylist(Playlist playlist) throws PlaylistDejaExistanteException {
+        if (playlistExiste(playlist.getNum())) {
+            throw new PlaylistDejaExistanteException();
+        }
         playlists.add(playlist);
         // ajouter la playlist chez son createur
     }

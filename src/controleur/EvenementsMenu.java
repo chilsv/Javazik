@@ -5,7 +5,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import vue.FenetreMenu;
 
-public class Evenements {
+public class EvenementsMenu {
 
     public interface MenuListener {
         void onChoix(int choix);
@@ -19,10 +19,11 @@ public class Evenements {
         JLabel logo = fenetre.getLogoLabel();
         JLabel bandeau = fenetre.getBandeauLabel();
 
-        // Quitter → choix 0
+        // Quitter → choix 4
         btnQuitter.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                listener.onChoix(4);
                 frame.dispose();
 
             }
@@ -32,11 +33,11 @@ public class Evenements {
             }
         });
 
-        // Admin → choix 1
+        // Bouton admin qui devient Se connecter
         btnAdmin.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                listener.onChoix(1); // ← était 2, corrigé
+                listener.onChoix(2);
             }
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -44,11 +45,11 @@ public class Evenements {
             }
         });
 
-        // Connexion → choix 2
+        // S'inscire
         btnConnexion.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                listener.onChoix(2); // ← manquait complètement
+                listener.onChoix(3);
             }
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -56,8 +57,13 @@ public class Evenements {
             }
         });
 
-        // Logo (optionnel, pas de choix ici)
+        // Logo → choix 1 (visiter l'application)
         logo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                listener.onChoix(1);
+            }
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 logo.setCursor(new Cursor(Cursor.HAND_CURSOR));

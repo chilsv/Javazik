@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import controleur.actions.Action;
+import controleur.formulaires.ArtisteForm;
+import controleur.formulaires.ConnexionForm;
+import controleur.formulaires.InscriptionForm;
+import controleur.formulaires.MorceauForm;
+import controleur.formulaires.PlaylistForm;
+import controleur.formulaires.RechercheForm;
 import metier.*;
 
 public class Console implements InterfaceVue {
@@ -77,7 +83,7 @@ public class Console implements InterfaceVue {
         System.out.println("-".repeat(40));
         System.out.println("Informations nécessaires :");
         return new InscriptionForm(
-                lireTexte("Type (Abonné --> 1 ou Admin --> 2) : "),
+                "abonne",
                 lireTexte("Nom : "),
                 lireTexte("Adresse e-mail : "),
                 lireTexte("Mot de passe : "));
@@ -241,10 +247,49 @@ public class Console implements InterfaceVue {
     }
 
     @Override
-    public PlaylistForm demanderPlaylist() {
+    public PlaylistForm demanderPlaylist(int numUtilisateur) {
         Scanner saisie = new Scanner(System.in);
         System.out.println("-".repeat(40));
         String nom = lireTexte("Nom de la playlist : ");
-        return new PlaylistForm(nom);
+        return new PlaylistForm(nom, numUtilisateur);
+    }
+
+    @Override
+    public void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {
+        System.out.println("-".repeat(40));
+        if (abonnes == null && admins == null) {
+            System.out.println("Aucun utilisateur enregistré.");
+            return;
+        } else if (abonnes.isEmpty() && admins.isEmpty()) {
+            System.out.println("Aucun utilisateur enregistré.");
+            return;
+        }
+        if (abonnes == null) {
+            System.out.println("Aucun abonné enregistré.");
+        } else if (abonnes.isEmpty()) {
+            System.out.println("Aucun abonné enregistré.");
+        } else {
+            System.out.println("Liste des abonnés :");
+            for (Abonne abonne : abonnes) {
+                System.out.println(abonne.getNom() + " (@" + abonne.getMail() + ") : " + abonne.getAge() + " jours.");
+            }
+        }
+        if (admins == null) {
+            System.out.println("Aucun administrateur enregistré.");
+        } else if (admins.isEmpty()) {
+            System.out.println("Aucun administrateur enregistré.");
+        } else {
+            System.out.println("-".repeat(40));
+            System.out.println("Liste des admins :");
+            for (Admin admin : admins) {
+                System.out.println(admin.getNom() + " (@" + admin.getMail() + ") : " + admin.getAge() + " jours.");
+            }
+        }
+        System.out.println();
+    }
+
+    @Override
+    public void afficherAimer(String nom) {
+        System.out.println("Vous avez aimé " + nom + " !");
     }
 }

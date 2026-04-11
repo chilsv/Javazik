@@ -2,19 +2,19 @@ package controleur.actions;
 
 import metier.Abonne;
 import metier.Admin;
-import metier.Catalogue;
-import metier.Personne;
-import vue.InterfaceVue;
 
 public class ConsulterProfil implements Action {
+    /**
+     * @param arguments vue, utilisateur, catalogue
+     */
     @Override
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        if (utilisateur instanceof Abonne) {
-            Abonne abonne = (Abonne) utilisateur;
-            vue.afficherProfilAbonne(abonne, catalogue);
-        } else if (utilisateur instanceof Admin) {
-            Admin admin = (Admin) utilisateur;
-            vue.afficherProfilAdmin(admin);
+    public void executer(ActionArguments arguments) {
+        if (arguments.utilisateur instanceof Abonne) {
+            Abonne abonne = (Abonne) arguments.utilisateur;
+            arguments.vue.afficherProfilAbonne(abonne, arguments.catalogue);
+        } else if (arguments.utilisateur instanceof Admin) {
+            Admin admin = (Admin) arguments.utilisateur;
+            arguments.vue.afficherProfilAdmin(admin);
         }
     }
 

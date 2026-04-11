@@ -65,4 +65,8 @@ public abstract class Artiste implements TypeObjets {
     public ArrayList<Album> getAlbums() {
         return albums;
     }
+
+    public int getNum() {
+        return num;
+    }
 }

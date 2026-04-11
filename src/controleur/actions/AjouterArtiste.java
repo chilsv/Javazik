@@ -1,20 +1,24 @@
 package controleur.actions;
 
 import controleur.Main;
-import metier.Artiste;
-import metier.Catalogue;
-import metier.Personne;
-import vue.InterfaceVue;
-import vue.ArtisteForm;
+import metier.Solo;
+import metier.Groupe;
 
 public class AjouterArtiste implements Action {
+    /**
+     * @param arguments catalogue, artisteform
+     */
     @Override
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        ArtisteForm formulaire = vue.demanderArtiste();
-        Artiste artiste = new metier.Solo(formulaire.nom);
-        catalogue.ajouterArtiste(artiste);
-        Main.sauvegarder(catalogue.getArtistes(), "artistes.ser");
-        Main.sauvegarder(catalogue.getAlbums(), "albums.ser");
+    public void executer(ActionArguments arguments) {
+        if (arguments.artisteForm.type.equals("solo")) {
+            Solo artiste = new Solo(arguments.artisteForm.nom);
+            arguments.catalogue.ajouterArtiste(artiste);
+        } else {
+            Groupe artiste = new Groupe(arguments.artisteForm.nom);
+            arguments.catalogue.ajouterArtiste(artiste);
+        }
+        Main.sauvegarder(arguments.catalogue.getArtistes(), "artistes.ser");
+        Main.sauvegarder(arguments.catalogue.getAlbums(), "albums.ser");
     }
 
     @Override

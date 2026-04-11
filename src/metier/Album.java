@@ -24,6 +24,14 @@ public class Album implements TypeObjets {
         this.morceaux = new ArrayList<>();
     }
 
+    public Album(String titre, Artiste artiste, int annee, ArrayList<String> genres) {
+        this.Titre = titre;
+        this.artiste = artiste;
+        this.annee = annee;
+        this.morceaux = new ArrayList<>();
+        this.genres = genres;
+    }
+
     public ArrayList<Morceau> getMorceaux() {
         return morceaux;
     }
@@ -42,5 +50,13 @@ public class Album implements TypeObjets {
 
     public String getNom() {
         return Titre;
+    }
+
+    public Artiste getArtiste() {
+        return artiste;
+    }
+
+    public int getNum() {
+        return num;
     }
 }

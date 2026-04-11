@@ -3,11 +3,12 @@ package vue;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
+import controleur.formulaires.*;
 import metier.Abonne;
 import metier.Admin;
-import metier.Artiste;
 import metier.Catalogue;
 import metier.Morceau;
+import metier.Personne;
 import metier.ResultatRecherche;
 
 public interface InterfaceVue {
@@ -25,8 +26,10 @@ public interface InterfaceVue {
     InscriptionForm demanderInscription();
     RechercheForm demanderRecherche(boolean filtrage);
     void afficherRecherche(ResultatRecherche resultat);
+    void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins);
+    void afficherAimer(String nom);
 
     MorceauForm demanderMorceau();
     ArtisteForm demanderArtiste();
-    PlaylistForm demanderPlaylist(); // pour créer une playlist
+    PlaylistForm demanderPlaylist(int numUtilisateur); // pour créer une playlist
 }

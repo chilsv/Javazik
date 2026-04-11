@@ -10,9 +10,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-import controleur.actions.Action;
-import controleur.actions.Deconnexion;
-import controleur.actions.Quitter;
+import controleur.actions.*;
+import controleur.formulaires.ConnexionForm;
+import controleur.formulaires.InscriptionForm;
+import controleur.exceptions.*;
 import metier.*;
 import vue.*;
 
@@ -23,6 +24,7 @@ public class Main {
     private static ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private static ArrayList<Artiste> artistes = new ArrayList<Artiste>();
     private static ArrayList<Album> albums = new ArrayList<Album>();
+    private static Catalogue catalogue;
 
     // Après la connexion d'un utilisateur, on définit une variable de type Personne qui contiendra soit un Abonné, soit un Admin, soit un Visiteur
     // Ca permet ensuite de vérifier les droits de l'utilisateur connecté
@@ -36,7 +38,7 @@ public class Main {
         charger(playlists, "playlists.ser");
         charger(artistes, "artistes.ser");
         charger(albums, "albums.ser");
-        Catalogue catalogue = new Catalogue(morceaux, playlists, artistes, albums);
+        catalogue = new Catalogue(morceaux, playlists, artistes, albums);
 
         // Définition de la vue qu'on utilise
         //InterfaceVue vue = new Console();
@@ -47,10 +49,14 @@ public class Main {
 
     public static void initialiser() {
         if (admins.size() == 0) {
-            Admin defaut = new Admin("Defaut", "defaut", "", 0);
-            Admin Gab = new Admin("Gab", "gabriel.jamet@edu.ece.fr", "gab", 1);
-            admins.add(defaut);
-            admins.add(Gab);
+            InscriptionForm defautForm = new InscriptionForm("admin", "Admin", "defaut", "", 0);
+            InscriptionForm gabForm = new InscriptionForm("admin", "Gab", "gabriel.jamet@edu.ece.fr", "gab", 1);
+            InscriptionForm ilanForm = new InscriptionForm("admin", "Ilan", "ilan.bide", "", 2);
+            try {
+                inscription(abonnes, admins, catalogue, defautForm);
+                inscription(abonnes, admins, catalogue, gabForm);
+                inscription(abonnes, admins, catalogue, ilanForm);
+            } catch (UtilisateurDejaCreeException e) {}
         }
     }
 
@@ -58,9 +64,14 @@ public class Main {
         File fichier = new File("donnees/" + nomFichier);
 
         if (!fichier.exists()) {
-            try (FileOutputStream fos = new FileOutputStream(fichier)) {
+            try (FileOutputStream _ = new FileOutputStream(fichier)) {
+                if ("admins.ser".equals(nomFichier)) {
+                    initialiser();
+                }
+                return;
             } catch (IOException e) {
                 initialiser();
+                System.err.println("Erreur lors de la création de " + nomFichier);
                 return;
             }
         }
@@ -70,7 +81,9 @@ public class Main {
             ArrayList<T> chargement = (ArrayList<T>) ois.readObject();
             arrayList.addAll(chargement);
         } catch (EOFException e) {
-            initialiser();
+            if ("admins.ser".equals(nomFichier)) {
+                initialiser();
+            }
         } catch (InvalidClassException e) {
             // si la classe a chanté entre temps, on réinitialise le fichier
             sauvegarder(new ArrayList<>(), nomFichier);
@@ -94,11 +107,21 @@ public class Main {
     }
 
     public static void ajouterAbonne(Personne utilisateur, ArrayList<Abonne> abonnes) {
+        for (Abonne abonne :abonnes) {
+            if (abonne.getMail().equals(utilisateur.getMail())) {
+                return; // abonné déjà existant
+            }
+        }
         abonnes.add((Abonne) utilisateur);
         sauvegarder(abonnes, "abonnes.ser");
     }
 
     public static void ajouterAdmin(Personne utilisateur, ArrayList<Admin> admins) {
+        for (Admin admin :admins) {
+            if (admin.getMail().equals(utilisateur.getMail())) {
+                return; // admin déjà existant
+            }
+        }
         admins.add((Admin) utilisateur);
         sauvegarder(admins, "admins.ser");
     }
@@ -112,7 +135,7 @@ public class Main {
                 break;
             case 2: // connexion
                 try {
-                    connexion(vue, abonnes, admins, catalogue);
+                    connexion(vue, abonnes, admins, catalogue, vue.demanderConnexion());
                 } catch (UtilisateurIntrouvableException e) {
                     vue.afficherErreur(e.getMessage());
                     menu(vue, abonnes, admins, catalogue);
@@ -123,14 +146,15 @@ public class Main {
                 break;
             case 3: // inscription
                 try {
-                    inscription(vue, abonnes, admins, catalogue);
+                    Personne utilisateur = inscription(abonnes, admins, catalogue, vue.demanderInscription());
+                    visiter(utilisateur, vue, abonnes, admins, catalogue);
                 } catch (UtilisateurDejaCreeException e) {
                     vue.afficherErreur(e.getMessage());
                     menu(vue, abonnes, admins, catalogue);
                 }
                 break;
             case 4: // quitter
-                new Quitter().executer(vue, null, catalogue);
+                new Quitter().executer(new ActionArguments(vue, null, catalogue));
                 break;
             default:
                 vue.afficherErreur("Choix invalide.");
@@ -138,54 +162,43 @@ public class Main {
         }
     }
 
-    public static void inscription(InterfaceVue vue, ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue) throws UtilisateurDejaCreeException {
+    public static Personne inscription(ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue, InscriptionForm formulaire) throws UtilisateurDejaCreeException {
         Personne utilisateur;
-        InscriptionForm formulaire = vue.demanderInscription(); // prend les infos
-        String type = formulaire.type; // type d'utilisateur (abonné ou admin)
-        if (!"1".equals(type) && !"2".equals(type)) {
-            vue.afficherErreur("Choix invalide pour le type d'utilisateur.");
-            inscription(vue, abonnes, admins, catalogue);
-            return;
-        }
-
         String nom = formulaire.nom;
         String mail = formulaire.mail;
-
-        // on vérifie que c'est psa déjà pris
-        for (Abonne abonne : abonnes) {
-            if (abonne.getMail().equals(mail)) {
-                throw new UtilisateurDejaCreeException();
-            }
-        }
-        for (Admin admin : admins) {
-            if (admin.getMail().equals(mail)) {
-                throw new UtilisateurDejaCreeException();
-            }
-        }
-
         String mdp = formulaire.mdp;
-        int nbUtilisateurs = abonnes.size() + admins.size();
+        if (formulaire.num == -1) {
+            formulaire.num = abonnes.size() + admins.size();
+        }
 
-        switch (type) {
-            case "1":
-                utilisateur = new Abonne(nom, mail, mdp, nbUtilisateurs, catalogue);
+        switch (formulaire.type) {
+            case "abonne":
+                // on vérifie que c'est psa déjà pris
+                for (Abonne abonne : abonnes) {
+                    if (abonne.getMail().equals(mail)) {
+                        throw new UtilisateurDejaCreeException();
+                    }
+                }
+                utilisateur = new Abonne(nom, mail, mdp, formulaire.num, catalogue);
                 ajouterAbonne(utilisateur, abonnes);
                 break;
-            case "2":
-                utilisateur = new Admin(nom, mail, mdp, nbUtilisateurs);
+            case "admin":
+                for (Admin admin : admins) {
+                    if (admin.getMail().equals(mail)) {
+                        throw new UtilisateurDejaCreeException();
+                    }
+                }
+                utilisateur = new Admin(nom, mail, mdp, formulaire.num);
                 ajouterAdmin(utilisateur, admins);
                 break;
             default:
                 utilisateur = new Visiteur();
                 break;
         }
-
-        // On lance l'appli
-        visiter(utilisateur, vue, abonnes, admins, catalogue);
+        return utilisateur;
     }
 
-    public static void connexion(InterfaceVue vue, ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue) throws UtilisateurIntrouvableException, MdpIncorrectException {
-        ConnexionForm formulaire = vue.demanderConnexion(); // obitent les infos
+    public static void connexion(InterfaceVue vue, ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue, ConnexionForm formulaire) throws UtilisateurIntrouvableException, MdpIncorrectException {
         String mail = formulaire.mail;
         String mdp = formulaire.mdp;
 
@@ -217,26 +230,49 @@ public class Main {
         ArrayList<Action> actionsPossibles = utilisateur.getActions();
         // on récupère l'action choisie
         Action actionChoisie = vue.choisirAction(utilisateur.getAccueil(vue), actionsPossibles);
+
         if (actionChoisie == null) {
             vue.afficherErreur("Choix invalide pour l'action.");
-            visiter(utilisateur, vue, abonnes, admins, catalogue);
-            return;
-        }
-        try {
-            // on fait l'action choisie
-            utilisateur.executerAction(actionChoisie, vue, catalogue);
-        } catch (MorceauIntrouvableException e) {
-            vue.afficherErreur(e.getMessage());
-            visiter(utilisateur, vue, abonnes, admins, catalogue);
-            return;
-        }
-
-        if (actionChoisie instanceof Deconnexion) {
+        } else if (actionChoisie instanceof Deconnexion) {
             menu(vue, abonnes, admins, catalogue);
-            return;
+        } else if (actionChoisie instanceof Quitter) {
+            new Quitter().executer(new ActionArguments(vue, utilisateur, catalogue));
+        } else if (actionChoisie instanceof AjouterArtiste) {
+            new AjouterArtiste().executer(new ActionArguments(catalogue, vue.demanderArtiste()));
+        } else if (actionChoisie instanceof AjouterMorceau) {
+            new AjouterMorceau().executer(new ActionArguments(catalogue, vue.demanderMorceau()));
+        } else if (actionChoisie instanceof AjouterPlaylist) {
+            try {
+                new AjouterPlaylist().executer(new ActionArguments(utilisateur, catalogue, vue.demanderPlaylist(utilisateur.getNum())));
+            } catch (PlaylistDejaExistanteException e) {
+                vue.afficherErreur(e.getMessage());
+            }
+        } else if (actionChoisie instanceof ConsulterProfil) {
+        } else if (actionChoisie instanceof Recherche) {
+        } else if (actionChoisie instanceof ConsulterUtilisateurs) {
+            new ConsulterUtilisateurs().executer(new ActionArguments(vue, utilisateur, catalogue, abonnes, admins));
+        } else if (actionChoisie instanceof JouerMorceau) {
+            jouerMorceau(vue, catalogue);
         }
-
         visiter(utilisateur, vue, abonnes, admins, catalogue);
+        return;
     }
 
+    public static void supprimerAbonne(Abonne abonne) {
+        if (abonnes.contains(abonne)) {
+            abonnes.remove(abonne);
+            sauvegarder(abonnes, "abonnes.ser");
+        }
+    }
+
+    public static void jouerMorceau(InterfaceVue vue, Catalogue catalogue) {
+        Morceau morceauTrouve = null;
+        try {
+            new JouerMorceau().executer(new ActionArguments(catalogue, vue.choisirMorceau(), morceauTrouve));
+            // oN affiche la lecture du morceau
+            vue.afficherLecture(morceauTrouve);
+        } catch (MorceauIntrouvableException e) {
+            vue.afficherErreur(e.getMessage());
+        }
+    }
 }

@@ -1,13 +1,11 @@
 package controleur.actions;
 
-import metier.Catalogue;
-import metier.Personne;
-import vue.InterfaceVue;
-
 public class Deconnexion implements Action {
+    /**
+     * @param arguments aucun
+     */
     @Override
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        vue.afficherMessage("Déconnexion...");
+    public void executer(ActionArguments arguments) {
     }
 
     @Override

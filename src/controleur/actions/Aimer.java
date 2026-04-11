@@ -1,30 +1,30 @@
 package controleur.actions;
 
 import metier.Abonne;
-import metier.Catalogue;
-import metier.Morceau;
-import metier.Personne;
-import metier.Playlist;
-import vue.InterfaceVue;
 
 public class Aimer implements Action {
+    /**
+     * @param arguments vue, utilisateur, catalogue, morceau/playlist
+     */
     @Override
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-    }
-
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, Morceau morceau) {
-        if (utilisateur instanceof Abonne) {
-            Abonne abonne = (Abonne) utilisateur;
-            //vue.afficherAimer(morceau.getNom());
-            catalogue.ajouterMorceauPlaylist(morceau, abonne.getAimes());
-        }
-    }
-
-    public void executer(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, Playlist playlist) {
-        if (utilisateur instanceof Abonne) {
-            Abonne abonne = (Abonne) utilisateur;
-            //vue.afficherAimer(playlist.getNom());
-            abonne.ajouterPlaylist(playlist.getNum());
+    public void executer(ActionArguments arguments) {
+        if (arguments.utilisateur instanceof Abonne) {
+            Abonne abonne = (Abonne) arguments.utilisateur;
+            if (arguments.morceau != null) {
+                if (!abonne.morceauDejaAime(arguments.morceau, arguments.catalogue)) {
+                    arguments.vue.afficherAimer(arguments.morceau.getNom());
+                    arguments.catalogue.ajouterMorceauPlaylist(arguments.morceau, abonne.getAimes());
+                } else {
+                    abonne.retirerMorceauPlaylist(arguments.morceau, arguments.catalogue, 0); // 0 parce qu'on retire des morceaux aimés
+                }
+            } else if (arguments.playlist != null) {
+                if (!abonne.playlistDejaSauvegardee(arguments.playlist.getNum())) {
+                    arguments.vue.afficherAimer(arguments.playlist.getNom());
+                    abonne.ajouterPlaylist(arguments.playlist.getNum());
+                } else {
+                    abonne.retirerPlaylist(arguments.playlist.getNum());
+                }
+            }
         }
     }
 

@@ -2,6 +2,7 @@ package metier;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import controleur.actions.Action;
@@ -11,6 +12,7 @@ public abstract class Personne implements Serializable {
     private String nom;
     private String mail;
     private String mdp;
+    private int num;
     private LocalDate date_creation;
     private final ArrayList<Action> actions = new ArrayList<Action>();
 
@@ -27,7 +29,7 @@ public abstract class Personne implements Serializable {
     /**
      * Instanciation d'un abonné ou d'un administrateur
      */
-    public Personne(String nom, String mail, String mdp) {
+    public Personne(String nom, String mail, String mdp, int num) {
         this.nom = nom;
         this.mail = mail;
         this.mdp = mdp;
@@ -56,6 +58,10 @@ public abstract class Personne implements Serializable {
         return nom;
     }
 
+    public int getNum() {
+        return num;
+    }
+
     public String getMail() {
         return mail;
     }
@@ -64,16 +70,26 @@ public abstract class Personne implements Serializable {
         return mdp;
     }
 
+    public int getAge() {
+        // trouvé sur google
+        return (int) ChronoUnit.DAYS.between(this.getDateCreation(), LocalDate.now());
+    }
+    
     public LocalDate getDateCreation() {
         return date_creation;
      }
 
     /**
      * Permet d'exécuter une action choisie par l'utilisateur
-     */
-    public void executerAction(Action action, InterfaceVue vue, Catalogue catalogue) {
-        action.executer(vue, this, catalogue);
-    }
+     * @params arguments vue, catalogue
+     
+    public void executerAction(Action action, ActionArguments arguments) throws ActionException {
+        try {
+            action.executer(arguments);
+        } catch (MorceauIntrouvableException e) {
+            throw e;
+        }
+    }*/
 
     /**
      * Renvoie la liste des actions possibles

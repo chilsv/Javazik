@@ -1,13 +1,17 @@
 package vue;
-import controleur.Evenements;
-import controleur.actions.Action;
-import controleur.Evenements;
-
-import metier.*;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Scanner;
+
+import controleur.EvenementsMenu;
+import controleur.actions.Action;
+import controleur.formulaires.ArtisteForm;
+import controleur.formulaires.ConnexionForm;
+import controleur.formulaires.InscriptionForm;
+import controleur.formulaires.MorceauForm;
+import controleur.formulaires.PlaylistForm;
+import controleur.formulaires.RechercheForm;
+import metier.*;
 
 public class Fenetre implements InterfaceVue {
 
@@ -44,14 +48,24 @@ public class Fenetre implements InterfaceVue {
         SwingUtilities.invokeLater(() -> {
             FenetreMenu fenetreMenu = new FenetreMenu();
 
-            Evenements.ajouterEvenements(fenetreMenu, choix -> {
+            EvenementsMenu.ajouterEvenements(fenetreMenu, choix -> {
                 synchronized (verrou) {
-                    if (choix == 1) {
-                        System.out.println("Admin");
-                    } else if (choix == 2) {
-                        System.out.println("Connexion");
-                    } else if (choix == 0) {
-                        System.out.println("Quitter");
+                    switch (choix) {
+                        case 1:
+                            System.out.println("Visiter");
+                            break;
+                        case 2:
+                            System.out.println("Se connecter");
+                            break;
+                        case 3:
+                            System.out.println("S'inscrire");
+                            break;
+                        case 4:
+                            System.out.println("Quitter");
+                            break;
+                        default:
+                            System.out.println("Choix inconnu");
+                            break;
                     }
                     resultat[0] = choix;
                     verrou.notify(); // réveille le thread principal
@@ -90,13 +104,14 @@ public class Fenetre implements InterfaceVue {
     public void afficherRecherche(ResultatRecherche resultat){}; //reuslata rehcerche
     public MorceauForm demanderMorceau(){return null;}; //admin ajouter
     public ArtisteForm demanderArtiste(){return null;}; //admin
-    public PlaylistForm demanderPlaylist(){return null;}; //abonéé
+    public PlaylistForm demanderPlaylist(int numUtilisateur){return null;}; //abonéé
 
 
     public String choisirMorceau(){
         return "0";
     }
 
+    public void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {}
 
-
+    public void afficherAimer(String nom) {}
 }
