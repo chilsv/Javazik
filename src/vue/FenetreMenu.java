@@ -1,5 +1,7 @@
 package vue;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 
 public class FenetreMenu {
 
@@ -50,7 +52,13 @@ public class FenetreMenu {
         backgroundLabel.add(btnAdminLabel);
         backgroundLabel.add(btnQuitterLabel);
 
+
+
+
         frame.setVisible(true);
+
+
+
 
     }
 
@@ -66,3 +74,6 @@ public class FenetreMenu {
 
 
 }
+
+
+
