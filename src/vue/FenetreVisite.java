@@ -15,10 +15,9 @@ public class FenetreVisite {
         profil = new JLabel(new ImageIcon("assets/profil.png"));
 
         profil.setBounds(100, 100, 100, 100);
-        
+
         frame.add(profil);
 
         frame.setVisible(true);
     }
-
 }
