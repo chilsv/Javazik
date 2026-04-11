@@ -50,12 +50,22 @@ public class Fenetre implements InterfaceVue {
 
             EvenementsMenu.ajouterEvenements(fenetreMenu, choix -> {
                 synchronized (verrou) {
-                    if (choix == 1) {
-                        System.out.println("Admin");
-                    } else if (choix == 2) {
-                        System.out.println("Connexion");
-                    } else if (choix == 0) {
-                        System.out.println("Quitter");
+                    switch (choix) {
+                        case 1:
+                            System.out.println("Visiter");
+                            break;
+                        case 2:
+                            System.out.println("Se connecter");
+                            break;
+                        case 3:
+                            System.out.println("S'inscrire");
+                            break;
+                        case 4:
+                            System.out.println("Quitter");
+                            break;
+                        default:
+                            System.out.println("Choix inconnu");
+                            break;
                     }
                     resultat[0] = choix;
                     verrou.notify(); // réveille le thread principal
