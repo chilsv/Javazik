@@ -259,6 +259,13 @@ public class Main {
         return;
     }
 
+    public static void supprimerAbonne(Abonne abonne) {
+        if (abonnes.contains(abonne)) {
+            abonnes.remove(abonne);
+            sauvegarder(abonnes, "abonnes.ser");
+        }
+    }
+
     public static void jouerMorceau(InterfaceVue vue, Catalogue catalogue) {
         Morceau morceauTrouve = null;
         try {
