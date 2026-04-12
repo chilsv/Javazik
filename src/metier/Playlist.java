@@ -9,6 +9,7 @@ public class Playlist implements TypeObjets {
     private int numUtilisateur;
     private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
     private LocalDate dateCreation;
+    private String image;
 
     public Playlist(String nom, ArrayList<Morceau> morceaux, Catalogue catalogue) {
         this.nom = nom;
@@ -44,6 +45,10 @@ public class Playlist implements TypeObjets {
         morceaux.remove(morceau);
     }
 
+    public ArrayList<Morceau> getMorceaux() {
+        return morceaux;
+    }
+
     public int getAnnee() {
         // On ne peut dire qu'une playlist a une année, du coup on renvoie celle du morceau n°1
         return morceaux.get(0).getAnnee();
@@ -63,5 +68,13 @@ public class Playlist implements TypeObjets {
 
     public LocalDate getCreation() {
         return dateCreation;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public abstract class Artiste implements TypeObjets {
     private int num;
     private String nom;
+    private String image;
     private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
     private ArrayList<Album> albums = new ArrayList<Album>();
     private ArrayList<String> genres = new ArrayList<String>();
@@ -66,7 +67,19 @@ public abstract class Artiste implements TypeObjets {
         return albums;
     }
 
+    public ArrayList<Morceau> getMorceaux() {
+        return morceaux;
+    }
+
     public int getNum() {
         return num;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import metier.Album;
 import metier.Artiste;
 import metier.Catalogue;
+import metier.Groupe;
 import metier.Morceau;
 import metier.Playlist;
 import metier.Solo;
@@ -27,20 +28,94 @@ public class ScriptPeuplement {
         Solo daftPunk = getOrCreateSolo(catalogue, "Daft Punk");
         Solo stromae = getOrCreateSolo(catalogue, "Stromae");
         Solo adele = getOrCreateSolo(catalogue, "Adele");
+        Solo weeknd = getOrCreateSolo(catalogue, "The Weeknd");
+        Solo billie = getOrCreateSolo(catalogue, "Billie Eilish");
+        Solo orelsan = getOrCreateSolo(catalogue, "Orelsan");
+        Solo sza = getOrCreateSolo(catalogue, "SZA");
+        Solo drake = getOrCreateSolo(catalogue, "Drake");
+        Solo coldplaySolo = getOrCreateSolo(catalogue, "Chris Martin");
+        Groupe coldplay = getOrCreateGroupe(catalogue, "Coldplay");
 
         Album randomAccess = getOrCreateAlbum(catalogue, daftPunk, "Random Access Memories", 2013);
+        Album discovery = getOrCreateAlbum(catalogue, daftPunk, "Discovery", 2001);
         Album racineCarree = getOrCreateAlbum(catalogue, stromae, "Racine Carree", 2013);
+        Album multitude = getOrCreateAlbum(catalogue, stromae, "Multitude", 2022);
         Album twentyOne = getOrCreateAlbum(catalogue, adele, "21", 2011);
+        Album thirty = getOrCreateAlbum(catalogue, adele, "30", 2021);
+        Album afterHours = getOrCreateAlbum(catalogue, weeknd, "After Hours", 2020);
+        Album dawnFm = getOrCreateAlbum(catalogue, weeknd, "Dawn FM", 2022);
+        Album happierThanEver = getOrCreateAlbum(catalogue, billie, "Happier Than Ever", 2021);
+        Album dontSmileAtMe = getOrCreateAlbum(catalogue, billie, "Dont Smile At Me", 2017);
+        Album civilisation = getOrCreateAlbum(catalogue, orelsan, "Civilisation", 2021);
+        Album leChantDesSirenes = getOrCreateAlbum(catalogue, orelsan, "Le Chant des Sirenes", 2011);
+        Album sos = getOrCreateAlbum(catalogue, sza, "SOS", 2022);
+        Album ctrl = getOrCreateAlbum(catalogue, sza, "Ctrl", 2017);
+        Album scorpion = getOrCreateAlbum(catalogue, drake, "Scorpion", 2018);
+        Album views = getOrCreateAlbum(catalogue, drake, "Views", 2016);
+        Album parachutes = getOrCreateAlbum(catalogue, coldplay, "Parachutes", 2000);
+        Album aRushOfBlood = getOrCreateAlbum(catalogue, coldplay, "A Rush of Blood to the Head", 2002);
+        Album xAndY = getOrCreateAlbum(catalogue, coldplay, "X&Y", 2005);
 
         Morceau getLucky = getOrCreateMorceau(catalogue, daftPunk, randomAccess, "Get Lucky", 248);
         Morceau instantCrush = getOrCreateMorceau(catalogue, daftPunk, randomAccess, "Instant Crush", 337);
+        Morceau loseYourselfToDance = getOrCreateMorceau(catalogue, daftPunk, randomAccess, "Lose Yourself to Dance", 353);
+        Morceau oneMoreTime = getOrCreateMorceau(catalogue, daftPunk, discovery, "One More Time", 320);
+        Morceau hardBetter = getOrCreateMorceau(catalogue, daftPunk, discovery, "Harder Better Faster Stronger", 224);
+
         Morceau formi = getOrCreateMorceau(catalogue, stromae, racineCarree, "Formidable", 214);
         Morceau papaoutai = getOrCreateMorceau(catalogue, stromae, racineCarree, "Papaoutai", 232);
-        Morceau rolling = getOrCreateMorceau(catalogue, adele, twentyOne, "Rolling in the Deep", 228);
+        Morceau taFete = getOrCreateMorceau(catalogue, stromae, racineCarree, "Ta fete", 173);
+        Morceau sante = getOrCreateMorceau(catalogue, stromae, multitude, "Sante", 191);
+        Morceau lenfer = getOrCreateMorceau(catalogue, stromae, multitude, "Lenfer", 189);
 
-        getOrCreatePlaylist(catalogue, "Top Electro", 1, List.of(getLucky, instantCrush));
-        getOrCreatePlaylist(catalogue, "Top Francophone", 1, List.of(formi, papaoutai));
-        getOrCreatePlaylist(catalogue, "Top Mix", 1, List.of(getLucky, papaoutai, rolling));
+        Morceau rolling = getOrCreateMorceau(catalogue, adele, twentyOne, "Rolling in the Deep", 228);
+        Morceau someoneLikeYou = getOrCreateMorceau(catalogue, adele, twentyOne, "Someone Like You", 285);
+        Morceau easyOnMe = getOrCreateMorceau(catalogue, adele, thirty, "Easy On Me", 224);
+        Morceau ohMyGod = getOrCreateMorceau(catalogue, adele, thirty, "Oh My God", 225);
+
+        Morceau blindingLights = getOrCreateMorceau(catalogue, weeknd, afterHours, "Blinding Lights", 200);
+        Morceau saveYourTears = getOrCreateMorceau(catalogue, weeknd, afterHours, "Save Your Tears", 215);
+        Morceau takeMyBreath = getOrCreateMorceau(catalogue, weeknd, dawnFm, "Take My Breath", 220);
+        Morceau lessThanZero = getOrCreateMorceau(catalogue, weeknd, dawnFm, "Less Than Zero", 211);
+
+        Morceau badGuy = getOrCreateMorceau(catalogue, billie, dontSmileAtMe, "Bad Guy", 194);
+        Morceau oceanEyes = getOrCreateMorceau(catalogue, billie, dontSmileAtMe, "Ocean Eyes", 200);
+        Morceau happier = getOrCreateMorceau(catalogue, billie, happierThanEver, "Happier Than Ever", 298);
+        Morceau yourPower = getOrCreateMorceau(catalogue, billie, happierThanEver, "Your Power", 245);
+
+        Morceau jourMeilleur = getOrCreateMorceau(catalogue, orelsan, civilisation, "Jour meilleur", 242);
+        Morceau basique = getOrCreateMorceau(catalogue, orelsan, civilisation, "Basique", 228);
+        Morceau raelsan = getOrCreateMorceau(catalogue, orelsan, leChantDesSirenes, "Raelsan", 210);
+        Morceau suicideSocial = getOrCreateMorceau(catalogue, orelsan, leChantDesSirenes, "Suicide social", 477);
+
+        Morceau killBill = getOrCreateMorceau(catalogue, sza, sos, "Kill Bill", 153);
+        Morceau snooze = getOrCreateMorceau(catalogue, sza, sos, "Snooze", 201);
+        Morceau loveGalore = getOrCreateMorceau(catalogue, sza, ctrl, "Love Galore", 275);
+        Morceau theWeekend = getOrCreateMorceau(catalogue, sza, ctrl, "The Weekend", 273);
+
+        Morceau godsPlan = getOrCreateMorceau(catalogue, drake, scorpion, "Gods Plan", 198);
+        Morceau inMyFeelings = getOrCreateMorceau(catalogue, drake, scorpion, "In My Feelings", 217);
+        Morceau hotlineBling = getOrCreateMorceau(catalogue, drake, views, "Hotline Bling", 267);
+        Morceau oneDance = getOrCreateMorceau(catalogue, drake, views, "One Dance", 173);
+
+        Morceau yellow = getOrCreateMorceau(catalogue, coldplay, parachutes, "Yellow", 268);
+        Morceau trouble = getOrCreateMorceau(catalogue, coldplay, parachutes, "Trouble", 270);
+        Morceau clocks = getOrCreateMorceau(catalogue, coldplay, aRushOfBlood, "Clocks", 307);
+        Morceau theScientist = getOrCreateMorceau(catalogue, coldplay, aRushOfBlood, "The Scientist", 309);
+        Morceau fixYou = getOrCreateMorceau(catalogue, coldplay, xAndY, "Fix You", 294);
+
+        getOrCreatePlaylist(catalogue, "Top Electro", 1, List.of(getLucky, instantCrush, loseYourselfToDance, oneMoreTime, hardBetter));
+        getOrCreatePlaylist(catalogue, "Top Francophone", 1, List.of(formi, papaoutai, taFete, sante, lenfer, jourMeilleur, basique));
+        getOrCreatePlaylist(catalogue, "Top Mix", 1, List.of(getLucky, papaoutai, rolling, blindingLights, killBill, yellow));
+        getOrCreatePlaylist(catalogue, "Mood Chill", 1, List.of(someoneLikeYou, easyOnMe, oceanEyes, theScientist, snooze));
+        getOrCreatePlaylist(catalogue, "Cardio Boost", 1, List.of(blindingLights, oneDance, godsPlan, hardBetter, clocks));
+        getOrCreatePlaylist(catalogue, "Nocturne", 1, List.of(instantCrush, takeMyBreath, lessThanZero, hotlineBling, trouble));
+        getOrCreatePlaylist(catalogue, "Classiques 2000", 1, List.of(yellow, clocks, oneMoreTime, hotlineBling, loveGalore));
+        getOrCreatePlaylist(catalogue, "Hits 2020", 1, List.of(easyOnMe, takeMyBreath, killBill, jourMeilleur, yourPower));
+        getOrCreatePlaylist(catalogue, "Rap & RnB", 1, List.of(godsPlan, inMyFeelings, killBill, snooze, raelsan));
+        getOrCreatePlaylist(catalogue, "Weekend Playlist", 1, List.of(saveYourTears, takeMyBreath, oneDance, badGuy, fixYou));
+
+        ajouterImagesParDefaut(catalogue);
 
         Main.sauvegarder(catalogue.getMorceaux(), "morceaux.ser");
         Main.sauvegarder(catalogue.getPlaylists(), "playlists.ser");
@@ -54,6 +129,36 @@ public class ScriptPeuplement {
         System.out.println("Playlists: " + catalogue.getPlaylists().size());
     }
 
+    private static boolean imageVide(String image) {
+        return image == null || image.isBlank();
+    }
+
+    private static void ajouterImagesParDefaut(Catalogue catalogue) {
+        for (Artiste artiste : catalogue.getArtistes()) {
+            if (imageVide(artiste.getImage())) {
+                artiste.setImage("assets/profil.png");
+            }
+        }
+
+        for (Album album : catalogue.getAlbums()) {
+            if (imageVide(album.getImage())) {
+                album.setImage("assets/librairie.png");
+            }
+        }
+
+        for (Morceau morceau : catalogue.getMorceaux()) {
+            if (imageVide(morceau.getImage())) {
+                morceau.setImage("assets/logo.png");
+            }
+        }
+
+        for (Playlist playlist : catalogue.getPlaylists()) {
+            if (imageVide(playlist.getImage())) {
+                playlist.setImage("assets/librairie.png");
+            }
+        }
+    }
+
     private static Solo getOrCreateSolo(Catalogue catalogue, String nom) {
         for (Artiste artiste : catalogue.getArtistes()) {
             if (artiste.getNom().equalsIgnoreCase(nom) && artiste instanceof Solo) {
@@ -64,6 +169,18 @@ public class ScriptPeuplement {
         Solo solo = new Solo(nom);
         catalogue.ajouterArtiste(solo);
         return solo;
+    }
+
+    private static Groupe getOrCreateGroupe(Catalogue catalogue, String nom) {
+        for (Artiste artiste : catalogue.getArtistes()) {
+            if (artiste.getNom().equalsIgnoreCase(nom) && artiste instanceof Groupe) {
+                return (Groupe) artiste;
+            }
+        }
+
+        Groupe groupe = new Groupe(nom);
+        catalogue.ajouterArtiste(groupe);
+        return groupe;
     }
 
     private static Album getOrCreateAlbum(Catalogue catalogue, Artiste artiste, String titre, int annee) {

@@ -29,7 +29,6 @@ public interface InterfaceVue {
     RechercheForm demanderRecherche(Filtre filtre);
     void afficherRecherche(ResultatRecherche resultat);
     void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins);
-    void afficherAimer(String nom);
 
     MorceauForm demanderMorceau();
     ArtisteForm demanderArtiste();

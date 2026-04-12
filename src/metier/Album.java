@@ -9,7 +9,7 @@ public class Album implements TypeObjets {
     private int annee;
     private ArrayList<Morceau> morceaux;
     private ArrayList<String> genres;
-    // ajouter image peut-être
+    private String image;
 
     public Album(String titre, Artiste artiste, int annee) {
         this.Titre = titre;
@@ -58,5 +58,13 @@ public class Album implements TypeObjets {
 
     public int getNum() {
         return num;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

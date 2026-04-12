@@ -2,6 +2,9 @@ package metier;
 
 import java.util.ArrayList;
 
+import controleur.exceptions.ActionException;
+import vue.InterfaceVue;
+
 public class Morceau implements TypeObjets {
     private int num;
     private String Titre;
@@ -9,6 +12,7 @@ public class Morceau implements TypeObjets {
     private ArrayList<Artiste> artistes;
     private int annee;
     private ArrayList<String> genres;
+    private String image;
 
     public Morceau(String titre, Artiste artiste) {
         this.Titre = titre;
@@ -74,7 +78,11 @@ public class Morceau implements TypeObjets {
         return genres;
     }
 
-    public boolean estAimePar(Abonne abonne, Catalogue catalogue) {
-        return catalogue.getPlaylist(abonne.getAimes()).morceauDedans(this);
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -291,8 +291,4 @@ public class Console implements InterfaceVue {
         System.out.println();
     }
 
-    @Override
-    public void afficherAimer(String nom) {
-        System.out.println("Vous avez aimé " + nom + " !");
-    }
 }

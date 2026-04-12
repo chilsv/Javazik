@@ -259,5 +259,6 @@ public class FenetreVisite {
         vide.setOpaque(true);
         vide.setBackground(Color.WHITE);
         setPanelCentral(vide);
+        barreRecherche.setText("");
     }
 }

@@ -5,7 +5,11 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import controleur.EvenementsConnexion;
 import controleur.EvenementsInscription;
@@ -33,6 +37,10 @@ public class Fenetre implements InterfaceVue {
     private final JPanel cartes;
     private final Map<String, JPanel> cartesParNom;
     private FenetreVisite visiteCourante;
+    private Consumer<Morceau> basculerMorceauAimeHandler = morceau -> {};
+    private Function<Morceau, Boolean> estMorceauAimeProvider = morceau -> false;
+    private Consumer<Playlist> basculerPlaylistAimeeHandler = playlist -> {};
+    private Function<Playlist, Boolean> estPlaylistAimeeProvider = playlist -> false;
     private JWindow toastFenetre;
     private Timer toastTimer;
 
@@ -189,6 +197,7 @@ public class Fenetre implements InterfaceVue {
                         visiteCourante.viderPanelCentral();
                         resultat[0] = new ConsulterLibrairie();
                     } else if (choix == 3) {
+                        visiteCourante.viderPanelCentral();
                         resultat[0] = new Deconnexion();
                     } else if (choix == 4) {
                         resultat[0] = new ChoisirFiltre();
@@ -257,7 +266,8 @@ public class Fenetre implements InterfaceVue {
     }
 
     //barre de lecture
-    public void afficherLecture(Morceau morceau){};
+    public void afficherLecture(Morceau morceau){
+    };
 
     public void afficherMessage(String message) {
     }
@@ -310,7 +320,9 @@ public class Fenetre implements InterfaceVue {
     }
    
     public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue){};
-    public void afficherProfilAdmin(Admin admin){};
+
+    public void afficherProfilAdmin(Admin admin) {
+    }
 
     public RechercheForm demanderRecherche(Filtre filtre) {
         if (visiteCourante == null) {
@@ -324,6 +336,18 @@ public class Fenetre implements InterfaceVue {
             return null;
         }
         return visiteCourante.getFiltreSelectionne();
+    }
+
+    public void configurerActionsResultats(
+        Consumer<Morceau> basculerMorceauAime,
+        Function<Morceau, Boolean> estMorceauAime,
+        Consumer<Playlist> basculerPlaylistAimee,
+        Function<Playlist, Boolean> estPlaylistAimee
+    ) {
+        basculerMorceauAimeHandler = basculerMorceauAime != null ? basculerMorceauAime : (morceau -> {});
+        estMorceauAimeProvider = estMorceauAime != null ? estMorceauAime : (morceau -> false);
+        basculerPlaylistAimeeHandler = basculerPlaylistAimee != null ? basculerPlaylistAimee : (playlist -> {});
+        estPlaylistAimeeProvider = estPlaylistAimee != null ? estPlaylistAimee : (playlist -> false);
     }
 
     private JButton creerBoutonCategorie(String texte) {
@@ -349,35 +373,142 @@ public class Fenetre implements InterfaceVue {
         }
     }
 
-    private JPanel creerCarteResultat(String titre, String detail) {
-        JPanel carte = new JPanel(new BorderLayout());
+    private static class LigneResultat<T> {
+        private final T objet;
+        private final String titre;
+        private final String detail;
+        private final String duree;
+        private final boolean peutAimer;
+
+        private LigneResultat(T objet, String titre, String detail, String duree, boolean peutAimer) {
+            this.objet = objet;
+            this.titre = titre == null ? "" : titre;
+            this.detail = detail == null ? "" : detail;
+            this.duree = duree == null ? "" : duree;
+            this.peutAimer = peutAimer;
+        }
+    }
+
+    private JLabel creerLabelImage(String cheminImage, String fallback, Runnable action, int largeur, int hauteur) {
+        ImageIcon icon = new ImageIcon(cheminImage);
+        JLabel label;
+
+        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+            Image imageRedimensionnee = icon.getImage().getScaledInstance(largeur, hauteur, Image.SCALE_SMOOTH);
+            label = new JLabel(new ImageIcon(imageRedimensionnee));
+        } else {
+            label = new JLabel(fallback);
+        }
+
+        label.setToolTipText(fallback);
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                action.run();
+            }
+        });
+        return label;
+    }
+
+    private JLabel creerVignetteObjet(TypeObjets objet) {
+        String cheminImage = objet.getImage();
+        ImageIcon icon = new ImageIcon(cheminImage);
+        JLabel label;
+        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+            Image imageRedimensionnee = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            label = new JLabel(new ImageIcon(imageRedimensionnee));
+        } else {
+            label = new JLabel("img");
+        }
+        return label;
+    }
+
+    private void mettreIconeAimer(JLabel label, boolean aime) {
+        String cheminAimer = aime ? "assets/aime_true.png" : "assets/aime_false.png";
+        ImageIcon icon = new ImageIcon(cheminAimer);
+        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+            Image imageRedimensionnee = icon.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH);
+            label.setIcon(new ImageIcon(imageRedimensionnee));
+            label.setText(null);
+        } else {
+            label.setIcon(null);
+            label.setText("aimer");
+        }
+    }
+
+    private <T extends TypeObjets> JPanel creerCarteResultat(LigneResultat<T> ligne, Runnable actionPlay, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, Supplier<Boolean> aimeActuel) {
+        JPanel carte = new JPanel(new BorderLayout(12, 0));
         carte.setOpaque(true);
         carte.setBackground(new Color(248, 251, 255));
-        carte.setBorder(new EmptyBorder(10, 12, 10, 12));
-        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
-        carte.setPreferredSize(new Dimension(100, 70));
+        carte.setBorder(new EmptyBorder(6, 10, 6, 10));
+        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 76));
+        carte.setPreferredSize(new Dimension(100, 76));
         carte.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel principal = new JLabel(titre);
+        JLabel play = creerLabelImage("assets/play.png", "play", actionPlay, 22, 22);
+        JLabel vignette = creerVignetteObjet(ligne.objet);
+        play.setAlignmentY(Component.CENTER_ALIGNMENT);
+        vignette.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        JPanel gauche = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        gauche.setOpaque(false);
+        gauche.setAlignmentY(Component.CENTER_ALIGNMENT);
+        gauche.add(play);
+        gauche.add(vignette);
+
+        JPanel texte = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        texte.setOpaque(false);
+        texte.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        JLabel principal = new JLabel(ligne.titre);
         principal.setFont(new Font("SansSerif", Font.BOLD, 14));
         principal.setForeground(new Color(25, 25, 25));
+        texte.add(principal);
 
-        JLabel secondaire = new JLabel(detail);
-        secondaire.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        secondaire.setForeground(new Color(95, 95, 95));
+        if (!ligne.detail.isBlank()) {
+            JLabel secondaire = new JLabel(ligne.detail);
+            secondaire.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            secondaire.setForeground(new Color(95, 95, 95));
+            texte.add(secondaire);
+        }
 
-        carte.add(principal, BorderLayout.NORTH);
-        carte.add(secondaire, BorderLayout.SOUTH);
+        if (!ligne.duree.isBlank()) {
+            JLabel duree = new JLabel(ligne.duree);
+            duree.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            duree.setForeground(new Color(110, 110, 110));
+            texte.add(duree);
+        }
+
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        actions.setOpaque(false);
+        actions.setAlignmentY(Component.CENTER_ALIGNMENT);
+        if (afficherAimer) {
+            final JLabel[] aimerLabelRef = new JLabel[1];
+            boolean aimeInitial = aimeActuel != null && Boolean.TRUE.equals(aimeActuel.get());
+            String cheminAimer = aimeInitial ? "assets/aime_true.png" : "assets/aime_false.png";
+            aimerLabelRef[0] = creerLabelImage(cheminAimer, "aimer", () -> {
+                actionAimer.run();
+                boolean aimeMaj = aimeActuel != null && Boolean.TRUE.equals(aimeActuel.get());
+                mettreIconeAimer(aimerLabelRef[0], aimeMaj);
+            }, 22, 22);
+            actions.add(aimerLabelRef[0]);
+        }
+        actions.add(creerLabelImage("assets/details.png", "details", actionDetails, 22, 22));
+
+        carte.add(gauche, BorderLayout.WEST);
+        carte.add(texte, BorderLayout.CENTER);
+        carte.add(actions, BorderLayout.EAST);
         return carte;
     }
 
-    private JComponent creerVueCategorie(ArrayList<String> lignes) {
+    private <T extends TypeObjets> JComponent creerVueCategorie(List<T> objets, Function<T, LigneResultat<T>> mapper, Consumer<T> actionPlay, Consumer<T> actionDetails, Consumer<T> actionAimer, Function<T, Boolean> aimeProvider) {
         JPanel liste = new JPanel();
         liste.setLayout(new BoxLayout(liste, BoxLayout.Y_AXIS));
         liste.setBackground(Color.WHITE);
         liste.setBorder(new EmptyBorder(10, 0, 10, 0));
 
-        if (lignes == null || lignes.isEmpty()) {
+        if (objets == null || objets.isEmpty()) {
             JLabel vide = new JLabel("Aucun resultat dans cette categorie.");
             vide.setFont(new Font("SansSerif", Font.PLAIN, 14));
             vide.setForeground(new Color(120, 120, 120));
@@ -385,16 +516,11 @@ public class Fenetre implements InterfaceVue {
             vide.setAlignmentX(Component.LEFT_ALIGNMENT);
             liste.add(vide);
         } else {
-            for (String ligne : lignes) {
-                String titre = ligne;
-                String detail = "";
-                int idx = ligne.indexOf(" - ");
-                if (idx >= 0) {
-                    titre = ligne.substring(0, idx);
-                    detail = ligne.substring(idx + 3);
-                }
-                liste.add(creerCarteResultat(titre, detail));
-                liste.add(Box.createVerticalStrut(8));
+            for (T objet : objets) {
+                LigneResultat<T> ligne = mapper.apply(objet);
+                Supplier<Boolean> aimeActuel = () -> aimeProvider != null && Boolean.TRUE.equals(aimeProvider.apply(objet));
+                liste.add(creerCarteResultat(ligne, () -> actionPlay.accept(objet), () -> actionDetails.accept(objet), () -> actionAimer.accept(objet), ligne.peutAimer, aimeActuel));
+                liste.add(Box.createVerticalStrut(4));
             }
         }
 
@@ -403,6 +529,74 @@ public class Fenetre implements InterfaceVue {
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         scroll.getViewport().setBackground(Color.WHITE);
         return scroll;
+    }
+
+    private String formatterDuree(int secondes) {
+        int minutes = Math.max(0, secondes) / 60;
+        int reste = Math.max(0, secondes) % 60;
+        return String.format("%d:%02d", minutes, reste);
+    }
+
+    private Morceau premierMorceau(Album album) {
+        if (album == null || album.getMorceaux() == null || album.getMorceaux().isEmpty()) {
+            return null;
+        }
+        return album.getMorceaux().get(0);
+    }
+
+    private Morceau premierMorceau(Playlist playlist) {
+        if (playlist == null || playlist.getMorceaux() == null || playlist.getMorceaux().isEmpty()) {
+            return null;
+        }
+        return playlist.getMorceaux().get(0);
+    }
+
+    private Morceau premierMorceau(Artiste artiste) {
+        if (artiste == null || artiste.getAlbums() == null) {
+            return null;
+        }
+
+        for (Album album : artiste.getAlbums()) {
+            Morceau morceau = premierMorceau(album);
+            if (morceau != null) {
+                return morceau;
+            }
+        }
+        return null;
+    }
+
+    private void jouerObjet(Object objet) {
+        if (objet instanceof Morceau) {
+            afficherLecture((Morceau) objet);
+        } else if (objet instanceof Album) {
+            Morceau morceau = premierMorceau((Album) objet);
+            if (morceau != null) {
+                afficherLecture(morceau);
+            } else {
+                afficherMessage("Cet album ne contient aucun morceau.");
+            }
+        } else if (objet instanceof Playlist) {
+            Morceau morceau = premierMorceau((Playlist) objet);
+            if (morceau != null) {
+                afficherLecture(morceau);
+            } else {
+                afficherMessage("Cette playlist ne contient aucun morceau.");
+            }
+        } else if (objet instanceof Artiste) {
+            Morceau morceau = premierMorceau((Artiste) objet);
+            if (morceau != null) {
+                afficherLecture(morceau);
+            } else {
+                afficherMessage("Aucun morceau disponible pour cet artiste.");
+            }
+        }
+    }
+
+    private void afficherDetailsObjet(Object objet) {
+        // Pas de dialogue detail: on conserve juste l'action cliquable sans pop-up.
+        if (objet != null) {
+            System.out.println("Details: " + objet.getClass().getSimpleName());
+        }
     }
 
     private String formatterArtistes(ArrayList<Artiste> artistes) {
@@ -450,34 +644,18 @@ public class Fenetre implements InterfaceVue {
             haut.add(titre);
             haut.add(resume);
 
-            ArrayList<String> lignesMorceaux = new ArrayList<>();
-            if (resultat != null && resultat.morceaux != null) {
-                for (Morceau morceau : resultat.morceaux) {
-                    lignesMorceaux.add(morceau.getNom() + " - " + formatterArtistes(morceau.getArtistes()));
-                }
-            }
-
-            ArrayList<String> lignesArtistes = new ArrayList<>();
-            if (resultat != null && resultat.artistes != null) {
-                for (Artiste artiste : resultat.artistes) {
-                    lignesArtistes.add(artiste.getNom());
-                }
-            }
-
-            ArrayList<String> lignesAlbums = new ArrayList<>();
-            if (resultat != null && resultat.albums != null) {
-                for (Album album : resultat.albums) {
-                    String nomArtiste = album.getArtiste() != null ? album.getArtiste().getNom() : "Inconnu";
-                    lignesAlbums.add(album.getNom() + " - " + nomArtiste);
-                }
-            }
-
-            ArrayList<String> lignesPlaylists = new ArrayList<>();
-            if (resultat != null && resultat.playlists != null) {
-                for (Playlist playlist : resultat.playlists) {
-                    lignesPlaylists.add(playlist.getNom());
-                }
-            }
+            List<Morceau> morceauxResultat = (resultat != null && resultat.morceaux != null)
+                ? resultat.morceaux
+                : new ArrayList<>();
+            List<Artiste> artistesResultat = (resultat != null && resultat.artistes != null)
+                ? resultat.artistes
+                : new ArrayList<>();
+            List<Album> albumsResultat = (resultat != null && resultat.albums != null)
+                ? resultat.albums
+                : new ArrayList<>();
+            List<Playlist> playlistsResultat = (resultat != null && resultat.playlists != null)
+                ? resultat.playlists
+                : new ArrayList<>();
 
             JPanel barreCategories = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
             barreCategories.setOpaque(false);
@@ -491,16 +669,34 @@ public class Fenetre implements InterfaceVue {
             JButton btnAlbums = creerBoutonCategorie("Albums (" + nbAlbums + ")");
             JButton btnPlaylists = creerBoutonCategorie("Playlists (" + nbPlaylists + ")");
 
-            Map<String, JButton> boutons = new HashMap<>();
-            boutons.put("morceaux", btnMorceaux);
-            boutons.put("artistes", btnArtistes);
-            boutons.put("albums", btnAlbums);
-            boutons.put("playlists", btnPlaylists);
-
-            cartesCategories.add(creerVueCategorie(lignesMorceaux), "morceaux");
-            cartesCategories.add(creerVueCategorie(lignesArtistes), "artistes");
-            cartesCategories.add(creerVueCategorie(lignesAlbums), "albums");
-            cartesCategories.add(creerVueCategorie(lignesPlaylists), "playlists");
+            cartesCategories.add(creerVueCategorie(morceauxResultat,
+                morceau -> new LigneResultat<>(morceau, morceau.getNom(), formatterArtistes(morceau.getArtistes()), formatterDuree(morceau.getDuree()), true),
+                this::jouerObjet,
+                this::afficherDetailsObjet,
+                objet -> basculerMorceauAimeHandler.accept((Morceau) objet),
+                objet -> estMorceauAimeProvider.apply((Morceau) objet)), "morceaux");
+            cartesCategories.add(creerVueCategorie(artistesResultat,
+                artiste -> new LigneResultat<>(artiste, artiste.getNom(), artiste.getAlbums() == null ? "0 album" : artiste.getAlbums().size() + " album(s)", "", false),
+                this::jouerObjet,
+                this::afficherDetailsObjet,
+                objet -> {},
+                objet -> false), "artistes");
+            cartesCategories.add(creerVueCategorie(albumsResultat,
+                album -> {
+                    String nomArtiste = album.getArtiste() != null ? album.getArtiste().getNom() : "Inconnu";
+                    String detail = nomArtiste + (album.getAnnee() > 0 ? " - " + album.getAnnee() : "");
+                    return new LigneResultat<>(album, album.getNom(), detail, "", false);
+                },
+                this::jouerObjet,
+                this::afficherDetailsObjet,
+                objet -> {},
+                objet -> false), "albums");
+            cartesCategories.add(creerVueCategorie(playlistsResultat,
+                playlist -> new LigneResultat<>(playlist, playlist.getNom(), (playlist.getMorceaux() == null ? 0 : playlist.getMorceaux().size()) + " morceau(x) - " + playlist.getCreation(), "", true),
+                this::jouerObjet,
+                this::afficherDetailsObjet,
+                objet -> basculerPlaylistAimeeHandler.accept((Playlist) objet),
+                objet -> estPlaylistAimeeProvider.apply((Playlist) objet)), "playlists");
 
             btnMorceaux.addActionListener(evt -> {
                 cartesCategoriesLayout.show(cartesCategories, "morceaux");
@@ -559,6 +755,7 @@ public class Fenetre implements InterfaceVue {
             visiteCourante.setPanelCentral(contenu);
         });
     } //reuslata rehcerche
+   
     public MorceauForm demanderMorceau(){return null;}; //admin ajouter
     public ArtisteForm demanderArtiste(){return null;}; //admin
     public PlaylistForm demanderPlaylist(int numUtilisateur){return null;}; //abonéé
@@ -569,5 +766,4 @@ public class Fenetre implements InterfaceVue {
 
     public void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {}
 
-    public void afficherAimer(String nom) {}
 }

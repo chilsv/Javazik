@@ -6,4 +6,5 @@ import java.io.Serializable;
 public interface TypeObjets extends Serializable {
     int getAnnee();
     String getNom();
+    String getImage();
 }
