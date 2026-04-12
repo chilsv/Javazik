@@ -1,6 +1,7 @@
 package vue;
 
 import javax.swing.*;
+import java.awt.event.MouseListener;
 import java.awt.*;
 
 import metier.Filtre;
@@ -219,5 +220,44 @@ public class FenetreVisite {
 
     public Filtre getFiltreSelectionne() {
         return panneauFiltre.getFiltre();
+    }
+
+    public void setPanelCentral(JComponent nouveauPanel) {
+        central.removeAll();
+        central.add(nouveauPanel, BorderLayout.CENTER);
+        central.revalidate();
+        central.repaint();
+    }
+
+    private void retirerMouseListenersEvenementsVisite(Component composant) {
+        for (MouseListener listener : composant.getMouseListeners()) {
+            String nomClasse = listener.getClass().getName();
+            if (nomClasse.startsWith("controleur.EvenementsVisite")) {
+                composant.removeMouseListener(listener);
+            }
+        }
+
+        if (composant instanceof Container) {
+            for (Component enfant : ((Container) composant).getComponents()) {
+                retirerMouseListenersEvenementsVisite(enfant);
+            }
+        }
+    }
+
+    public void reinitialiserEvenementsVisite() {
+        retirerMouseListenersEvenementsVisite(profil);
+        retirerMouseListenersEvenementsVisite(librairie);
+        retirerMouseListenersEvenementsVisite(btnRetour);
+        retirerMouseListenersEvenementsVisite(loupe);
+        retirerMouseListenersEvenementsVisite(filtre);
+        retirerMouseListenersEvenementsVisite(barreRecherche);
+        retirerMouseListenersEvenementsVisite(panneauFiltre);
+    }
+
+    public void viderPanelCentral() {
+        JPanel vide = new JPanel(new BorderLayout());
+        vide.setOpaque(true);
+        vide.setBackground(Color.WHITE);
+        setPanelCentral(vide);
     }
 }

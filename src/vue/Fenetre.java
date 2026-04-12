@@ -172,17 +172,21 @@ public class Fenetre implements InterfaceVue {
         final Object verrou = new Object();
 
         executerSurEdtEtAttendre(() -> {
-            FenetreVisite fenetre = new FenetreVisite();
-            fenetre.setFrame(frame);
-            visiteCourante = fenetre;
-            afficherCarte(CARTE_VISITE, fenetre.getPanel());
+            if (visiteCourante == null) {
+                visiteCourante = new FenetreVisite();
+                visiteCourante.setFrame(frame);
+            }
+            afficherCarte(CARTE_VISITE, visiteCourante.getPanel());
+            visiteCourante.reinitialiserEvenementsVisite();
 
             boolean filtreVisible = !(utilisateur instanceof Visiteur);
-            EvenementsVisite.ajouterEvenements(fenetre, choix -> {
+            EvenementsVisite.ajouterEvenements(visiteCourante, choix -> {
                 synchronized (verrou) {
                     if (choix == 1) {
+                        visiteCourante.viderPanelCentral();
                         resultat[0] = new ConsulterProfil();
                     } else if (choix == 2) {
+                        visiteCourante.viderPanelCentral();
                         resultat[0] = new ConsulterLibrairie();
                     } else if (choix == 3) {
                         resultat[0] = new Deconnexion();
@@ -322,7 +326,239 @@ public class Fenetre implements InterfaceVue {
         return visiteCourante.getFiltreSelectionne();
     }
 
-    public void afficherRecherche(ResultatRecherche resultat){}; //reuslata rehcerche
+    private JButton creerBoutonCategorie(String texte) {
+        JButton bouton = new JButton(texte);
+        bouton.setFocusPainted(false);
+        bouton.setBorderPainted(false);
+        bouton.setOpaque(true);
+        bouton.setBackground(new Color(235, 235, 235));
+        bouton.setForeground(new Color(55, 55, 55));
+        bouton.setFont(new Font("SansSerif", Font.BOLD, 13));
+        bouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        bouton.setBorder(new EmptyBorder(8, 12, 8, 12));
+        return bouton;
+    }
+
+    private void appliquerStyleCategorieActive(JButton bouton, boolean active) {
+        if (active) {
+            bouton.setBackground(new Color(45, 140, 240));
+            bouton.setForeground(Color.WHITE);
+        } else {
+            bouton.setBackground(new Color(235, 235, 235));
+            bouton.setForeground(new Color(55, 55, 55));
+        }
+    }
+
+    private JPanel creerCarteResultat(String titre, String detail) {
+        JPanel carte = new JPanel(new BorderLayout());
+        carte.setOpaque(true);
+        carte.setBackground(new Color(248, 251, 255));
+        carte.setBorder(new EmptyBorder(10, 12, 10, 12));
+        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+        carte.setPreferredSize(new Dimension(100, 70));
+        carte.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel principal = new JLabel(titre);
+        principal.setFont(new Font("SansSerif", Font.BOLD, 14));
+        principal.setForeground(new Color(25, 25, 25));
+
+        JLabel secondaire = new JLabel(detail);
+        secondaire.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        secondaire.setForeground(new Color(95, 95, 95));
+
+        carte.add(principal, BorderLayout.NORTH);
+        carte.add(secondaire, BorderLayout.SOUTH);
+        return carte;
+    }
+
+    private JComponent creerVueCategorie(ArrayList<String> lignes) {
+        JPanel liste = new JPanel();
+        liste.setLayout(new BoxLayout(liste, BoxLayout.Y_AXIS));
+        liste.setBackground(Color.WHITE);
+        liste.setBorder(new EmptyBorder(10, 0, 10, 0));
+
+        if (lignes == null || lignes.isEmpty()) {
+            JLabel vide = new JLabel("Aucun resultat dans cette categorie.");
+            vide.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            vide.setForeground(new Color(120, 120, 120));
+            vide.setBorder(new EmptyBorder(14, 6, 0, 0));
+            vide.setAlignmentX(Component.LEFT_ALIGNMENT);
+            liste.add(vide);
+        } else {
+            for (String ligne : lignes) {
+                String titre = ligne;
+                String detail = "";
+                int idx = ligne.indexOf(" - ");
+                if (idx >= 0) {
+                    titre = ligne.substring(0, idx);
+                    detail = ligne.substring(idx + 3);
+                }
+                liste.add(creerCarteResultat(titre, detail));
+                liste.add(Box.createVerticalStrut(8));
+            }
+        }
+
+        JScrollPane scroll = new JScrollPane(liste);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.getViewport().setBackground(Color.WHITE);
+        return scroll;
+    }
+
+    private String formatterArtistes(ArrayList<Artiste> artistes) {
+        if (artistes == null || artistes.isEmpty()) {
+            return "Inconnu";
+        }
+
+        StringBuilder noms = new StringBuilder();
+        for (int i = 0; i < artistes.size(); i++) {
+            if (i > 0) {
+                noms.append(", ");
+            }
+            noms.append(artistes.get(i).getNom());
+        }
+        return noms.toString();
+    }
+
+    public void afficherRecherche(ResultatRecherche resultat) {
+        if (visiteCourante == null) {
+            return;
+        }
+
+        executerSurEdtEtAttendre(() -> {
+            JPanel contenu = new JPanel(new BorderLayout());
+            contenu.setBackground(Color.WHITE);
+            contenu.setBorder(new EmptyBorder(14, 18, 18, 18));
+
+            JLabel titre = new JLabel("Resultats de recherche");
+            titre.setFont(new Font("SansSerif", Font.BOLD, 24));
+            titre.setBorder(new EmptyBorder(0, 0, 6, 0));
+
+            int nbMorceaux = (resultat == null || resultat.morceaux == null) ? 0 : resultat.morceaux.size();
+            int nbArtistes = (resultat == null || resultat.artistes == null) ? 0 : resultat.artistes.size();
+            int nbAlbums = (resultat == null || resultat.albums == null) ? 0 : resultat.albums.size();
+            int nbPlaylists = (resultat == null || resultat.playlists == null) ? 0 : resultat.playlists.size();
+            int total = nbMorceaux + nbArtistes + nbAlbums + nbPlaylists;
+
+            JLabel resume = new JLabel(total + " resultat(s)");
+            resume.setForeground(new Color(90, 90, 90));
+            resume.setBorder(new EmptyBorder(0, 0, 10, 0));
+
+            JPanel haut = new JPanel();
+            haut.setLayout(new BoxLayout(haut, BoxLayout.Y_AXIS));
+            haut.setOpaque(false);
+            haut.add(titre);
+            haut.add(resume);
+
+            ArrayList<String> lignesMorceaux = new ArrayList<>();
+            if (resultat != null && resultat.morceaux != null) {
+                for (Morceau morceau : resultat.morceaux) {
+                    lignesMorceaux.add(morceau.getNom() + " - " + formatterArtistes(morceau.getArtistes()));
+                }
+            }
+
+            ArrayList<String> lignesArtistes = new ArrayList<>();
+            if (resultat != null && resultat.artistes != null) {
+                for (Artiste artiste : resultat.artistes) {
+                    lignesArtistes.add(artiste.getNom());
+                }
+            }
+
+            ArrayList<String> lignesAlbums = new ArrayList<>();
+            if (resultat != null && resultat.albums != null) {
+                for (Album album : resultat.albums) {
+                    String nomArtiste = album.getArtiste() != null ? album.getArtiste().getNom() : "Inconnu";
+                    lignesAlbums.add(album.getNom() + " - " + nomArtiste);
+                }
+            }
+
+            ArrayList<String> lignesPlaylists = new ArrayList<>();
+            if (resultat != null && resultat.playlists != null) {
+                for (Playlist playlist : resultat.playlists) {
+                    lignesPlaylists.add(playlist.getNom());
+                }
+            }
+
+            JPanel barreCategories = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+            barreCategories.setOpaque(false);
+
+            CardLayout cartesCategoriesLayout = new CardLayout();
+            JPanel cartesCategories = new JPanel(cartesCategoriesLayout);
+            cartesCategories.setOpaque(false);
+
+            JButton btnMorceaux = creerBoutonCategorie("Morceaux (" + nbMorceaux + ")");
+            JButton btnArtistes = creerBoutonCategorie("Artistes (" + nbArtistes + ")");
+            JButton btnAlbums = creerBoutonCategorie("Albums (" + nbAlbums + ")");
+            JButton btnPlaylists = creerBoutonCategorie("Playlists (" + nbPlaylists + ")");
+
+            Map<String, JButton> boutons = new HashMap<>();
+            boutons.put("morceaux", btnMorceaux);
+            boutons.put("artistes", btnArtistes);
+            boutons.put("albums", btnAlbums);
+            boutons.put("playlists", btnPlaylists);
+
+            cartesCategories.add(creerVueCategorie(lignesMorceaux), "morceaux");
+            cartesCategories.add(creerVueCategorie(lignesArtistes), "artistes");
+            cartesCategories.add(creerVueCategorie(lignesAlbums), "albums");
+            cartesCategories.add(creerVueCategorie(lignesPlaylists), "playlists");
+
+            btnMorceaux.addActionListener(evt -> {
+                cartesCategoriesLayout.show(cartesCategories, "morceaux");
+                appliquerStyleCategorieActive(btnMorceaux, true);
+                appliquerStyleCategorieActive(btnArtistes, false);
+                appliquerStyleCategorieActive(btnAlbums, false);
+                appliquerStyleCategorieActive(btnPlaylists, false);
+            });
+            btnArtistes.addActionListener(evt -> {
+                cartesCategoriesLayout.show(cartesCategories, "artistes");
+                appliquerStyleCategorieActive(btnMorceaux, false);
+                appliquerStyleCategorieActive(btnArtistes, true);
+                appliquerStyleCategorieActive(btnAlbums, false);
+                appliquerStyleCategorieActive(btnPlaylists, false);
+            });
+            btnAlbums.addActionListener(evt -> {
+                cartesCategoriesLayout.show(cartesCategories, "albums");
+                appliquerStyleCategorieActive(btnMorceaux, false);
+                appliquerStyleCategorieActive(btnArtistes, false);
+                appliquerStyleCategorieActive(btnAlbums, true);
+                appliquerStyleCategorieActive(btnPlaylists, false);
+            });
+            btnPlaylists.addActionListener(evt -> {
+                cartesCategoriesLayout.show(cartesCategories, "playlists");
+                appliquerStyleCategorieActive(btnMorceaux, false);
+                appliquerStyleCategorieActive(btnArtistes, false);
+                appliquerStyleCategorieActive(btnAlbums, false);
+                appliquerStyleCategorieActive(btnPlaylists, true);
+            });
+
+            barreCategories.add(btnMorceaux);
+            barreCategories.add(btnArtistes);
+            barreCategories.add(btnAlbums);
+            barreCategories.add(btnPlaylists);
+            barreCategories.setBorder(new EmptyBorder(0, 0, 10, 0));
+
+            haut.add(barreCategories);
+            contenu.add(haut, BorderLayout.NORTH);
+            contenu.add(cartesCategories, BorderLayout.CENTER);
+
+            String categorieInitiale = "morceaux";
+            if (nbMorceaux == 0 && nbArtistes > 0) {
+                categorieInitiale = "artistes";
+            } else if (nbMorceaux == 0 && nbArtistes == 0 && nbAlbums > 0) {
+                categorieInitiale = "albums";
+            } else if (nbMorceaux == 0 && nbArtistes == 0 && nbAlbums == 0 && nbPlaylists > 0) {
+                categorieInitiale = "playlists";
+            }
+
+            cartesCategoriesLayout.show(cartesCategories, categorieInitiale);
+            appliquerStyleCategorieActive(btnMorceaux, "morceaux".equals(categorieInitiale));
+            appliquerStyleCategorieActive(btnArtistes, "artistes".equals(categorieInitiale));
+            appliquerStyleCategorieActive(btnAlbums, "albums".equals(categorieInitiale));
+            appliquerStyleCategorieActive(btnPlaylists, "playlists".equals(categorieInitiale));
+
+            visiteCourante.setPanelCentral(contenu);
+        });
+    } //reuslata rehcerche
     public MorceauForm demanderMorceau(){return null;}; //admin ajouter
     public ArtisteForm demanderArtiste(){return null;}; //admin
     public PlaylistForm demanderPlaylist(int numUtilisateur){return null;}; //abonéé
