@@ -51,11 +51,15 @@ public class FenetreConnexion {
         card.setOpaque(false);
         card.setBounds(carteX, CarteY, carteLongeur, carteLargeur);
 
-        // Ecriture de Login dans notre panel
-        JLabel titre = new JLabel("Login", SwingConstants.CENTER); // Centre + login
-        titre.setFont(new Font("Segoe UI", Font.PLAIN, 26)); //font
+
+        //Texte login
+        JLabel titre = new JLabel("Login", SwingConstants.CENTER);// Centre + login
+        titre.setFont(new Font("Segoe UI", Font.PLAIN, 26));//font
         titre.setForeground(Color.WHITE);
-        titre.setBounds(0, 20, carteLongeur, 40); //placement
+        titre.setBounds(80, 20, carteLongeur - 2 * 80, 40);//placement en evitant le bouton sur le coté avec une marge de 80
+
+
+
 
         // creation du champ username
         champMail = new JTextField();
@@ -99,6 +103,7 @@ public class FenetreConnexion {
         Image newImg = img.getScaledInstance(50, 50, Image.SCALE_SMOOTH); //redimension
         btnRetourLabel = new JLabel(new ImageIcon(newImg)); //affciher l'iamge redomasionner
         btnRetourLabel.setBounds(20,10, 50, 50);
+
 
         // ajouter sur la carte
         card.add(titre);

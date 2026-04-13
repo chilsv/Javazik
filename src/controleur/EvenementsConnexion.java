@@ -25,10 +25,11 @@ public class EvenementsConnexion {
             @Override
             public void mouseEntered(MouseEvent e) {
                 btnValider.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
             }
         });
 
-        // Retour → choix 2
+        // Quitter → choix 4
         btnRetour.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

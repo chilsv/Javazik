@@ -58,10 +58,11 @@ public class FenetreInscription {
         card.setOpaque(false);
         card.setBounds(carteX, carteY, carteLongueur, carteLargeur);
 
-        JLabel titre = new JLabel("S'inscrire", SwingConstants.CENTER);
-        titre.setFont(new Font("Segoe UI", Font.PLAIN, 26));
+        //Texte login
+        JLabel titre = new JLabel("S'inscrire", SwingConstants.CENTER);// Centre + login
+        titre.setFont(new Font("Segoe UI", Font.PLAIN, 26));//font
         titre.setForeground(Color.WHITE);
-        titre.setBounds(0, 20, carteLongueur, 40);
+        titre.setBounds(80, 20, carteLongueur - 2 * 80, 40);//placement en evitant le bouton sur le coté avec une marge de 80
 
         champNom = new JTextField();
         champNom.setBounds(30, 80, carteLongueur - 60, 40);
