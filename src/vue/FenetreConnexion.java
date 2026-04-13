@@ -32,7 +32,7 @@ public class FenetreConnexion {
         // ── Carte centrale (panneau semi-transparent) ──
         // Dimensions de la carte
         int carteLongeur = 340;
-        int carteLargeur = 380;
+        int carteLargeur = 260;
         int carteX = (Ecran.LONGUEUR - carteLongeur) / 2; // centré horizontalement
         int CarteY = (Ecran.HAUTEUR - carteLargeur) / 2;  // centré verticalement
 
@@ -94,13 +94,11 @@ public class FenetreConnexion {
         btnValider.setCursor(new Cursor(Cursor.HAND_CURSOR));//placr le curseur en mode main au dessus du botuon pour que l'utilisateur sache qu'il peut cliquer
 
 
-        btnRetourLabel = new JLabel(new ImageIcon("assets/btn_retour.png"));
-        // X : centré dans la carte    Y : 10px au dessus du bas de la carte
-        int btnRetourX = (carteLongeur - 80) / 2;
-        int btnRetourY = carteLargeur - 40 - 15;
-        btnRetourLabel.setBounds(btnRetourX, btnRetourY, 80, 40);
-        btnRetourLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
+        ImageIcon icon = new ImageIcon("assets/btn_retour.png"); //chercher l'image
+        Image img = icon.getImage(); //defeinir une nouvelle image que l'onva redimensuionner
+        Image newImg = img.getScaledInstance(50, 50, Image.SCALE_SMOOTH); //redimension
+        btnRetourLabel = new JLabel(new ImageIcon(newImg)); //affciher l'iamge redomasionner
+        btnRetourLabel.setBounds(20,10, 50, 50);
 
         // ajouter sur la carte
         card.add(titre);

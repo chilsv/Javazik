@@ -1,5 +1,6 @@
 package vue;
 
+import java.awt.Image;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -98,11 +99,12 @@ public class FenetreInscription {
         btnValider.setFocusPainted(false);
         btnValider.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnRetourLabel = new JLabel(new ImageIcon("assets/btn_retour.png"));
-        int btnRetourX = (carteLongueur - 80) / 2;
-        int btnRetourY = carteLargeur - 40 - 15;
-        btnRetourLabel.setBounds(btnRetourX, btnRetourY, 80, 40);
-        btnRetourLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        ImageIcon icon = new ImageIcon("assets/btn_retour.png"); //chercher l'image
+        Image img = icon.getImage(); //defeinir une nouvelle image que l'onva redimensuionner
+        Image newImg = img.getScaledInstance(50, 50, Image.SCALE_SMOOTH); //redimension
+        btnRetourLabel = new JLabel(new ImageIcon(newImg)); //affciher l'iamge redomasionner
+        btnRetourLabel.setBounds(20,10, 50, 50);
+
 
         card.add(titre);
         card.add(champNom);
@@ -113,6 +115,8 @@ public class FenetreInscription {
 
         backgroundLabel.add(card);
     }
+
+
 
     private void styliserChamp(JTextField champ, String placeholder) {
         champ.setBackground(new Color(40, 50, 80, 200));
