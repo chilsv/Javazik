@@ -37,6 +37,7 @@ public class FenetreVisite {
     private final JLabel loupe;
     private final JLabel filtre;
     private final JLabel btnRetour;
+    //private final JLabel background;
 
     public FenetreVisite() {
         // On crée le panel princiapl qui contient tout
@@ -65,6 +66,8 @@ public class FenetreVisite {
         bandeSelection.setLayout(new BoxLayout(bandeSelection, BoxLayout.Y_AXIS));
         bandeSelection.setPreferredSize(new Dimension(BANDE_SELECTION_LARGEUR, Ecran.HAUTEUR));
         bandeSelection.setBackground(new Color(220, 240, 250));
+        //bandeSelection.setBackground(new Color(21, 22, 28));
+
 
         // bande de lecture en bas
         lecture = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 10));
