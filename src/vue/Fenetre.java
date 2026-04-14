@@ -26,23 +26,22 @@ import controleur.formulaires.*;
 import metier.*;
 
 public class Fenetre implements InterfaceVue {
-    private static final String CARTE_MENU = "menu";
-    private static final String CARTE_CONNEXION = "connexion";
-    private static final String CARTE_INSCRIPTION = "inscription";
-    private static final String CARTE_VISITE = "visite";
-    private static final int DUREE_TOAST_MS = 2800;
+    private static final int DUREE_NOTIF = 2800;
 
-    private final JFrame frame;
+    private final JFrame frame; // fenêtre de l'appli
     private final CardLayout cardLayout;
-    private final JPanel cartes;
-    private final Map<String, JPanel> cartesParNom;
-    private FenetreVisite visiteCourante;
+    private final JPanel pages; // le panel princiapal qui va contenir toutes les pages
+    private final Map<String, JPanel> pagesMap; // map pour trouver le panel grâcec à son nom
+    private FenetreVisite fenetreVisite;
+
     private Consumer<Morceau> basculerMorceauAimeHandler = morceau -> {};
     private Function<Morceau, Boolean> estMorceauAimeProvider = morceau -> false;
     private Consumer<Playlist> basculerPlaylistAimeeHandler = playlist -> {};
     private Function<Playlist, Boolean> estPlaylistAimeeProvider = playlist -> false;
-    private JWindow toastFenetre;
-    private Timer toastTimer;
+
+    // notification pour faire les erreurs "résevré aux abonnés"
+    private JWindow notif;
+    private Timer tempsNotif;
 
     public Fenetre() {
         frame = new JFrame("Javazic"); //Creation
@@ -53,25 +52,27 @@ public class Fenetre implements InterfaceVue {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         cardLayout = new CardLayout();
-        cartes = new JPanel(cardLayout);
-        cartesParNom = new HashMap<>();
+        pages = new JPanel(cardLayout);
+        pagesMap = new HashMap<>();
 
-        frame.setContentPane(cartes);
+        frame.setContentPane(pages);
         frame.setVisible(true);
     }
 
-    private void afficherCarte(String nomCarte, JPanel panel) {
-        JPanel ancienneCarte = cartesParNom.put(nomCarte, panel);
-        if (ancienneCarte != null) {
-            cartes.remove(ancienneCarte);
+    /*Pour changer la page qui est affichée */
+    private void afficherPanel(String nom, JPanel panel) {
+        JPanel ancienPanel = pagesMap.put(nom, panel);
+        if (ancienPanel != null) {
+            pages.remove(ancienPanel);
         }
-        cartes.add(panel, nomCarte);
-        cartes.revalidate();
-        cartes.repaint();
-        cardLayout.show(cartes, nomCarte);
+        pages.add(panel, nom);
+        pages.revalidate(); // d'après la doc
+        pages.repaint(); // ça rafraichit l'affichage du panel
+        cardLayout.show(pages, nom);
     }
 
-    private void executerSurEdtEtAttendre(Runnable action) {
+    /*attend que l'utilisateur fasse une action */
+    private void executerEtAttendre(Runnable action) {
         if (SwingUtilities.isEventDispatchThread()) {
             action.run();
             return;
@@ -89,10 +90,10 @@ public class Fenetre implements InterfaceVue {
         final Object verrou = new Object();
 
         // Lancer Swing sur l'EDT correctement
-        executerSurEdtEtAttendre(() -> {
+        executerEtAttendre(() -> {
             FenetreMenu fenetreMenu = new FenetreMenu();
             fenetreMenu.setFrame(frame);
-            afficherCarte(CARTE_MENU, fenetreMenu.getPanel());
+            afficherPanel("menu", fenetreMenu.getPanel());
 
             EvenementsMenu.ajouterEvenements(fenetreMenu, choix -> {
                 synchronized (verrou) {
@@ -138,10 +139,10 @@ public class Fenetre implements InterfaceVue {
         final boolean[] termine = {false};
         final Object verrou = new Object();
 
-        executerSurEdtEtAttendre(() -> {
+        executerEtAttendre(() -> {
             FenetreConnexion fenetreConnexion = new FenetreConnexion();
             fenetreConnexion.setFrame(frame);
-            afficherCarte(CARTE_CONNEXION, fenetreConnexion.getPanel());
+            afficherPanel("connexion", fenetreConnexion.getPanel());
 
             EvenementsConnexion.ajouterEvenements(fenetreConnexion, choix -> {
                 synchronized (verrou) {
@@ -174,30 +175,31 @@ public class Fenetre implements InterfaceVue {
         return resultat[0];
     }
 
-    //quelle bouton on clique
+    /*quelle bouton on clique*/
     public Action choisirAction(String accueil, Personne utilisateur) {
         final Action[] resultat = {null};
         final Object verrou = new Object();
 
-        executerSurEdtEtAttendre(() -> {
-            if (visiteCourante == null) {
-                visiteCourante = new FenetreVisite();
-                visiteCourante.setFrame(frame);
+        executerEtAttendre(() -> {
+            if (fenetreVisite == null) {
+                fenetreVisite = new FenetreVisite();
+                fenetreVisite.setFrame(frame);
             }
-            afficherCarte(CARTE_VISITE, visiteCourante.getPanel());
-            visiteCourante.reinitialiserEvenementsVisite();
+            // On affiche la page de visite et on réinitialise tous les événeemnts
+            afficherPanel("visite", fenetreVisite.getPanel());
+            fenetreVisite.reinitialiserEvenements();
 
-            boolean filtreVisible = !(utilisateur instanceof Visiteur);
-            EvenementsVisite.ajouterEvenements(visiteCourante, choix -> {
+            boolean filtreVisible = !(utilisateur instanceof Visiteur); // ça dépend de si c'est un visiteur ou pas
+            EvenementsVisite.ajouterEvenements(fenetreVisite, choix -> {
                 synchronized (verrou) {
                     if (choix == 1) {
-                        visiteCourante.viderPanelCentral();
+                        fenetreVisite.viderPanelCentral();
                         resultat[0] = new ConsulterProfil();
                     } else if (choix == 2) {
-                        visiteCourante.viderPanelCentral();
+                        fenetreVisite.viderPanelCentral();
                         resultat[0] = new ConsulterLibrairie();
                     } else if (choix == 3) {
-                        visiteCourante.viderPanelCentral();
+                        fenetreVisite.viderPanelCentral();
                         resultat[0] = new Deconnexion();
                     } else if (choix == 4) {
                         resultat[0] = new ChoisirFiltre();
@@ -229,10 +231,11 @@ public class Fenetre implements InterfaceVue {
         final boolean[] termine = {false};
         final Object verrou = new Object();
 
-        executerSurEdtEtAttendre(() -> {
+        executerEtAttendre(() -> {
             FenetreInscription fenetre = new FenetreInscription();
             fenetre.setFrame(frame);
-            afficherCarte(CARTE_INSCRIPTION, fenetre.getPanel());
+            afficherPanel("inscription", fenetre.getPanel());
+
             EvenementsInscription.ajouterEvenements(fenetre, choix -> {
             synchronized (verrou) {
                 if (choix == 1) {
@@ -265,77 +268,79 @@ public class Fenetre implements InterfaceVue {
         return resultat[0];
     }
 
-    //barre de lecture
+    /* barre de lecture à faire*/
     public void afficherLecture(Morceau morceau){
     };
 
     public void afficherMessage(String message) {
     }
 
+    /* affiche une notif rouge */
     public void afficherErreur(Exception e) {
         if (e == null) {
             return;
         }
         String message = e.getMessage();
-        afficherMessage(e.getMessage());
-        String texte = (message == null || message.isBlank()) ? "Une erreur est survenue." : message;
-
-        if (toastTimer != null && toastTimer.isRunning()) {
-            toastTimer.stop();
-        }
-        if (toastFenetre != null) {
-            toastFenetre.dispose();
+        if (message == null || message.isBlank()) {
+            message = ""; // pour éviter ede me retrouver avec un null
         }
 
-        toastFenetre = new JWindow(frame);
-        toastFenetre.setBackground(new Color(0, 0, 0, 0));
+        if (tempsNotif != null && tempsNotif.isRunning()) {
+            tempsNotif.stop();
+        }
+        if (notif != null) {
+            notif.dispose();
+        }
+
+        // ça je te laisse gérer le style
+        notif = new JWindow(frame);
+        notif.setBackground(new Color(0, 0, 0, 0));
 
         JPanel contenu = new JPanel(new BorderLayout());
         contenu.setBorder(new EmptyBorder(10, 14, 10, 14));
         contenu.setBackground(new Color(210, 20, 20, 185));
 
-        JLabel label = new JLabel(texte, SwingConstants.CENTER);
+        JLabel label = new JLabel(message, SwingConstants.CENTER);
         label.setForeground(Color.WHITE);
         label.setFont(new Font("SansSerif", Font.BOLD, 14));
         contenu.add(label, BorderLayout.CENTER);
 
-        toastFenetre.setContentPane(contenu);
-        toastFenetre.pack();
+        notif.setContentPane(contenu);
+        notif.pack();
 
-        Point posFenetre = frame.getLocationOnScreen();
-        int x = posFenetre.x + (frame.getWidth() - toastFenetre.getWidth()) / 2;
-        int y = posFenetre.y + 28;
-        toastFenetre.setLocation(x, y);
-        toastFenetre.setAlwaysOnTop(true);
-        toastFenetre.setVisible(true);
+        // on affiche la notif en haut
+        Point fenetrePosition = frame.getLocationOnScreen(); // ça retourne un point, j'imagine que c'est des coordonénes
+        int x = fenetrePosition.x + (frame.getWidth() - notif.getWidth()) / 2;
+        int y = fenetrePosition.y + 28;
+        notif.setLocation(x, y);
+        notif.setAlwaysOnTop(true);
+        notif.setVisible(true);
 
-        toastTimer = new Timer(DUREE_TOAST_MS, evt -> {
-            if (toastFenetre != null) {
-                toastFenetre.dispose();
-                toastFenetre = null;
+        tempsNotif = new Timer(DUREE_NOTIF, evt -> {
+            if (notif != null) {
+                notif.dispose();
+                notif = null;
             }
         });
-        toastTimer.setRepeats(false);
-        toastTimer.start();
+        tempsNotif.setRepeats(false);
+        tempsNotif.start();
     }
    
+    /* peut-être que  */
     public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue){};
 
     public void afficherProfilAdmin(Admin admin) {
     }
 
     public RechercheForm demanderRecherche(Filtre filtre) {
-        if (visiteCourante == null) {
+        if (fenetreVisite == null) {
             return null;
         }
-        return new RechercheForm(visiteCourante.getBarreRecherche().getText(), filtre);
+        return new RechercheForm(fenetreVisite.getBarreRecherche().getText(), filtre);
     }
 
     public Filtre afficherFiltres() {
-        if (visiteCourante == null) {
-            return null;
-        }
-        return visiteCourante.getFiltreSelectionne();
+        return fenetreVisite.getFiltres();
     }
 
     public void configurerActionsResultats(
@@ -345,6 +350,9 @@ public class Fenetre implements InterfaceVue {
         Function<Playlist, Boolean> estPlaylistAimee
     ) {
         basculerMorceauAimeHandler = basculerMorceauAime != null ? basculerMorceauAime : (morceau -> {});
+        if (basculerMorceauAime != null) {
+            basculerMorceauAimeHandler = basculerMorceauAime;
+        }
         estMorceauAimeProvider = estMorceauAime != null ? estMorceauAime : (morceau -> false);
         basculerPlaylistAimeeHandler = basculerPlaylistAimee != null ? basculerPlaylistAimee : (playlist -> {});
         estPlaylistAimeeProvider = estPlaylistAimee != null ? estPlaylistAimee : (playlist -> false);
@@ -615,11 +623,11 @@ public class Fenetre implements InterfaceVue {
     }
 
     public void afficherRecherche(ResultatRecherche resultat) {
-        if (visiteCourante == null) {
+        if (fenetreVisite == null) {
             return;
         }
 
-        executerSurEdtEtAttendre(() -> {
+        executerEtAttendre(() -> {
             JPanel contenu = new JPanel(new BorderLayout());
             contenu.setBackground(Color.WHITE);
             contenu.setBorder(new EmptyBorder(14, 18, 18, 18));
@@ -752,7 +760,7 @@ public class Fenetre implements InterfaceVue {
             appliquerStyleCategorieActive(btnAlbums, "albums".equals(categorieInitiale));
             appliquerStyleCategorieActive(btnPlaylists, "playlists".equals(categorieInitiale));
 
-            visiteCourante.setPanelCentral(contenu);
+            fenetreVisite.setPanelCentral(contenu);
         });
     } //reuslata rehcerche
    

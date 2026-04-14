@@ -17,6 +17,7 @@ public class EvenementsVisite {
     }
 
     public static void ajouterEvenements(FenetreVisite fenetre, VisiteListener listener) {
+        // pour les visiteurs
         ajouterEvenements(fenetre, listener, false);
     }
 
@@ -26,7 +27,7 @@ public class EvenementsVisite {
         JLabel btnRetour = fenetre.getBtnRetour();
         JLabel loupe = fenetre.getLoupe();
         JLabel filtre = fenetre.getFiltre();
-        JPanel panneauFiltre = fenetre.getPanneauFiltre();
+        JPanel panelFiltre = fenetre.getPanelFiltre();
         JTextField barreRecherche = fenetre.getBarreRecherche();
 
         // Profil choix 1
@@ -73,21 +74,21 @@ public class EvenementsVisite {
             }
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (filtreVisible) {
-                    fenetre.afficherPanneauFiltre();
+                if (filtreVisible) { // si c'est pas un visiteur
+                    fenetre.afficherPanelFiltre();
                 }
                 filtre.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
             @Override
             public void mouseExited(MouseEvent e) {
                 if (filtreVisible) {
-                    masquerSiHorsSurvol(fenetre, panneauFiltre);
+                    masquerFiltre(fenetre, fenetre.getPanelFiltre());
                 }
             }
         });
 
         if (filtreVisible) {
-            installerSurvolRecursif(panneauFiltre, fenetre);
+            installerSurvolRecursif(fenetre.getPanelFiltre(), fenetre);
         }
 
         // Loupe choix 5
@@ -107,7 +108,7 @@ public class EvenementsVisite {
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (filtreVisible) {
-                    fenetre.masquerPanneauFiltre();
+                    fenetre.masquerPanelFiltre();
                 }
             }
         });
@@ -117,12 +118,12 @@ public class EvenementsVisite {
         composant.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                fenetre.afficherPanneauFiltre();
+                fenetre.afficherPanelFiltre();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                masquerSiHorsSurvol(fenetre, fenetre.getPanneauFiltre());
+                masquerFiltre(fenetre, fenetre.getPanelFiltre());
             }
         });
 
@@ -134,19 +135,20 @@ public class EvenementsVisite {
         }
     }
 
-    private static void masquerSiHorsSurvol(FenetreVisite fenetre, JComponent zone) {
+    /* si la souris passe en dehors, le panneau disparait :) (c'était long) */
+    private static void masquerFiltre(FenetreVisite fenetre, JComponent zone) {
         SwingUtilities.invokeLater(() -> {
             boolean surPanneau = estSurvole(zone);
-            boolean surLigneGrise = estSurvole(fenetre.getLigneRecherche());
+            boolean surLigneGrise = estSurvole(fenetre.getBoutonsRecherche());
             boolean surChampTexte = estSurvole(fenetre.getBarreRecherche());
 
             if (surChampTexte) {
-                fenetre.masquerPanneauFiltre();
+                fenetre.masquerPanelFiltre();
                 return;
             }
 
             if (!surPanneau && !surLigneGrise) {
-                fenetre.masquerPanneauFiltre();
+                fenetre.masquerPanelFiltre();
             }
         });
     }
