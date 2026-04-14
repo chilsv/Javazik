@@ -10,10 +10,12 @@ public class FenetreVisite {
     private static final int ICON_TARGET_WIDTH = 72;
     private static final int ICON_TARGET_HEIGHT = 72;
     private static final int BANDE_SELECTION_LARGEUR = 110;
+    
     private static final int ZONE_RECHERCHE_X = BANDE_SELECTION_LARGEUR;
     private static final int ZONE_RECHERCHE_Y = 8;
     private static final int ZONE_RECHERCHE_LARGEUR = Ecran.LONGUEUR - BANDE_SELECTION_LARGEUR;
     private static final int ZONE_RECHERCHE_HAUTEUR = 60;
+
     private static final int PANNEAU_FILTRE_Y = ZONE_RECHERCHE_HAUTEUR;
     private static final int PANNEAU_FILTRE_LARGEUR = 330;
     private static final int PANNEAU_FILTRE_HAUTEUR = 340;
@@ -28,9 +30,9 @@ public class FenetreVisite {
     private final JPanel lecture; // bande en bas : play pause like et tout
 
     private final JPanel zoneRecherche;
-    private final JPanel ligneRecherche;
+    private final JPanel boutonsRecherche; // zone où y'a les boutons loupe et filtre
     private final JTextField barreRecherche;
-    private final FenetreFiltre panneauFiltre;
+    private final FenetreFiltre panelFiltre; // la page qui apparait quand on passe la souris sur filtre
 
     private final JLabel profil;
     private final JLabel librairie;
@@ -76,30 +78,30 @@ public class FenetreVisite {
         btnRetour = creerLabel("assets/btn_retour.png", "Retour", ICON_TARGET_WIDTH, ICON_TARGET_HEIGHT);
         loupe = creerLabel("assets/loupe.png", "Rechercher", 32, 32);
         filtre = creerLabel("assets/filtre.png", "", 32, 32);
-        panneauFiltre = new FenetreFiltre();
-        panneauFiltre.setVisible(false);
+        panelFiltre = new FenetreFiltre();
+        panelFiltre.setVisible(false);
 
         // là ou on écrit
         barreRecherche = new JTextField();
         barreRecherche.setPreferredSize(new Dimension(200, 32));
 
-        ligneRecherche = new JPanel(new BorderLayout(12, 10));
-        ligneRecherche.setBackground(Color.LIGHT_GRAY);
-        ligneRecherche.setBounds(0, 0, ZONE_RECHERCHE_LARGEUR, ZONE_RECHERCHE_HAUTEUR);
+        boutonsRecherche = new JPanel(new BorderLayout(12, 10));
+        boutonsRecherche.setBackground(Color.LIGHT_GRAY);
+        boutonsRecherche.setBounds(0, 0, ZONE_RECHERCHE_LARGEUR, ZONE_RECHERCHE_HAUTEUR);
 
         JPanel actionsRecherche = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 10));
         actionsRecherche.setOpaque(false);
         actionsRecherche.add(loupe);
         actionsRecherche.add(filtre);
 
-        ligneRecherche.add(actionsRecherche, BorderLayout.EAST);
-        ligneRecherche.add(barreRecherche, BorderLayout.CENTER);
-        zoneRecherche.add(ligneRecherche);
+        boutonsRecherche.add(actionsRecherche, BorderLayout.EAST);
+        boutonsRecherche.add(barreRecherche, BorderLayout.CENTER);
+        zoneRecherche.add(boutonsRecherche);
 
         int xPanneau = ZONE_RECHERCHE_LARGEUR - PANNEAU_FILTRE_LARGEUR;
-        panneauFiltre.setBounds(Math.max(0, xPanneau), PANNEAU_FILTRE_Y, PANNEAU_FILTRE_LARGEUR, PANNEAU_FILTRE_HAUTEUR);
-        panneauFiltre.setVisible(false);
-        zoneRecherche.add(panneauFiltre);
+        panelFiltre.setBounds(Math.max(0, xPanneau), PANNEAU_FILTRE_Y, PANNEAU_FILTRE_LARGEUR, PANNEAU_FILTRE_HAUTEUR);
+        panelFiltre.setVisible(false);
+        zoneRecherche.add(panelFiltre);
 
         bandeSelection.add(Box.createVerticalStrut(20));
         bandeSelection.add(profil);
@@ -186,42 +188,44 @@ public class FenetreVisite {
         return loupe;
     }
 
-    public JPanel getPanneauFiltre() {
-        return panneauFiltre;
+    public JPanel getPanelFiltre() {
+        return panelFiltre;
     }
 
-    public JPanel getLigneRecherche() {
-        return ligneRecherche;
+    public JPanel getBoutonsRecherche() {
+        return boutonsRecherche;
     }
 
     /* pour afficher les filtres quand on passe la souris dessus */
-    public void afficherPanneauFiltre() {
-        panneauFiltre.setVisible(true);
+    public void afficherPanelFiltre() {
+        panelFiltre.setVisible(true);
         zoneRecherche.revalidate();
         zoneRecherche.repaint();
         coucheContenu.repaint();
     }
 
     /* pour enlever les filtres quand la souris est pas dessu */
-    public void basculerPanneauFiltre() {
-        panneauFiltre.setVisible(!panneauFiltre.isVisible());
+    public void basculerPanelFiltre() {
+        panelFiltre.setVisible(!panelFiltre.isVisible());
         zoneRecherche.revalidate();
         zoneRecherche.repaint();
         coucheContenu.repaint();
     }
 
     /* ça cache les filtres */
-    public void masquerPanneauFiltre() {
-        panneauFiltre.setVisible(false);
+    public void masquerPanelFiltre() {
+        panelFiltre.setVisible(false);
         zoneRecherche.revalidate();
         zoneRecherche.repaint();
         coucheContenu.repaint();
     }
 
-    public Filtre getFiltreSelectionne() {
-        return panneauFiltre.getFiltre();
+    /* renvoie les cases cochées */
+    public Filtre getFiltres() {
+        return panelFiltre.getFiltre();
     }
 
+    /* actualise le panel central avec une nouvelle page */
     public void setPanelCentral(JComponent nouveauPanel) {
         central.removeAll();
         central.add(nouveauPanel, BorderLayout.CENTER);
@@ -229,7 +233,7 @@ public class FenetreVisite {
         central.repaint();
     }
 
-    private void retirerMouseListenersEvenementsVisite(Component composant) {
+    private void enleverML(Component composant) {
         for (MouseListener listener : composant.getMouseListeners()) {
             String nomClasse = listener.getClass().getName();
             if (nomClasse.startsWith("controleur.EvenementsVisite")) {
@@ -238,22 +242,25 @@ public class FenetreVisite {
         }
 
         if (composant instanceof Container) {
-            for (Component enfant : ((Container) composant).getComponents()) {
-                retirerMouseListenersEvenementsVisite(enfant);
+            for (Component interieur : ((Container) composant).getComponents()) {
+                enleverML(interieur);
             }
         }
     }
 
-    public void reinitialiserEvenementsVisite() {
-        retirerMouseListenersEvenementsVisite(profil);
-        retirerMouseListenersEvenementsVisite(librairie);
-        retirerMouseListenersEvenementsVisite(btnRetour);
-        retirerMouseListenersEvenementsVisite(loupe);
-        retirerMouseListenersEvenementsVisite(filtre);
-        retirerMouseListenersEvenementsVisite(barreRecherche);
-        retirerMouseListenersEvenementsVisite(panneauFiltre);
+    /*On retire tous les MouseListener pour chaque composant de la page de visite */
+    public void reinitialiserEvenements() {
+        enleverML(profil);
+        enleverML(librairie);
+        enleverML(btnRetour);
+        enleverML(loupe);
+        enleverML(filtre);
+        enleverML(barreRecherche);
+        enleverML(panelFiltre);
     }
 
+    /* bah ça vide le panel central quoi 
+    Mais ça serait bien de mettre des morceaux aléatoires plus tard au lieu du vide*/
     public void viderPanelCentral() {
         JPanel vide = new JPanel(new BorderLayout());
         vide.setOpaque(true);
