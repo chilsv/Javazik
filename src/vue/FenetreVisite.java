@@ -1,6 +1,9 @@
 package vue;
 
 import javax.swing.*;
+
+import controleur.exceptions.ActionException;
+
 import java.awt.event.MouseListener;
 import java.awt.*;
 
@@ -18,11 +21,12 @@ public class FenetreVisite {
 
     private static final int PANNEAU_FILTRE_Y = ZONE_RECHERCHE_HAUTEUR;
     private static final int PANNEAU_FILTRE_LARGEUR = 330;
-    private static final int PANNEAU_FILTRE_HAUTEUR = 340;
+    private static final int PANNEAU_FILTRE_HAUTEUR = 300;
 
+    public Fenetre vue;
     private JFrame frame;
     private final JPanel panel;
-    private final JLayeredPane coucheContenu;
+    private final JLayeredPane couche;
     private final JPanel base;
     private final JPanel central; // tout le reste
 
@@ -40,15 +44,16 @@ public class FenetreVisite {
     private final JLabel filtre;
     private final JLabel btnRetour;
 
-    public FenetreVisite() {
+    public FenetreVisite(Fenetre vue) {
+        this.vue = vue;
         // On crée le panel princiapl qui contient tout
         panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
 
-        // lui aussi contient tout. en gros panel contient coucheContenu, et ça permet d'afficher des trucs au-dessus de coucheContenu (ex: panneau de filtre)
-        coucheContenu = new JLayeredPane();
-        coucheContenu.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
-        coucheContenu.setLayout(null);
+        // lui aussi contient tout. en gros panel contient couche, et ça permet d'afficher des trucs au-dessus de couche (ex: panneau de filtre)
+        couche = new JLayeredPane();
+        couche.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
+        couche.setLayout(null);
 
         // base contient tout sauf la barre de recherche
         base = new JPanel(new BorderLayout());
@@ -118,15 +123,13 @@ public class FenetreVisite {
         base.add(central, BorderLayout.CENTER);
         base.add(lecture, BorderLayout.SOUTH);
 
-        coucheContenu.add(base, JLayeredPane.DEFAULT_LAYER);
-        coucheContenu.add(zoneRecherche, JLayeredPane.PALETTE_LAYER);
+        couche.add(base, JLayeredPane.DEFAULT_LAYER);
+        couche.add(zoneRecherche, JLayeredPane.PALETTE_LAYER);
 
-        panel.add(coucheContenu, BorderLayout.CENTER);
+        panel.add(couche, BorderLayout.CENTER);
     }
 
-    /*
-     * Pour créer un JLabel 
-     */
+    /* Pour créer un JLabel */
     private JLabel creerLabel(String cheminIcone, String texte, int cibleLargeur, int cibleHauteur) {
         ImageIcon icon = new ImageIcon(cheminIcone);
         JLabel label;
@@ -196,20 +199,16 @@ public class FenetreVisite {
         return boutonsRecherche;
     }
 
+    public void afficherErreur(ActionException e) {
+        vue.afficherErreur(e);
+    }
+
     /* pour afficher les filtres quand on passe la souris dessus */
     public void afficherPanelFiltre() {
         panelFiltre.setVisible(true);
         zoneRecherche.revalidate();
         zoneRecherche.repaint();
-        coucheContenu.repaint();
-    }
-
-    /* pour enlever les filtres quand la souris est pas dessu */
-    public void basculerPanelFiltre() {
-        panelFiltre.setVisible(!panelFiltre.isVisible());
-        zoneRecherche.revalidate();
-        zoneRecherche.repaint();
-        coucheContenu.repaint();
+        couche.repaint();
     }
 
     /* ça cache les filtres */
@@ -217,7 +216,7 @@ public class FenetreVisite {
         panelFiltre.setVisible(false);
         zoneRecherche.revalidate();
         zoneRecherche.repaint();
-        coucheContenu.repaint();
+        couche.repaint();
     }
 
     /* renvoie les cases cochées */

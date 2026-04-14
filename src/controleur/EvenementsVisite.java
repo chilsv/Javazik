@@ -4,11 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import metier.Abonne;
-import metier.Personne;
-import metier.Visiteur;
+import controleur.exceptions.ActionException;
 import vue.FenetreVisite;
-import vue.InterfaceVue;
 
 public class EvenementsVisite {
 
@@ -27,13 +24,13 @@ public class EvenementsVisite {
         JLabel btnRetour = fenetre.getBtnRetour();
         JLabel loupe = fenetre.getLoupe();
         JLabel filtre = fenetre.getFiltre();
-        JPanel panelFiltre = fenetre.getPanelFiltre();
         JTextField barreRecherche = fenetre.getBarreRecherche();
 
         // Profil choix 1
         profil.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                fenetre.afficherErreur(new ActionException("A venir"));
                 listener.onChoix(1);
             }
             @Override
@@ -46,6 +43,7 @@ public class EvenementsVisite {
         librairie.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                fenetre.afficherErreur(new ActionException("A venir"));
                 listener.onChoix(2);
             }
             @Override
@@ -69,26 +67,29 @@ public class EvenementsVisite {
         // Filtre choix 4
         filtre.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) { // quand on clique sur le filtre
                 listener.onChoix(4);
             }
             @Override
-            public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(MouseEvent e) { // quand on apsse la souris sur le filtre
                 if (filtreVisible) { // si c'est pas un visiteur
                     fenetre.afficherPanelFiltre();
                 }
                 filtre.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseExited(MouseEvent e) { // quand la souris est plus sur le fitlre
                 if (filtreVisible) {
+                    // on masque le filtre, mais il est pas forcément masqué visuellement
+                    // si la souris est toujours sur le panel, il le filtre va rester visiible
                     masquerFiltre(fenetre, fenetre.getPanelFiltre());
                 }
             }
         });
 
         if (filtreVisible) {
-            installerSurvolRecursif(fenetre.getPanelFiltre(), fenetre);
+            // autres coniditions pour afficher le panneau des filtres
+            passageSouris(fenetre.getPanelFiltre(), fenetre, "filtre");
         }
 
         // Loupe choix 5
@@ -103,7 +104,8 @@ public class EvenementsVisite {
             }
         });
 
-        // pour effacer le panneau où sont les filtres
+        // j'ai rajouté ça sinon ça bug
+        // si la souris est sur la barre de recherche le panneau filtres disparait
         barreRecherche.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -114,23 +116,31 @@ public class EvenementsVisite {
         });
     }
 
-    private static void installerSurvolRecursif(Component composant, FenetreVisite fenetre) {
+    /* si la souris est sur ce composant on l'affiche */
+    private static void passageSouris(Component composant, FenetreVisite fenetre, String type) {
         composant.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) {
-                fenetre.afficherPanelFiltre();
+            public void mouseEntered(MouseEvent e) { // si la souris est sur le composant on l'affiche
+                if (type.equals("filtre")) {
+                    fenetre.afficherPanelFiltre();
+                }
             }
 
             @Override
-            public void mouseExited(MouseEvent e) {
-                masquerFiltre(fenetre, fenetre.getPanelFiltre());
+            public void mouseExited(MouseEvent e) { // si la souris part, on masque le panneau
+                if (type.equals("filtre")) {
+                    fenetre.masquerPanelFiltre();
+                }
             }
         });
 
+        // on fait ça récursivement pour les composants du composants
+        // en rgos les composants du panneau sont considérés comme exéterieurs
+        // donc le panneau disparaitrait si on faisait pas ça
         if (composant instanceof Container) {
             Container container = (Container) composant;
             for (Component enfant : container.getComponents()) {
-                installerSurvolRecursif(enfant, fenetre);
+                passageSouris(enfant, fenetre, type);
             }
         }
     }
@@ -139,15 +149,14 @@ public class EvenementsVisite {
     private static void masquerFiltre(FenetreVisite fenetre, JComponent zone) {
         SwingUtilities.invokeLater(() -> {
             boolean surPanneau = estSurvole(zone);
-            boolean surLigneGrise = estSurvole(fenetre.getBoutonsRecherche());
-            boolean surChampTexte = estSurvole(fenetre.getBarreRecherche());
+            boolean surBoutonsRecherche = estSurvole(fenetre.getBoutonsRecherche());
+            boolean surBarre = estSurvole(fenetre.getBarreRecherche());
 
-            if (surChampTexte) {
+            if (surBarre) {
                 fenetre.masquerPanelFiltre();
                 return;
             }
-
-            if (!surPanneau && !surLigneGrise) {
+            if (!surPanneau && !surBoutonsRecherche) {
                 fenetre.masquerPanelFiltre();
             }
         });
@@ -158,14 +167,16 @@ public class EvenementsVisite {
             return false;
         }
 
+        // d'après la docu c'est ça
         PointerInfo pointeur = MouseInfo.getPointerInfo();
         if (pointeur == null) {
             return false;
         }
 
-        Point positionEcran = pointeur.getLocation();
-        Point origine = composant.getLocationOnScreen();
-        Rectangle zone = new Rectangle(origine.x, origine.y, composant.getWidth(), composant.getHeight());
-        return zone.contains(positionEcran);
+        Point positionSouris = pointeur.getLocation();
+        Point positionComposant = composant.getLocationOnScreen();
+        // on vérifie si la souris est dans le composant
+        Rectangle zone = new Rectangle(positionComposant.x, positionComposant.y, composant.getWidth(), composant.getHeight());
+        return zone.contains(positionSouris);
     }
 }

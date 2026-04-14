@@ -26,7 +26,7 @@ import controleur.formulaires.*;
 import metier.*;
 
 public class Fenetre implements InterfaceVue {
-    private static final int DUREE_NOTIF = 2800;
+    private static final int DUREE_NOTIF = 1500;
 
     private final JFrame frame; // fenêtre de l'appli
     private final CardLayout cardLayout;
@@ -182,7 +182,7 @@ public class Fenetre implements InterfaceVue {
 
         executerEtAttendre(() -> {
             if (fenetreVisite == null) {
-                fenetreVisite = new FenetreVisite();
+                fenetreVisite = new FenetreVisite(this);
                 fenetreVisite.setFrame(frame);
             }
             // On affiche la page de visite et on réinitialise tous les événeemnts
@@ -333,9 +333,6 @@ public class Fenetre implements InterfaceVue {
     }
 
     public RechercheForm demanderRecherche(Filtre filtre) {
-        if (fenetreVisite == null) {
-            return null;
-        }
         return new RechercheForm(fenetreVisite.getBarreRecherche().getText(), filtre);
     }
 
@@ -371,6 +368,7 @@ public class Fenetre implements InterfaceVue {
         return bouton;
     }
 
+    /* pour afficher la catégorie en bleu quand on est dedans */
     private void appliquerStyleCategorieActive(JButton bouton, boolean active) {
         if (active) {
             bouton.setBackground(new Color(45, 140, 240));
@@ -381,38 +379,58 @@ public class Fenetre implements InterfaceVue {
         }
     }
 
-    private static class LigneResultat<T> {
-        private final T objet;
+    private static class LigneResultat<TypeObjets> {
+        private final TypeObjets objet; // morceau, artiste, album ou playlist
         private final String titre;
         private final String detail;
         private final String duree;
         private final boolean peutAimer;
 
-        private LigneResultat(T objet, String titre, String detail, String duree, boolean peutAimer) {
+        private LigneResultat(TypeObjets objet, String titre, String detail, String duree, boolean peutAimer) {
             this.objet = objet;
-            this.titre = titre == null ? "" : titre;
-            this.detail = detail == null ? "" : detail;
-            this.duree = duree == null ? "" : duree;
+            if (titre == null) {
+                this.titre = "";
+            } else {
+                this.titre = titre;
+            }
+            
+            if (detail == null) {
+                this.detail = "";
+            } else {
+                this.detail = detail;
+            }
+
+             if (duree == null) {
+                this.duree = "";
+            } else {
+                this.duree = duree;
+            }
+
             this.peutAimer = peutAimer;
         }
     }
 
-    private JLabel creerLabelImage(String cheminImage, String fallback, Runnable action, int largeur, int hauteur) {
-        ImageIcon icon = new ImageIcon(cheminImage);
+    /* pose l'image cliquable pour jouer, mettre en file d'attente et aimer */
+    private JLabel creerLabelImage(String chemin, String texte, Runnable action, int largeur, int hauteur) {
+        ImageIcon icon = new ImageIcon(chemin);
         JLabel label;
 
+        // pour rétrécir l'image
         if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
             Image imageRedimensionnee = icon.getImage().getScaledInstance(largeur, hauteur, Image.SCALE_SMOOTH);
             label = new JLabel(new ImageIcon(imageRedimensionnee));
         } else {
-            label = new JLabel(fallback);
+            // si ya un pb avec l'image on affiche le texte
+            label = new JLabel(texte);
         }
 
-        label.setToolTipText(fallback);
+        // quand on passe la souris dessus ça affiche le texte et ça change le curseur
+        label.setToolTipText(texte);
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         label.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
+                System.out.println("Clic sur " + texte);
                 action.run();
             }
         });
@@ -420,8 +438,8 @@ public class Fenetre implements InterfaceVue {
     }
 
     private JLabel creerVignetteObjet(TypeObjets objet) {
-        String cheminImage = objet.getImage();
-        ImageIcon icon = new ImageIcon(cheminImage);
+        String chemin = objet.getImage();
+        ImageIcon icon = new ImageIcon(chemin);
         JLabel label;
         if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
             Image imageRedimensionnee = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
@@ -432,9 +450,16 @@ public class Fenetre implements InterfaceVue {
         return label;
     }
 
+    /* pour changer l'image coeur quand on clique sur aimer */
     private void mettreIconeAimer(JLabel label, boolean aime) {
-        String cheminAimer = aime ? "assets/aime_true.png" : "assets/aime_false.png";
-        ImageIcon icon = new ImageIcon(cheminAimer);
+        String chemin;
+        if (aime) {
+            chemin = "assets/aime_true.png";
+        } else {
+            chemin = "assets/aime_false.png";
+        }
+        ImageIcon icon = new ImageIcon(chemin);
+
         if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
             Image imageRedimensionnee = icon.getImage().getScaledInstance(22, 22, Image.SCALE_SMOOTH);
             label.setIcon(new ImageIcon(imageRedimensionnee));
@@ -445,15 +470,17 @@ public class Fenetre implements InterfaceVue {
         }
     }
 
-    private <T extends TypeObjets> JPanel creerCarteResultat(LigneResultat<T> ligne, Runnable actionPlay, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, Supplier<Boolean> aimeActuel) {
-        JPanel carte = new JPanel(new BorderLayout(12, 0));
-        carte.setOpaque(true);
-        carte.setBackground(new Color(248, 251, 255));
-        carte.setBorder(new EmptyBorder(6, 10, 6, 10));
-        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 76));
-        carte.setPreferredSize(new Dimension(100, 76));
-        carte.setAlignmentX(Component.LEFT_ALIGNMENT);
+    /* crée visuellement la ligne avec les boutons et infos */
+    private <T extends TypeObjets> JPanel creerLigne(LigneResultat<T> ligne, Runnable actionPlay, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, Supplier<Boolean> aimeActuel) {
+        JPanel lignePanel = new JPanel(new BorderLayout(12, 0));
+        lignePanel.setOpaque(true);
+        lignePanel.setBackground(new Color(248, 251, 255));
+        lignePanel.setBorder(new EmptyBorder(6, 10, 6, 10));
+        lignePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 76));
+        lignePanel.setPreferredSize(new Dimension(100, 76));
+        lignePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // bouton play
         JLabel play = creerLabelImage("assets/play.png", "play", actionPlay, 22, 22);
         JLabel vignette = creerVignetteObjet(ligne.objet);
         play.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -494,8 +521,13 @@ public class Fenetre implements InterfaceVue {
         if (afficherAimer) {
             final JLabel[] aimerLabelRef = new JLabel[1];
             boolean aimeInitial = aimeActuel != null && Boolean.TRUE.equals(aimeActuel.get());
-            String cheminAimer = aimeInitial ? "assets/aime_true.png" : "assets/aime_false.png";
-            aimerLabelRef[0] = creerLabelImage(cheminAimer, "aimer", () -> {
+            String chemin;
+            if (aimeInitial) {
+                chemin = "assets/aime_true.png";
+            } else {
+                chemin = "assets/aime_false.png";
+            }
+            aimerLabelRef[0] = creerLabelImage(chemin, "aimer", () -> {
                 actionAimer.run();
                 boolean aimeMaj = aimeActuel != null && Boolean.TRUE.equals(aimeActuel.get());
                 mettreIconeAimer(aimerLabelRef[0], aimeMaj);
@@ -504,10 +536,10 @@ public class Fenetre implements InterfaceVue {
         }
         actions.add(creerLabelImage("assets/details.png", "details", actionDetails, 22, 22));
 
-        carte.add(gauche, BorderLayout.WEST);
-        carte.add(texte, BorderLayout.CENTER);
-        carte.add(actions, BorderLayout.EAST);
-        return carte;
+        lignePanel.add(gauche, BorderLayout.WEST);
+        lignePanel.add(texte, BorderLayout.CENTER);
+        lignePanel.add(actions, BorderLayout.EAST);
+        return lignePanel;
     }
 
     private <T extends TypeObjets> JComponent creerVueCategorie(List<T> objets, Function<T, LigneResultat<T>> mapper, Consumer<T> actionPlay, Consumer<T> actionDetails, Consumer<T> actionAimer, Function<T, Boolean> aimeProvider) {
@@ -527,7 +559,7 @@ public class Fenetre implements InterfaceVue {
             for (T objet : objets) {
                 LigneResultat<T> ligne = mapper.apply(objet);
                 Supplier<Boolean> aimeActuel = () -> aimeProvider != null && Boolean.TRUE.equals(aimeProvider.apply(objet));
-                liste.add(creerCarteResultat(ligne, () -> actionPlay.accept(objet), () -> actionDetails.accept(objet), () -> actionAimer.accept(objet), ligne.peutAimer, aimeActuel));
+                liste.add(creerLigne(ligne, () -> actionPlay.accept(objet), () -> actionDetails.accept(objet), () -> actionAimer.accept(objet), ligne.peutAimer, aimeActuel));
                 liste.add(Box.createVerticalStrut(4));
             }
         }
