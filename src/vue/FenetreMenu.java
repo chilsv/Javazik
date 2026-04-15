@@ -31,7 +31,7 @@ public class FenetreMenu {
         logoLabel = new JLabel(new ImageIcon("assets/logo.png"));
         bandeauLabel = new JLabel(new ImageIcon("assets/bandeau.png"));
         btnConnexionLabel = new JLabel(new ImageIcon("assets/btn_connexion.png"));
-        btnAdminLabel = new JLabel(new ImageIcon("assets/btn_admin.png"));
+        btnAdminLabel = new JLabel(new ImageIcon("assets/btn_inscirption.png"));
         btnQuitterLabel = new JLabel(new ImageIcon("assets/btn_quitter.png"));
 
 
