@@ -13,7 +13,6 @@ public class JouerMorceau implements Action {
     public void executer(ActionArguments arguments) throws MorceauIntrouvableException {
         // on cherche le morceau dans le catalogue
         ResultatRecherche resultat = arguments.catalogue.chercher(new Filtre(true, false, false, false, false, new int[] {0, 0}), arguments.nomMorceau);
-        
         for (Morceau morceau : resultat.morceaux) {
             if (morceau.getNom().equalsIgnoreCase(arguments.nomMorceau)) {
                 arguments.morceauTrouve = morceau;

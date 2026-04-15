@@ -8,14 +8,23 @@ import metier.Filtre;
 
 
 public class FenetreVisite {
+    private static final int ICON_TARGET_WIDTH = 72;
+    private static final int ICON_TARGET_HEIGHT = 72;
+    private static final int BANDE_SELECTION_LARGEUR = 220;
+    
+    private static final int ZONE_RECHERCHE_X = BANDE_SELECTION_LARGEUR;
+    private static final int ZONE_RECHERCHE_Y = 8;
+    private static final int ZONE_RECHERCHE_LARGEUR = Ecran.LONGUEUR - BANDE_SELECTION_LARGEUR;
+    private static final int ZONE_RECHERCHE_HAUTEUR = 60;
 
+    private static final int PANNEAU_FILTRE_Y = ZONE_RECHERCHE_HAUTEUR;
+    private static final int PANNEAU_FILTRE_LARGEUR = 330;
+    private static final int PANNEAU_FILTRE_HAUTEUR = 300;
 
-    private static final int largeur_bandeauGauche = 220;
-    private static final int largeur_barreDeRecherche = Ecran.LONGUEUR - largeur_bandeauGauche;
+    private static final int largeur_barreDeRecherche = Ecran.LONGUEUR - BANDE_SELECTION_LARGEUR;
     private static final int hauteur_barreDeRecherche = 64;
-    private static final int largueur_filtre = 330;
-    private static final int hauteur_filtre = 340;
 
+    public Fenetre vue;
     private JFrame frame;
     private final JPanel panel; // conteneur racine
     private final JLayeredPane coucheContenu;  // permet la superposition du contenu
@@ -42,8 +51,9 @@ public class FenetreVisite {
     private final JLabel logoJavasik;
     private final JLabel fond;
 
-    public FenetreVisite() {
-
+    public FenetreVisite(Fenetre vue) {
+        this.vue = vue;
+        // On crée le panel princiapl qui contient tout
         panel = new JPanel(new BorderLayout()); //panel de fond, pour eviter les probleme de superposition
         panel.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
         //panel.setBackground(new Color(18, 18, 18)); // couleur du fond
@@ -141,7 +151,7 @@ public class FenetreVisite {
         //Barre de rechercher
         zoneRecherche = new JPanel(null);
         zoneRecherche.setOpaque(false);
-        zoneRecherche.setBounds(largeur_bandeauGauche, 0, largeur_barreDeRecherche, hauteur_barreDeRecherche + 64 + hauteur_filtre);
+        zoneRecherche.setBounds(BANDE_SELECTION_LARGEUR, 0, largeur_barreDeRecherche, hauteur_barreDeRecherche + 64 + PANNEAU_FILTRE_HAUTEUR);
 
         // Barre de recherche avec fond arrondi simulé avec JPanel
         boutonsRecherche = new JPanel(new BorderLayout(8, 0)) {
@@ -182,8 +192,8 @@ public class FenetreVisite {
 
         // Panneau filtre (caché par défaut)
         panelFiltre = new FenetreFiltre();
-        int xPanneau = largeur_barreDeRecherche - largueur_filtre - 8;
-        panelFiltre.setBounds(Math.max(0, xPanneau), largeur_barreDeRecherche, largueur_filtre, hauteur_filtre);
+        int xPanneau = largeur_barreDeRecherche - PANNEAU_FILTRE_LARGEUR - 8;
+        panelFiltre.setBounds(Math.max(0, xPanneau), largeur_barreDeRecherche, PANNEAU_FILTRE_LARGEUR, PANNEAU_FILTRE_HAUTEUR);
         panelFiltre.setVisible(false);
         zoneRecherche.add(boutonsRecherche);
         zoneRecherche.add(panelFiltre);
@@ -283,14 +293,6 @@ public class FenetreVisite {
         coucheContenu.repaint();
     }
 
-    //Bascule la visibilité du panneau filtre
-    public void basculerPanelFiltre() {
-        panelFiltre.setVisible(!panelFiltre.isVisible());
-        zoneRecherche.revalidate();
-        zoneRecherche.repaint();
-        coucheContenu.repaint();
-    }
-
     // Cache le panneau filtre
     public void masquerPanelFiltre() {
         panelFiltre.setVisible(false);
@@ -341,5 +343,9 @@ public class FenetreVisite {
         vide.setBackground(new Color(26, 26, 26));
         setPanelCentral(vide);
         barreRecherche.setText("");
+    }
+
+    public void afficherErreur(Exception e) {
+        vue.afficherErreur(e);
     }
 }
