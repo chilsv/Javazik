@@ -44,7 +44,7 @@ public class FenetreVisite {
     private final JLabel librairie;
     private final JLabel menuArtistes;
     private final JLabel menuAlbums;
-    private final JLabel menuSongs;
+    private final JLabel menuMorceaux;
     private final JLabel loupe;
     private final JLabel filtre;
     private final JLabel btnRetour;
@@ -95,7 +95,7 @@ public class FenetreVisite {
         menuArtistes = creerLabelMenu("assets/playlists.png","Artistes",25, 25);
         librairie = creerLabelMenu("assets/librairie.png","Playlists",25, 25);
         menuAlbums = creerLabelMenu("assets/songs.png","Albums",25, 25);
-        menuSongs = creerLabelMenu("assets/songs.png","Morceaux",25, 25);
+        menuMorceaux = creerLabelMenu("assets/songs.png","Morceaux",25, 25);
 
         //Creation du contenu de la selection decouvrire
         JLabel labelDiscover = creerLabelTitre("DÉCOUVERTE");
@@ -117,7 +117,7 @@ public class FenetreVisite {
         bandeSelection.add(librairie);
         bandeSelection.add(menuArtistes);
         bandeSelection.add(menuAlbums);
-        bandeSelection.add(menuSongs);
+        bandeSelection.add(menuMorceaux);
         bandeSelection.add(Box.createVerticalStrut(12));
         bandeSelection.add(creerSeparateur());
         bandeSelection.add(labelDiscover);
@@ -277,6 +277,9 @@ public class FenetreVisite {
     public JPanel getPanel(){ return panel; }
     public JLabel getProfil(){ return profil; }
     public JLabel getLibrairie() { return librairie; }
+    public JLabel getMenuArtistes() { return menuArtistes; }
+    public JLabel getMenuAlbums() { return menuAlbums; }
+    public JLabel getMenuMorceaux() { return menuMorceaux; }
     public JLabel getBtnRetour(){ return btnRetour; }
     public JTextField getBarreRecherche()  { return barreRecherche; }
     public JLabel getFiltre(){ return filtre; }
