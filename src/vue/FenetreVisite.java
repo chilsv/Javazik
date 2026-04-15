@@ -88,7 +88,7 @@ public class FenetreVisite {
         menuSongs = creerLabelMenu("assets/songs.png","Morceaux",25, 25);
 
         //Creation du contenu de la selection decouvrire
-        JLabel labelDiscover = creerLabelTitre("Découverte");
+        JLabel labelDiscover = creerLabelTitre("DÉCOUVERTE");
         JLabel parcourir = creerLabelMenu(null,"Parcourir",25, 25);
         JLabel pourVous = creerLabelMenu(null,"Pour vous",25, 25);
         JLabel populaire = creerLabelMenu(null,"Populaire",25, 25);
