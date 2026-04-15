@@ -367,11 +367,11 @@ public class Main {
     }
 
     public static void jouerMorceau(InterfaceVue vue, Catalogue catalogue) {
-        Morceau morceauTrouve = null;
         try {
-            new JouerMorceau().executer(new ActionArguments(catalogue, vue.choisirMorceau(), morceauTrouve));
-            // oN affiche la lecture du morceau
-            vue.afficherLecture(morceauTrouve);
+            ActionArguments arguments = new ActionArguments(catalogue, vue.choisirMorceau(), null);
+            new JouerMorceau().executer(arguments);
+            // On affiche la lecture du morceau trouve par l'action.
+            vue.afficherLecture(arguments.morceauTrouve);
         } catch (MorceauIntrouvableException e) {
             vue.afficherErreur(e);
         }
