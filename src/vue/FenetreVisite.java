@@ -91,20 +91,19 @@ public class FenetreVisite {
 
         // Creation du contenu de la selection librairie
         JLabel labelLibrary = creerLabelTitre("LIBRAIRIE");
-        profil = creerLabelMenu("assets/profil.png","Votre compte",22, 22); //32 est la taille du coté du carre de l'image
+        profil = creerLabelMenu("assets/profil.png","Votre compte",25, 25); //32 est la taille du coté du carre de l'image
         menuArtistes = creerLabelMenu("assets/playlists.png","Artistes",25, 25);
         librairie = creerLabelMenu("assets/librairie.png","Playlists",25, 25);
         menuAlbums = creerLabelMenu("assets/songs.png","Albums",25, 25);
         menuSongs = creerLabelMenu("assets/songs.png","Morceaux",25, 25);
 
-        // --- Section DISCOVER ---
-        JLabel labelDiscover = creerLabelTitre("DISCOVER");
-        JLabel menuBrowse  = creerLabelMenu(null, "Browse",   32, 32);
-        JLabel menuForYou  = creerLabelMenu(null, "For you",  32, 32);
-        // "Popular" est mis en surbrillance accent (page active)
-        JLabel menuPopular = creerLabelMenu(null, "Popular", 32, 32);
-        JLabel menuRadio   = creerLabelMenu(null, "Radio",    32, 32);
-        JLabel menuPodcast = creerLabelMenu(null, "Podcasts", 32, 32);
+        //Creation du contenu de la selection decouvrire
+        JLabel labelDiscover = creerLabelTitre("Découverte");
+        JLabel parcourir = creerLabelMenu(null,"Parcourir",25, 25);
+        JLabel pourVous = creerLabelMenu(null,"Pour vous",25, 25);
+        JLabel populaire = creerLabelMenu(null,"Populaire",25, 25);
+        JLabel radio = creerLabelMenu(null,"Radio",25, 25);
+        JLabel podcasts = creerLabelMenu(null,"Podcasts",25, 25);
 
         btnRetour = creerLabelMenu("assets/btn_retour.png", "Back", 32, 32);
 
@@ -122,11 +121,11 @@ public class FenetreVisite {
         bandeSelection.add(Box.createVerticalStrut(12));
         bandeSelection.add(creerSeparateur());
         bandeSelection.add(labelDiscover);
-        bandeSelection.add(menuBrowse);
-        bandeSelection.add(menuForYou);
-        bandeSelection.add(menuPopular);
-        bandeSelection.add(menuRadio);
-        bandeSelection.add(menuPodcast);
+        bandeSelection.add(parcourir);
+        bandeSelection.add(pourVous);
+        bandeSelection.add(populaire);
+        bandeSelection.add(radio);
+        bandeSelection.add(podcasts);
         bandeSelection.add(Box.createVerticalGlue()); // pousse btnRetour vers le bas
         bandeSelection.add(creerSeparateur());
         bandeSelection.add(Box.createVerticalStrut(10));
