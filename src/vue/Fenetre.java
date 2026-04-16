@@ -152,7 +152,6 @@ public class Fenetre implements InterfaceVue {
                         resultat[0] = new ConnexionForm(mail, mdp);
                         termine[0] = true;
                     } else if (choix == 2) {
-                        System.out.println("Retour au menu");
                         termine[0] = true;
                     } else {
                         termine[0] = true;
@@ -222,7 +221,7 @@ public class Fenetre implements InterfaceVue {
                 }
             }
         }
-
+        
         return resultat[0];
     }
 
@@ -245,7 +244,6 @@ public class Fenetre implements InterfaceVue {
                     resultat[0] = new InscriptionForm("abonne", nom, mail, mdp);
                     termine[0] = true;
                 } else if (choix == 2) {
-                    System.out.println("Retour au menu");
                     termine[0] = true;
                 } else {
                     termine[0] = true;

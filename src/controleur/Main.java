@@ -42,6 +42,10 @@ public class Main {
         charger(artistes, "artistes.ser");
         charger(albums, "albums.ser");
 
+        if (morceaux.isEmpty()) {
+            ScriptPeuplement.main(new String[0]);
+        }
+
         initialiser();
         catalogue = new Catalogue(morceaux, playlists, artistes, albums);
 
@@ -296,6 +300,9 @@ public class Main {
         }
         // on récupère l'action choisie
         Action actionChoisie = vue.choisirAction(utilisateur.getAccueil(vue), utilisateur);
+
+        // test demandé dans la grille d'évaluation
+        if (actionChoisie != null) {System.out.println(actionChoisie.getNom());}
 
         if (actionChoisie == null) {
             vue.afficherErreur(new ActionException("Choix invalide pour l'action."));

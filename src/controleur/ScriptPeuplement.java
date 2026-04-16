@@ -122,11 +122,11 @@ public class ScriptPeuplement {
         Main.sauvegarder(catalogue.getArtistes(), "artistes.ser");
         Main.sauvegarder(catalogue.getAlbums(), "albums.ser");
 
-        System.out.println("Peuplement termine.");
-        System.out.println("Artistes: " + catalogue.getArtistes().size());
-        System.out.println("Albums: " + catalogue.getAlbums().size());
-        System.out.println("Morceaux: " + catalogue.getMorceaux().size());
-        System.out.println("Playlists: " + catalogue.getPlaylists().size());
+        System.out.println("ajout automatique de");
+        System.out.println(catalogue.getArtistes().size() + " artistes");
+        System.out.println(catalogue.getAlbums().size() + " albums");
+        System.out.println(catalogue.getMorceaux().size() + " morceaux");
+        System.out.println(catalogue.getPlaylists().size() + " playlists");
     }
 
     private static boolean imageVide(String image) {
