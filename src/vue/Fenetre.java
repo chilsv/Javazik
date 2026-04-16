@@ -361,30 +361,6 @@ public class Fenetre implements InterfaceVue {
         estPlaylistAimeeProvider = estPlaylistAimee != null ? estPlaylistAimee : (playlist -> false);
     }
 
-    private JButton creerBoutonCategorie(String texte) {
-        JButton bouton = new JButton(texte);
-        bouton.setFocusPainted(false);
-        bouton.setBorderPainted(false);
-        bouton.setOpaque(true);
-        bouton.setBackground(new Color(235, 235, 235));
-        bouton.setForeground(new Color(55, 55, 55));
-        bouton.setFont(new Font("SansSerif", Font.BOLD, 13));
-        bouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        bouton.setBorder(new EmptyBorder(8, 12, 8, 12));
-        return bouton;
-    }
-
-    /* pour afficher la catégorie en bleu quand on est dedans */
-    private void appliquerStyleCategorieActive(JButton bouton, boolean active) {
-        if (active) {
-            bouton.setBackground(new Color(45, 140, 240));
-            bouton.setForeground(Color.WHITE);
-        } else {
-            bouton.setBackground(new Color(235, 235, 235));
-            bouton.setForeground(new Color(55, 55, 55));
-        }
-    }
-
     private static class LigneResultat<TypeObjets> {
         private final TypeObjets objet; // morceau, artiste, album ou playlist
         private final String titre;
@@ -603,6 +579,7 @@ public class Fenetre implements InterfaceVue {
         return scroll;
     }
 
+    /* pour bien afficher la durée */
     private String formatterDuree(int secondes) {
         int minutes = Math.max(0, secondes) / 60;
         int reste = Math.max(0, secondes) % 60;
@@ -637,7 +614,7 @@ public class Fenetre implements InterfaceVue {
         return null;
     }
 
-    private void jouerObjet(Object objet) {
+    private void jouer(TypeObjets objet) {
         if (objet instanceof Morceau) {
             afficherLecture((Morceau) objet);
         } else if (objet instanceof Album) {
@@ -664,10 +641,12 @@ public class Fenetre implements InterfaceVue {
         }
     }
 
-    private void afficherDetailsObjet(Object objet) {
-        // Pas de dialogue detail: on conserve juste l'action cliquable sans pop-up.
+    private void afficherDetails(TypeObjets objet) {
         if (objet != null) {
-            System.out.println("Details: " + objet.getClass().getSimpleName());
+            System.out.println("Clic sur détails");
+            // afficher la page du morceau !! (pareil pour si on clique sur le JLabel du nom du morceau)
+            JPanel details = new JPanel();
+            afficherPanel(objet.getNom(), details);
         }
     }
 
@@ -754,14 +733,14 @@ public class Fenetre implements InterfaceVue {
             cartesCategories.add(creerVueCategorie(morceauxResultat,
                     morceau -> new LigneResultat<>(morceau, morceau.getNom(),
                             formatterArtistes(morceau.getArtistes()), formatterDuree(morceau.getDuree()), true),
-                    this::jouerObjet, this::afficherDetailsObjet,
+                    this::jouer, this::afficherDetails,
                     objet -> basculerMorceauAimeHandler.accept((Morceau) objet),
                     objet -> estMorceauAimeProvider.apply((Morceau) objet)), "morceaux");
 
             cartesCategories.add(creerVueCategorie(artistesResultat,
                     artiste -> new LigneResultat<>(artiste, artiste.getNom(),
                             artiste.getAlbums() == null ? "0 album" : artiste.getAlbums().size() + " album(s)", "", false),
-                    this::jouerObjet, this::afficherDetailsObjet,
+                    this::jouer, this::afficherDetails,
                     objet -> {}, objet -> false), "artistes");
 
             cartesCategories.add(creerVueCategorie(albumsResultat,
@@ -770,13 +749,13 @@ public class Fenetre implements InterfaceVue {
                         String detail = nomArtiste + (album.getAnnee() > 0 ? " — " + album.getAnnee() : "");
                         return new LigneResultat<>(album, album.getNom(), detail, "", false);
                     },
-                    this::jouerObjet, this::afficherDetailsObjet,
+                    this::jouer, this::afficherDetails,
                     objet -> {}, objet -> false), "albums");
 
             cartesCategories.add(creerVueCategorie(playlistsResultat,
                     playlist -> new LigneResultat<>(playlist, playlist.getNom(),
                             (playlist.getMorceaux() == null ? 0 : playlist.getMorceaux().size()) + " morceau(x) · " + playlist.getCreation(), "", true),
-                    this::jouerObjet, this::afficherDetailsObjet,
+                    this::jouer, this::afficherDetails,
                     objet -> basculerPlaylistAimeeHandler.accept((Playlist) objet),
                     objet -> estPlaylistAimeeProvider.apply((Playlist) objet)), "playlists");
 

@@ -10,6 +10,7 @@ public class Filtre {
     public boolean playlist;
     public boolean croissant;
     public int[] annees;
+    public ArrayList<String> genres;
 
     public Filtre(boolean morceau, boolean artiste, boolean album, boolean playlist, boolean croissant, int[] annees) {
         this.morceau = morceau;
@@ -18,6 +19,16 @@ public class Filtre {
         this.playlist = playlist;
         this.croissant = croissant;
         this.annees = normaliserAnnees(annees);
+    }
+
+    public Filtre(boolean morceau, boolean artiste, boolean album, boolean playlist, boolean croissant, int[] annees, ArrayList<String> genres) {
+        this.morceau = morceau;
+        this.artiste = artiste;
+        this.album = album;
+        this.playlist = playlist;
+        this.croissant = croissant;
+        this.annees = normaliserAnnees(annees);
+        this.genres = genres;
     }
 
     public <T extends TypeObjets> ArrayList<T> trier(ArrayList<T> liste) {

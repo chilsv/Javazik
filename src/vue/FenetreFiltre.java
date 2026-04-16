@@ -11,6 +11,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -62,10 +63,10 @@ public class FenetreFiltre extends JPanel {
         setPreferredSize(new Dimension(310, 410));
 
         // on creer les Checkboxes et les boutons de tri
-        Pop = new DarkCheckBox("Morceaux",true);
-        Rock = new DarkCheckBox("Artistes",true);
-        Rap = new DarkCheckBox("Albums",false);
-        Variete = new DarkCheckBox("Playlists",false);
+        Pop = new DarkCheckBox("Pop",true);
+        Rock = new DarkCheckBox("Rock",true);
+        Rap = new DarkCheckBox("Rap",false);
+        Variete = new DarkCheckBox("Variété",false);
         radioCroissant = new DarkRadioButton("Croissant",true);
         radioDecroissant= new DarkRadioButton("Décroissant",false);
         ButtonGroup groupeTri = new ButtonGroup();
@@ -211,11 +212,23 @@ public class FenetreFiltre extends JPanel {
             int hi = anneeIntervalle.getUpperValue();
             intervalle = (lo == ANNEE_MIN && hi == ANNEE_MAX) ? new int[]{0, 0} : new int[]{lo, hi};
         }
+        ArrayList<String> genres = new ArrayList<>();
+        if (Pop.isSelected()) genres.add("Pop");
+        if (Rock.isSelected()) genres.add("Rock");
+        if (Rap.isSelected()) genres.add("Rap");
+        if (Variete.isSelected()) genres.add("Variété");
+        if (!Pop.isSelected() && !Rock.isSelected() && !Rap.isSelected() && !Variete.isSelected()) {
+            // Si aucun genre n'est sélectionné, on considère que tous les genres sont sélectionnés (pas de filtre)
+             genres.add("Pop");
+             genres.add("Rock");
+             genres.add("Rap");
+             genres.add("Variété");
+        }
         return new Filtre(
-                Pop.isSelected(), Rock.isSelected(),
-                Rap.isSelected(),   Variete.isSelected(),
+                true, true, true, true,
                 radioCroissant.isSelected(),   // true = croissant, false = décroissant
-                intervalle
+                intervalle,
+                genres
         );
     }
 
