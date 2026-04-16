@@ -13,6 +13,8 @@ public class Morceau implements TypeObjets {
     private int annee;
     private ArrayList<String> genres;
     private String image;
+    private float noteMoy;
+    private ArrayList<Avis> avis = new ArrayList<Avis>();
 
     public Morceau(String titre, Artiste artiste) {
         this.Titre = titre;

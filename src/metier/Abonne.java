@@ -11,6 +11,7 @@ public class Abonne extends Personne {
     private ArrayList<Integer> historique = new ArrayList<Integer>();
     private int playlistDefaut; // Playlist des morceaux aimés créée par défaut
     private ArrayList<Integer> playlists = new ArrayList<Integer>(); // playlists sauvegardées par l'abonné
+    private ArrayList<Avis> avis = new ArrayList<Avis>();
     // On liste les actions possibles pour un abonné ici
     private final ArrayList<Action> actions = new ArrayList<Action>();
 
