@@ -2,9 +2,6 @@ package metier;
 
 import java.util.ArrayList;
 
-import controleur.exceptions.ActionException;
-import vue.InterfaceVue;
-
 public class Morceau implements TypeObjets {
     private int num;
     private String Titre;
@@ -84,7 +81,24 @@ public class Morceau implements TypeObjets {
         return image;
     }
 
+    public ArrayList<Avis> getAvis() {
+        return avis;
+    }
+
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public void ajouterAvis(Avis avis) {
+        this.avis.add(avis);
+        float somme = 0;
+        for (Avis a : this.avis) {
+            somme += a.getNote();
+        }
+        noteMoy = somme / this.avis.size();
+    }
+
+    public float getNoteMoy() {
+        return noteMoy;
     }
 }

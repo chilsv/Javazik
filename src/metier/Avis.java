@@ -1,37 +1,39 @@
 package metier;
 
-public class Avis {
-    private int numMoreau;
-    private int numAbonne;
-    private int note;
-    private int commentaire;
-    private int date;
+import java.time.LocalDate;
 
-    public Avis(int numMorceau, int numAbonne, int note, int commentaire, int date) {
-        this.numMoreau = numMorceau;
-        this.numAbonne = numAbonne;
+public class Avis {
+    private Morceau morceau;
+    private Abonne abonne;
+    private int note;
+    private String commentaire;
+    private LocalDate date;
+
+    public Avis(Morceau morceau, Abonne abonne, int note, String commentaire) {
+        this.morceau = morceau;
+        this.abonne = abonne;
         this.note = note;
         this.commentaire = commentaire;
-        this.date = date;
+        date = LocalDate.now();
     }
 
-    public int getNumMoreau() {
-        return numMoreau;
+    public Morceau getMorceau() {
+        return morceau;
     }
 
-    public int getNumAbonne() {
-        return numAbonne;
+    public Abonne getAbonne() {
+        return abonne;
     }
 
     public int getNote() {
         return note;
     }
 
-    public int getCommentaire() {
+    public String getCommentaire() {
         return commentaire;
     }
 
-    public int getDate() {
+    public LocalDate getDate() {
         return date;
     }
 

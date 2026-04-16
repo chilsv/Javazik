@@ -1,10 +1,16 @@
 package controleur.actions;
 
+import static controleur.Main.getAvis;
 import static controleur.Main.sauvegarder;
+import static controleur.Main.sauvegarderAvis;
+
+import java.util.ArrayList;
+
+import metier.Avis;
 
 public class Quitter implements Action {
     /**
-     * @param arguments vue, utilisateur, catalogue
+     * @param arguments vue, utilisateur, catalogue, avis
      */
     @Override
     public void executer(ActionArguments arguments) {
@@ -13,6 +19,8 @@ public class Quitter implements Action {
         sauvegarder(arguments.catalogue.getPlaylists(), "playlists.ser");
         sauvegarder(arguments.catalogue.getArtistes(), "artistes.ser");
         sauvegarder(arguments.catalogue.getAlbums(), "albums.ser");
+        ArrayList<Avis> avisASauvegarder = arguments.avis != null ? arguments.avis : getAvis();
+        sauvegarderAvis(avisASauvegarder);
         System.exit(0);
     }
 

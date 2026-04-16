@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import controleur.formulaires.*;
 import metier.Abonne;
 import metier.Admin;
+import metier.Avis;
 import metier.Catalogue;
 import metier.Morceau;
 import metier.Personne;
@@ -28,11 +29,19 @@ public class ActionArguments {
     public String nomMorceau;
     public Morceau morceauTrouve;
     public Filtre filtre;
+    public String commentaire;
+    public int note;
+    public ArrayList<Avis> avis;
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         this.vue = vue;
         this.utilisateur = utilisateur;
         this.catalogue = catalogue;
+    }
+
+    public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, ArrayList<Avis> avis) {
+        this(vue, utilisateur, catalogue);
+        this.avis = avis;
     }
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, Morceau morceau) {
@@ -90,5 +99,20 @@ public class ActionArguments {
     public ActionArguments(InterfaceVue vue, Personne utilisateur) {
         this.vue = vue;
         this.utilisateur = utilisateur;
+    }
+
+    public ActionArguments(Personne utilisateur, Morceau morceau, String commentaire, int note, ArrayList<Avis> listeAvis) {
+        this.utilisateur = utilisateur;
+        this.morceau = morceau;
+        this.commentaire = commentaire;
+        this.note = note;
+        this.avis = listeAvis;
+    }
+
+    public ActionArguments(Personne utilisateur, Morceau morceau, String commentaire, int note) {
+        this.utilisateur = utilisateur;
+        this.morceau = morceau;
+        this.commentaire = commentaire;
+        this.note = note;
     }
 }

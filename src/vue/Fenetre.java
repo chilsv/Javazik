@@ -3,6 +3,7 @@ package vue;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,10 +17,12 @@ import controleur.EvenementsInscription;
 import controleur.EvenementsMenu;
 import controleur.EvenementsVisite;
 import controleur.actions.Action;
+import controleur.actions.ActionArguments;
 import controleur.actions.ChoisirFiltre;
 import controleur.actions.ConsulterLibrairie;
 import controleur.actions.ConsulterProfil;
 import controleur.actions.Deconnexion;
+import controleur.actions.MettreAvis;
 import controleur.actions.Recherche;
 import controleur.exceptions.ActionException;
 import controleur.formulaires.*;
@@ -33,6 +36,7 @@ public class Fenetre implements InterfaceVue {
     private final JPanel pages; // le panel princiapal qui va contenir toutes les pages
     private final Map<String, JPanel> pagesMap; // map pour trouver le panel grâcec à son nom
     private FenetreVisite fenetreVisite;
+    private Personne utilisateur;
 
     private Consumer<Morceau> basculerMorceauAimeHandler = morceau -> {};
     private Function<Morceau, Boolean> estMorceauAimeProvider = morceau -> false;
@@ -188,6 +192,7 @@ public class Fenetre implements InterfaceVue {
         final Object verrou = new Object();
 
         executerEtAttendre(() -> {
+            this.utilisateur = utilisateur;
             if (fenetreVisite == null) {
                 fenetreVisite = new FenetreVisite(this);
                 fenetreVisite.setFrame(frame);
@@ -642,12 +647,266 @@ public class Fenetre implements InterfaceVue {
     }
 
     private void afficherDetails(TypeObjets objet) {
-        if (objet != null) {
-            System.out.println("Clic sur détails");
-            // afficher la page du morceau !! (pareil pour si on clique sur le JLabel du nom du morceau)
-            JPanel details = new JPanel();
-            afficherPanel(objet.getNom(), details);
+        if (objet == null || fenetreVisite == null) {
+            return;
         }
+        executerEtAttendre(() -> {
+            System.out.println("Clic sur détails");
+             if (objet instanceof Morceau) {
+                fenetreVisite.setPanelCentral(afficherMorceau((Morceau) objet));
+            } else if (objet instanceof Album) {
+                fenetreVisite.setPanelCentral(afficherAlbum((Album) objet));
+            } else if (objet instanceof Playlist) {
+                fenetreVisite.setPanelCentral(afficherPlaylist((Playlist) objet));
+            } else if (objet instanceof Artiste) {
+                fenetreVisite.setPanelCentral(afficherArtiste((Artiste) objet));
+            }
+        });
+    }
+
+    public JComponent afficherAlbum(Album album) {
+        JPanel panel = new JPanel();
+        panel.setBackground(BG_PRINCIPAL);
+        JLabel label = new JLabel(album.getNom());
+        label.setForeground(TEXT_BLANC);
+        panel.add(label);
+        return panel;
+    }
+
+    public JComponent afficherPlaylist(Playlist playlist) {
+        JPanel panel = new JPanel();
+        panel.setBackground(BG_PRINCIPAL);
+        JLabel label = new JLabel(playlist.getNom());
+        label.setForeground(TEXT_BLANC);
+        panel.add(label);
+        return panel;
+    }
+
+    public JComponent afficherArtiste(Artiste artiste) {
+        JPanel panel = new JPanel();
+        panel.setBackground(BG_PRINCIPAL);
+        JLabel label = new JLabel(artiste.getNom());
+        label.setForeground(TEXT_BLANC);
+        panel.add(label);
+        return panel;
+    }
+
+    public JComponent afficherMorceau(Morceau morceau) {
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        JPanel carte = new JPanel(new BorderLayout(20, 0));
+        carte.setBackground(BG_CARTE);
+        carte.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+        JLabel image = new JLabel();
+        image.setPreferredSize(new Dimension(180, 180));
+        image.setHorizontalAlignment(SwingConstants.CENTER);
+        image.setVerticalAlignment(SwingConstants.CENTER);
+        image.setForeground(TEXT_GRIS);
+
+        ImageIcon icon = new ImageIcon(morceau.getImage());
+        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+            Image imageRedimensionnee = icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+            image.setIcon(new ImageIcon(imageRedimensionnee));
+            image.setText(null);
+        } else {
+            image.setText("Aucune image");
+        }
+
+        JPanel infos = new JPanel();
+        infos.setOpaque(false);
+        infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
+
+        JLabel nom = new JLabel(morceau.getNom());
+        nom.setFont(new Font("SansSerif", Font.BOLD, 28));
+        nom.setForeground(TEXT_BLANC);
+        nom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel artistes = new JLabel("Artistes : " + formatterArtistes(morceau.getArtistes()));
+        artistes.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        artistes.setForeground(TEXT_GRIS);
+        artistes.setBorder(new EmptyBorder(10, 0, 0, 0));
+        artistes.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel duree = new JLabel("Durée : " + formatterDuree(morceau.getDuree()));
+        duree.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        duree.setForeground(TEXT_GRIS);
+        duree.setBorder(new EmptyBorder(6, 0, 0, 0));
+        duree.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        String anneeAffichee;
+        if (morceau.getAnnee() > 0) {
+            anneeAffichee = Integer.toString(morceau.getAnnee());
+        } else {
+            anneeAffichee = "Inconnue";
+        }
+        JLabel annee = new JLabel("Année : " + anneeAffichee);
+        annee.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        annee.setForeground(TEXT_GRIS);
+        annee.setBorder(new EmptyBorder(6, 0, 0, 0));
+        annee.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel jouer = new JLabel(new ImageIcon("assets/play.png"));
+        jouer.setFont(new Font("SansSerif", Font.BOLD, 13));
+        jouer.setForeground(Color.WHITE);
+        jouer.setBackground(ACCENT);
+        jouer.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jouer.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        jouer.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        infos.add(nom);
+        infos.add(artistes);
+        infos.add(duree);
+        infos.add(annee);
+        infos.add(Box.createVerticalStrut(16));
+        infos.add(jouer);
+
+        carte.add(image, BorderLayout.WEST);
+        carte.add(infos, BorderLayout.CENTER);
+
+        contenu.add(carte, BorderLayout.CENTER);
+        contenu.add(sectionAvis(morceau), BorderLayout.SOUTH);
+        return contenu;
+    }
+
+    /* fait en partie avec de l'ia, j'y arrivais pas... */
+    private JComponent sectionAvis(Morceau morceau) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setOpaque(false);
+        section.setBorder(new EmptyBorder(16, 0, 0, 0));
+
+        JPanel enTeteAvis = new JPanel(new BorderLayout());
+        enTeteAvis.setOpaque(false);
+
+        JLabel titreAvis = new JLabel("Avis des abonnés");
+        titreAvis.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titreAvis.setForeground(TEXT_BLANC);
+        titreAvis.setBorder(new EmptyBorder(0, 0, 10, 0));
+
+        JButton boutonCommenter = new JButton("Commenter");
+        boutonCommenter.setFont(new Font("SansSerif", Font.BOLD, 12));
+        boutonCommenter.setForeground(TEXT_BLANC);
+        boutonCommenter.setBackground(new Color(60, 60, 60));
+        boutonCommenter.setFocusPainted(false);
+        boutonCommenter.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boutonCommenter.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        boutonCommenter.addActionListener(evt -> ouvrirDialogueAvis(morceau));
+
+        enTeteAvis.add(titreAvis, BorderLayout.WEST);
+        enTeteAvis.add(boutonCommenter, BorderLayout.EAST);
+
+        JPanel listeAvis = new JPanel();
+        listeAvis.setLayout(new BoxLayout(listeAvis, BoxLayout.Y_AXIS));
+        listeAvis.setBackground(BG_CARTE);
+        listeAvis.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        ArrayList<Avis> avisMorceau = null;
+        if (morceau.getAvis() != null) {
+            avisMorceau = morceau.getAvis();
+        }
+
+        if (avisMorceau == null || avisMorceau.isEmpty()) {
+            JLabel vide = new JLabel("Soyez le premier à commenter !");
+            vide.setForeground(TEXT_GRIS);
+            vide.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            vide.setAlignmentX(Component.LEFT_ALIGNMENT);
+            listeAvis.add(vide);
+        } else {
+            for (Avis avis : avisMorceau) {
+                JPanel carteAvis = new JPanel();
+                carteAvis.setLayout(new BoxLayout(carteAvis, BoxLayout.Y_AXIS));
+                carteAvis.setAlignmentX(Component.LEFT_ALIGNMENT);
+                carteAvis.setBackground(new Color(45, 45, 45));
+                carteAvis.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+                JLabel utilisateur = new JLabel(avis.getAbonne().getNom());
+                utilisateur.setForeground(TEXT_BLANC);
+                utilisateur.setFont(new Font("SansSerif", Font.BOLD, 13));
+                utilisateur.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                JLabel date = new JLabel("ajouté le " + formatterDateAvis(avis.getDate()));
+                date.setForeground(TEXT_GRIS);
+                date.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                date.setBorder(new EmptyBorder(4, 0, 0, 0));
+                date.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                JLabel commentaire = new JLabel("\" " + avis.getCommentaire() + " \"");
+                commentaire.setForeground(TEXT_BLANC);
+                commentaire.setFont(new Font("SansSerif", Font.PLAIN, 13));
+                commentaire.setBorder(new EmptyBorder(6, 0, 0, 0));
+                commentaire.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                JLabel note = new JLabel("Note : " + avis.getNote() + "/5");
+                note.setForeground(TEXT_BLANC);
+                note.setFont(new Font("SansSerif", Font.PLAIN, 13));
+                note.setBorder(new EmptyBorder(6, 0, 0, 0));
+                note.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+                carteAvis.add(utilisateur);
+                carteAvis.add(date);
+                carteAvis.add(commentaire);
+                carteAvis.add(note);
+
+                listeAvis.add(carteAvis);
+                listeAvis.add(Box.createVerticalStrut(8));
+            }
+        }
+
+        JScrollPane scrollAvis = new JScrollPane(listeAvis);
+        scrollAvis.setBorder(BorderFactory.createEmptyBorder());
+        scrollAvis.getViewport().setBackground(BG_CARTE);
+        scrollAvis.setPreferredSize(new Dimension(100, 220));
+
+        section.add(enTeteAvis, BorderLayout.NORTH);
+        section.add(scrollAvis, BorderLayout.CENTER);
+        return section;
+    }
+
+    private void ouvrirDialogueAvis(Morceau morceau) {
+        if (morceau == null) {
+            return;
+        }
+        if (!(utilisateur instanceof Abonne)) {
+            afficherErreur(new ActionException("Réservé aux abonnés"));
+            return;
+        }
+
+        String texteNote = JOptionPane.showInputDialog(frame, "Note (1-5)");
+        if (texteNote == null) {
+            return;
+        }
+
+        int note;
+        try {
+            note = Integer.parseInt(texteNote.trim());
+        } catch (NumberFormatException e) {
+            afficherErreur(new ActionException("Note invalide (1-5)."));
+            return;
+        }
+
+        if (note < 1 || note > 5) {
+            afficherErreur(new ActionException("Note invalide (1-5)."));
+            return;
+        }
+
+        String commentaire = JOptionPane.showInputDialog(frame, "Commentaire");
+        if (commentaire == null) {
+            return;
+        }
+
+        new MettreAvis().executer(new ActionArguments(utilisateur, morceau, commentaire, note));
+        if (fenetreVisite != null) {
+            fenetreVisite.setPanelCentral(afficherMorceau(morceau));
+        }
+    }
+
+    private String formatterDateAvis(LocalDate dateAvis) {
+        if (dateAvis == null) {
+            return "Inconnue";
+        }
+        return dateAvis.toString();
     }
 
     private String formatterArtistes(ArrayList<Artiste> artistes) {

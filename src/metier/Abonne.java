@@ -28,6 +28,7 @@ public class Abonne extends Personne {
         actions.add(new JouerMorceau());
         actions.add(new AjouterPlaylist());
         actions.add(new ConsulterLibrairie());
+        actions.add(new MettreAvis());
         actions.add(new ConsulterProfil());
         actions.add(new Deconnexion());
         actions.add(new Quitter());
@@ -81,5 +82,13 @@ public class Abonne extends Personne {
 
     public boolean playlistDejaSauvegardee(int numPlaylist) {
         return playlists.contains(numPlaylist);
+    }
+
+    public void ajouterAvis(Avis avis) {
+        this.avis.add(avis);
+    }
+
+    public ArrayList<Avis> getAvis() {
+        return avis;
     }
 }

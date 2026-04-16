@@ -28,6 +28,7 @@ public class Main {
     private static Catalogue catalogue;
     private static Filtre filtreRechercheCourant = filtreParDefaut();
     private static ArrayList<Morceau> queue = new ArrayList<Morceau>();
+    private static ArrayList<Avis> avis = new ArrayList<Avis>();
 
     // Après la connexion d'un utilisateur, on définit une variable de type Personne qui contiendra soit un Abonné, soit un Admin, soit un Visiteur
     // Ca permet ensuite de vérifier les droits de l'utilisateur connecté
@@ -41,6 +42,7 @@ public class Main {
         charger(playlists, "playlists.ser");
         charger(artistes, "artistes.ser");
         charger(albums, "albums.ser");
+        charger(avis, "avis.ser");
 
         if (morceaux.isEmpty()) {
             ScriptPeuplement.main(new String[0]);
@@ -110,6 +112,30 @@ public class Main {
         } catch (IOException e) {
             System.err.println("Erreur lors de la sauvegarde de " + nomFichier + " : " + e.getMessage());
         }
+    }
+
+    public static void sauvegarderAvis(ArrayList<Avis> avis) {
+        File dossierDonnees = new File("donnees");
+        if (!dossierDonnees.exists()) {
+            dossierDonnees.mkdirs();
+        }
+
+        try (FileOutputStream fos = new FileOutputStream("donnees/" + "avis.ser");
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(avis);
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la sauvegarde de " + "avis.ser" + " : " + e.getMessage());
+        }
+    }
+
+    public static void ajouterAvis(Avis nouvelAvis) {
+        if (nouvelAvis != null) {
+            avis.add(nouvelAvis);
+        }
+    }
+
+    public static ArrayList<Avis> getAvis() {
+        return avis;
     }
 
     public static void ajouterAbonne(Personne utilisateur, ArrayList<Abonne> abonnes) {
