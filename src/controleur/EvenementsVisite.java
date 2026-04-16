@@ -61,6 +61,9 @@ public class EvenementsVisite {
         JLabel filtre = fenetre.getFiltre();
         JLabel loupe  = fenetre.getLoupe();
         JTextField barreRecherche = fenetre.getBarreRecherche();
+        JLabel menuArtistes = fenetre.getMenuArtistes();
+        JLabel menuAlbums = fenetre.getMenuAlbums();
+        JLabel menuMorceaux = fenetre.getMenuMorceaux();
 
         //detection souris filtre
         filtre.addMouseListener(new MouseAdapter() {
@@ -113,6 +116,46 @@ public class EvenementsVisite {
                 label.setForeground(new Color(160, 160, 160)); // retour couleur normale
             }
         });
+
+        // Artistes choix 6
+        menuArtistes.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                fenetre.afficherErreur(new ActionException("A venir"));
+                listener.onChoix(6);
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                menuArtistes.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+        });
+
+        // Albums choix 7
+        menuAlbums.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                fenetre.afficherErreur(new ActionException("A venir"));
+                listener.onChoix(7);
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                menuAlbums.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+        });
+
+        // Morceaux choix 8
+        menuMorceaux.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                fenetre.afficherErreur(new ActionException("A venir"));
+                listener.onChoix(8);
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                menuMorceaux.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+        });
+
     }
 
     //surbriller pour + de style et plus lisible
@@ -123,8 +166,17 @@ public class EvenementsVisite {
     // Affiche/masque le panneau filtre selon la position de la souris
     private static void passageSouris(Component composant, FenetreVisite fenetre, String type) {
         composant.addMouseListener(new MouseAdapter() {
+<<<<<<< HEAD
             @Override public void mouseEntered(MouseEvent e) {
                 if (type.equals("filtre")) fenetre.afficherPanelFiltre();
+=======
+            @Override
+            public void mouseEntered(MouseEvent e) { // si la souris est sur le composant on l'affiche
+                if (type.equals("filtre")) {
+                    System.out.println("Afficher le panneau de filtre");
+                    fenetre.afficherPanelFiltre();
+                }
+>>>>>>> f8aa5d7dc8eb258a5c7526070b0d475e60f88242
             }
             @Override public void mouseExited(MouseEvent e) {
                 if (type.equals("filtre")) fenetre.masquerPanelFiltre();
