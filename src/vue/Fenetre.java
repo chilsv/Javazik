@@ -873,30 +873,9 @@ public class Fenetre implements InterfaceVue {
             return;
         }
 
-        String texteNote = JOptionPane.showInputDialog(frame, "Note (1-5)");
-        if (texteNote == null) {
-            return;
-        }
+        // implémenter
 
-        int note;
-        try {
-            note = Integer.parseInt(texteNote.trim());
-        } catch (NumberFormatException e) {
-            afficherErreur(new ActionException("Note invalide (1-5)."));
-            return;
-        }
-
-        if (note < 1 || note > 5) {
-            afficherErreur(new ActionException("Note invalide (1-5)."));
-            return;
-        }
-
-        String commentaire = JOptionPane.showInputDialog(frame, "Commentaire");
-        if (commentaire == null) {
-            return;
-        }
-
-        new MettreAvis().executer(new ActionArguments(utilisateur, morceau, commentaire, note));
+        //new MettreAvis().executer(new ActionArguments(utilisateur, morceau, commentaire, note));
         if (fenetreVisite != null) {
             fenetreVisite.setPanelCentral(afficherMorceau(morceau));
         }

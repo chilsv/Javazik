@@ -1,8 +1,9 @@
 package metier;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Avis {
+public class Avis implements Serializable {
     private Morceau morceau;
     private Abonne abonne;
     private int note;
