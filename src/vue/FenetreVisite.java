@@ -19,7 +19,7 @@ public class FenetreVisite {
 
     private static final int PANNEAU_FILTRE_Y = ZONE_RECHERCHE_HAUTEUR;
     private static final int PANNEAU_FILTRE_LARGEUR = 330;
-    private static final int PANNEAU_FILTRE_HAUTEUR = 300;
+    private static final int PANNEAU_FILTRE_HAUTEUR = 380;
 
     private static final int largeur_barreDeRecherche = Ecran.LONGUEUR - BANDE_SELECTION_LARGEUR;
     private static final int hauteur_barreDeRecherche = 64;
@@ -50,13 +50,17 @@ public class FenetreVisite {
     private final JLabel btnRetour;
     private final JLabel logoJavasik;
     private final JLabel fond;
+    private final JLabel parcourir;
+    private final JLabel pourVous;
+    private final JLabel populaire;
+    private final JLabel radio;
+    private final JLabel podcasts;
 
     public FenetreVisite(Fenetre vue) {
         this.vue = vue;
         // On crée le panel princiapl qui contient tout
         panel = new JPanel(new BorderLayout()); //panel de fond, pour eviter les probleme de superposition
         panel.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
-        //panel.setBackground(new Color(18, 18, 18)); // couleur du fond
 
         // Background
         ImageIcon background = new ImageIcon("assets/Q.png");
@@ -64,18 +68,20 @@ public class FenetreVisite {
         fond.setLayout(null);
         fond.setBounds(0, 0, Ecran.LONGUEUR, Ecran.HAUTEUR);
 
-        coucheContenu = new JLayeredPane(); //panel de contenu, pour le filtrage par exemple
+        //panel de contenu, pour le filtrage par exemple
+        coucheContenu = new JLayeredPane();
         coucheContenu.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
         coucheContenu.setLayout(null);
         coucheContenu.add(fond, Integer.valueOf(-30000)); // couche tout en dessous
         coucheContenu.setOpaque(false);
 
-        base = new JPanel(new BorderLayout()); //panel de base pour mettre barre gauche, barre ecoute ect
+        //panel de base pour mettre barre gauche, barre ecoute ect
+        base = new JPanel(new BorderLayout());
         base.setBounds(0, 0, Ecran.LONGUEUR, Ecran.HAUTEUR);
         base.setOpaque(false); // laisse voir le fond du panel
 
-
-        bandeSelection = new JPanel(); //panel barre gauche de choix
+        //panel barre gauche de choix
+        bandeSelection = new JPanel();
         bandeSelection.setLayout(new BoxLayout(bandeSelection, BoxLayout.Y_AXIS));
         bandeSelection.setPreferredSize(new Dimension(220, Ecran.HAUTEUR)); //220 en x et y sur tout l'ecran
         bandeSelection.setBackground(new Color(18, 18, 18));
@@ -99,11 +105,11 @@ public class FenetreVisite {
 
         //Creation du contenu de la selection decouvrire
         JLabel labelDiscover = creerLabelTitre("DÉCOUVERTE");
-        JLabel parcourir = creerLabelMenu(null,"Parcourir",25, 25);
-        JLabel pourVous = creerLabelMenu(null,"Pour vous",25, 25);
-        JLabel populaire = creerLabelMenu(null,"Populaire",25, 25);
-        JLabel radio = creerLabelMenu(null,"Radio",25, 25);
-        JLabel podcasts = creerLabelMenu(null,"Podcasts",25, 25);
+        parcourir = creerLabelMenu(null,"Parcourir",25, 25);
+        pourVous = creerLabelMenu(null,"Pour vous",25, 25);
+        populaire = creerLabelMenu(null,"Populaire",25, 25);
+        radio = creerLabelMenu(null,"Radio",25, 25);
+        podcasts = creerLabelMenu(null,"Podcasts",25, 25);
 
         btnRetour = creerLabelMenu("assets/btn_retour.png", "Back", 32, 32);
 
@@ -148,7 +154,7 @@ public class FenetreVisite {
         placeholderLecture.setFont(new Font("SansSerif", Font.PLAIN, 13));
         lecture.add(placeholderLecture);
 
-        //Barre de rechercher
+        //filtre recherche
         zoneRecherche = new JPanel(null);
         zoneRecherche.setOpaque(false);
         zoneRecherche.setBounds(BANDE_SELECTION_LARGEUR, 0, largeur_barreDeRecherche, hauteur_barreDeRecherche + 64 + PANNEAU_FILTRE_HAUTEUR);
@@ -162,13 +168,14 @@ public class FenetreVisite {
                 g2.setColor(new Color(40, 40, 40));
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                 g2.dispose();
+                g2.setBackground(new Color(18, 18, 18));
             }
         };
         boutonsRecherche.setOpaque(false);
         boutonsRecherche.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12)); // On centre verticalement en ajoutant un padding
         boutonsRecherche.setBounds(8, 8, largeur_barreDeRecherche - 16, hauteur_barreDeRecherche - 16);
 
-        // Champ texte stylisé
+        // Champ texte stylisé piur le filtre
         barreRecherche = new JTextField();
         barreRecherche.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
         barreRecherche.setBackground(new Color(40, 40, 40));// transparent
@@ -193,7 +200,7 @@ public class FenetreVisite {
         // Panneau filtre (caché par défaut)
         panelFiltre = new FenetreFiltre();
         int xPanneau = largeur_barreDeRecherche - PANNEAU_FILTRE_LARGEUR - 8;
-        panelFiltre.setBounds(Math.max(0, xPanneau), largeur_barreDeRecherche, PANNEAU_FILTRE_LARGEUR, PANNEAU_FILTRE_HAUTEUR);
+        panelFiltre.setBounds(Math.max(0, xPanneau), PANNEAU_FILTRE_Y   , PANNEAU_FILTRE_LARGEUR, PANNEAU_FILTRE_HAUTEUR);
         panelFiltre.setVisible(false);
         zoneRecherche.add(boutonsRecherche);
         zoneRecherche.add(panelFiltre);
@@ -286,6 +293,11 @@ public class FenetreVisite {
     public JLabel getLoupe(){ return loupe; }
     public JPanel getPanelFiltre() { return panelFiltre; }
     public JPanel getBoutonsRecherche(){ return boutonsRecherche; }
+    public JLabel getParcourir(){ return parcourir; }
+    public JLabel getPourVous(){ return pourVous; }
+    public JLabel getPopulaire(){ return populaire; }
+    public JLabel getRadio(){ return radio; }
+    public JLabel getPodcasts() { return podcasts; }
 
     // methode publique appelées par EvenementsVisite, je vais changer ca
     // rend le panneau filtre visible

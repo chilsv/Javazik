@@ -61,10 +61,12 @@ public class Main {
             InscriptionForm defautForm = new InscriptionForm("admin", "Admin", "defaut", "", 0);
             InscriptionForm gabForm = new InscriptionForm("admin", "Gab", "gabriel.jamet@edu.ece.fr", "gab", 1);
             InscriptionForm ilanForm = new InscriptionForm("admin", "Ilan", "ilan.bide", "", 2);
+            //InscriptionForm ExAbo = new InscriptionForm("abonne", "Sacha", "a", "a", 3);
             try {
                 inscription(abonnes, admins, catalogue, defautForm);
                 inscription(abonnes, admins, catalogue, gabForm);
                 inscription(abonnes, admins, catalogue, ilanForm);
+                //inscription(abonnes, admins, catalogue, ExAbo);
             } catch (UtilisateurDejaCreeException e) {}
         }
     }

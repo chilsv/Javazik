@@ -39,6 +39,14 @@ public class Fenetre implements InterfaceVue {
     private Consumer<Playlist> basculerPlaylistAimeeHandler = playlist -> {};
     private Function<Playlist, Boolean> estPlaylistAimeeProvider = playlist -> false;
 
+    // couleur meme que les autres jpanel
+    final Color BG_PRINCIPAL = new Color(26, 26, 26);
+    final Color BG_CARTE = new Color(34, 34, 34);
+    final Color BORDER = new Color(50, 50, 50);
+    final Color TEXT_BLANC = new Color(255, 255, 255);
+    final Color TEXT_GRIS = new Color(160, 160, 160);
+    final Color ACCENT = new Color(80, 130, 220);
+
     // notification pour faire les erreurs "résevré aux abonnés"
     private JWindow notif;
     private Timer tempsNotif;
@@ -470,10 +478,18 @@ public class Fenetre implements InterfaceVue {
 
     /* crée visuellement la ligne avec les boutons et infos */
     private <T extends TypeObjets> JPanel creerLigne(LigneResultat<T> ligne, Runnable actionPlay, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, Supplier<Boolean> aimeActuel) {
-        JPanel lignePanel = new JPanel(new BorderLayout(12, 0));
-        lignePanel.setOpaque(true);
-        lignePanel.setBackground(new Color(248, 251, 255));
-        lignePanel.setBorder(new EmptyBorder(6, 10, 6, 10));
+        JPanel lignePanel = new JPanel(new BorderLayout(12, 0)) {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.dispose();
+            }
+        };
+        lignePanel.setOpaque(false);                              // false obligatoire pour que l'arrondi soit visible
+        lignePanel.setBackground(new Color(55, 55, 55));          // gris clair dark  ← était (248, 251, 255)
+        lignePanel.setBorder(new EmptyBorder(8, 10, 8, 10));      // un peu plus de padding vertical pour centrer
         lignePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 76));
         lignePanel.setPreferredSize(new Dimension(100, 76));
         lignePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -481,39 +497,40 @@ public class Fenetre implements InterfaceVue {
         // bouton play
         JLabel play = creerLabelImage("assets/play.png", "play", actionPlay, 22, 22);
         JLabel vignette = creerVignetteObjet(ligne.objet);
-        play.setAlignmentY(Component.CENTER_ALIGNMENT);
+        //play.setAlignmentY(Component.CENTER_ALIGNMENT);
         vignette.setAlignmentY(Component.CENTER_ALIGNMENT);
+        play.setBounds(20, 20, play.getIcon().getIconWidth(), play.getIcon().getIconHeight());
 
-        JPanel gauche = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JPanel gauche = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 10));
         gauche.setOpaque(false);
         gauche.setAlignmentY(Component.CENTER_ALIGNMENT);
         gauche.add(play);
         gauche.add(vignette);
 
-        JPanel texte = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JPanel texte = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 20));
         texte.setOpaque(false);
         texte.setAlignmentY(Component.CENTER_ALIGNMENT);
 
         JLabel principal = new JLabel(ligne.titre);
         principal.setFont(new Font("SansSerif", Font.BOLD, 14));
-        principal.setForeground(new Color(25, 25, 25));
+        principal.setForeground(new Color(230, 230, 230));
         texte.add(principal);
 
         if (!ligne.detail.isBlank()) {
             JLabel secondaire = new JLabel(ligne.detail);
             secondaire.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            secondaire.setForeground(new Color(95, 95, 95));
+            secondaire.setForeground(new Color(150, 150, 150));
             texte.add(secondaire);
         }
 
         if (!ligne.duree.isBlank()) {
             JLabel duree = new JLabel(ligne.duree);
             duree.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            duree.setForeground(new Color(110, 110, 110));
+            duree.setForeground(new Color(130, 130, 130));
             texte.add(duree);
         }
 
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 18));
         actions.setOpaque(false);
         actions.setAlignmentY(Component.CENTER_ALIGNMENT);
         if (afficherAimer) {
@@ -537,13 +554,15 @@ public class Fenetre implements InterfaceVue {
         lignePanel.add(gauche, BorderLayout.WEST);
         lignePanel.add(texte, BorderLayout.CENTER);
         lignePanel.add(actions, BorderLayout.EAST);
+
+
         return lignePanel;
     }
 
     private <T extends TypeObjets> JComponent creerVueCategorie(List<T> objets, Function<T, LigneResultat<T>> mapper, Consumer<T> actionPlay, Consumer<T> actionDetails, Consumer<T> actionAimer, Function<T, Boolean> aimeProvider) {
         JPanel liste = new JPanel();
         liste.setLayout(new BoxLayout(liste, BoxLayout.Y_AXIS));
-        liste.setBackground(Color.WHITE);
+        liste.setBackground(new Color(26, 26, 26));
         liste.setBorder(new EmptyBorder(10, 0, 10, 0));
 
         if (objets == null || objets.isEmpty()) {
@@ -565,7 +584,22 @@ public class Fenetre implements InterfaceVue {
         JScrollPane scroll = new JScrollPane(liste);
         scroll.setBorder(BorderFactory.createEmptyBorder());
         scroll.getVerticalScrollBar().setUnitIncrement(16);
-        scroll.getViewport().setBackground(Color.WHITE);
+        scroll.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override protected void configureScrollBarColors() {
+                thumbColor= new Color(70, 70, 70);   // poignée
+                trackColor= new Color(30, 30, 30);   // rail
+            }
+            @Override protected JButton createDecreaseButton(int o) { return boutonVide(); }
+            @Override protected JButton createIncreaseButton(int o) { return boutonVide(); }
+            private JButton boutonVide() {
+                JButton b = new JButton();
+                b.setPreferredSize(new Dimension(0, 0));
+                b.setVisible(false);
+                return b;
+            }
+        });
+        scroll.getVerticalScrollBar().setBackground(new Color(30, 30, 30));
+        scroll.getViewport().setBackground(new Color(26, 26, 26));
         return scroll;
     }
 
@@ -653,145 +687,179 @@ public class Fenetre implements InterfaceVue {
     }
 
     public void afficherRecherche(ResultatRecherche resultat) {
-        if (fenetreVisite == null) {
-            return;
-        }
+        if (fenetreVisite == null) return;
 
         executerEtAttendre(() -> {
-            JPanel contenu = new JPanel(new BorderLayout());
-            contenu.setBackground(Color.WHITE);
-            contenu.setBorder(new EmptyBorder(14, 18, 18, 18));
 
-            JLabel titre = new JLabel("Resultats de recherche");
-            titre.setFont(new Font("SansSerif", Font.BOLD, 24));
-            titre.setBorder(new EmptyBorder(0, 0, 6, 0));
-
+            // ── Comptages ────────────────────────────────────────────────────────
             int nbMorceaux = (resultat == null || resultat.morceaux == null) ? 0 : resultat.morceaux.size();
             int nbArtistes = (resultat == null || resultat.artistes == null) ? 0 : resultat.artistes.size();
             int nbAlbums = (resultat == null || resultat.albums == null) ? 0 : resultat.albums.size();
             int nbPlaylists = (resultat == null || resultat.playlists == null) ? 0 : resultat.playlists.size();
             int total = nbMorceaux + nbArtistes + nbAlbums + nbPlaylists;
 
-            JLabel resume = new JLabel(total + " resultat(s)");
-            resume.setForeground(new Color(90, 90, 90));
-            resume.setBorder(new EmptyBorder(0, 0, 10, 0));
+            List<Morceau> morceauxResultat = (resultat != null && resultat.morceaux != null) ? resultat.morceaux  : new ArrayList<>();
+            List<Artiste> artistesResultat = (resultat != null && resultat.artistes != null) ? resultat.artistes  : new ArrayList<>();
+            List<Album>  albumsResultat = (resultat != null && resultat.albums != null) ? resultat.albums    : new ArrayList<>();
+            List<Playlist> playlistsResultat = (resultat != null && resultat.playlists != null) ? resultat.playlists : new ArrayList<>();
 
+            // Conteneur racine
+            JPanel contenu = new JPanel(new BorderLayout());
+            contenu.setBackground(BG_PRINCIPAL);
+            contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+            // En-tête
             JPanel haut = new JPanel();
             haut.setLayout(new BoxLayout(haut, BoxLayout.Y_AXIS));
             haut.setOpaque(false);
+
+            JLabel titre = new JLabel("Résultats de recherche");
+            titre.setFont(new Font("SansSerif", Font.BOLD, 22));
+            titre.setForeground(TEXT_BLANC);
+            titre.setBorder(new EmptyBorder(0, 0, 4, 0));
+            titre.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel resume = new JLabel(total == 0 ? "Aucun résultat" : total + " résultat" + (total > 1 ? "s" : ""));
+            resume.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            resume.setForeground(TEXT_GRIS);
+            resume.setBorder(new EmptyBorder(0, 0, 16, 0));
+            resume.setAlignmentX(Component.LEFT_ALIGNMENT);
+
             haut.add(titre);
             haut.add(resume);
 
-            List<Morceau> morceauxResultat = (resultat != null && resultat.morceaux != null)
-                ? resultat.morceaux
-                : new ArrayList<>();
-            List<Artiste> artistesResultat = (resultat != null && resultat.artistes != null)
-                ? resultat.artistes
-                : new ArrayList<>();
-            List<Album> albumsResultat = (resultat != null && resultat.albums != null)
-                ? resultat.albums
-                : new ArrayList<>();
-            List<Playlist> playlistsResultat = (resultat != null && resultat.playlists != null)
-                ? resultat.playlists
-                : new ArrayList<>();
+            // Barre de catégories
+            CardLayout cartesCategoriesLayout = new CardLayout();
+            JPanel cartesCategories = new JPanel(cartesCategoriesLayout);
+            cartesCategories.setBackground(BG_PRINCIPAL);
+
+            // Boutons de catégorie stylisés dark
+            JButton btnMorceaux = creerBoutonCategorie("Morceaux ("+ nbMorceaux  + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            JButton btnArtistes = creerBoutonCategorie("Artistes (" + nbArtistes  + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            JButton btnAlbums = creerBoutonCategorie("Albums (" + nbAlbums + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            JButton btnPlaylists= creerBoutonCategorie("Playlists (" + nbPlaylists + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
 
             JPanel barreCategories = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
             barreCategories.setOpaque(false);
-
-            CardLayout cartesCategoriesLayout = new CardLayout();
-            JPanel cartesCategories = new JPanel(cartesCategoriesLayout);
-            cartesCategories.setOpaque(false);
-
-            JButton btnMorceaux = creerBoutonCategorie("Morceaux (" + nbMorceaux + ")");
-            JButton btnArtistes = creerBoutonCategorie("Artistes (" + nbArtistes + ")");
-            JButton btnAlbums = creerBoutonCategorie("Albums (" + nbAlbums + ")");
-            JButton btnPlaylists = creerBoutonCategorie("Playlists (" + nbPlaylists + ")");
-
-            cartesCategories.add(creerVueCategorie(morceauxResultat,
-                morceau -> new LigneResultat<>(morceau, morceau.getNom(), formatterArtistes(morceau.getArtistes()), formatterDuree(morceau.getDuree()), true),
-                this::jouerObjet,
-                this::afficherDetailsObjet,
-                objet -> basculerMorceauAimeHandler.accept((Morceau) objet),
-                objet -> estMorceauAimeProvider.apply((Morceau) objet)), "morceaux");
-            cartesCategories.add(creerVueCategorie(artistesResultat,
-                artiste -> new LigneResultat<>(artiste, artiste.getNom(), artiste.getAlbums() == null ? "0 album" : artiste.getAlbums().size() + " album(s)", "", false),
-                this::jouerObjet,
-                this::afficherDetailsObjet,
-                objet -> {},
-                objet -> false), "artistes");
-            cartesCategories.add(creerVueCategorie(albumsResultat,
-                album -> {
-                    String nomArtiste = album.getArtiste() != null ? album.getArtiste().getNom() : "Inconnu";
-                    String detail = nomArtiste + (album.getAnnee() > 0 ? " - " + album.getAnnee() : "");
-                    return new LigneResultat<>(album, album.getNom(), detail, "", false);
-                },
-                this::jouerObjet,
-                this::afficherDetailsObjet,
-                objet -> {},
-                objet -> false), "albums");
-            cartesCategories.add(creerVueCategorie(playlistsResultat,
-                playlist -> new LigneResultat<>(playlist, playlist.getNom(), (playlist.getMorceaux() == null ? 0 : playlist.getMorceaux().size()) + " morceau(x) - " + playlist.getCreation(), "", true),
-                this::jouerObjet,
-                this::afficherDetailsObjet,
-                objet -> basculerPlaylistAimeeHandler.accept((Playlist) objet),
-                objet -> estPlaylistAimeeProvider.apply((Playlist) objet)), "playlists");
-
-            btnMorceaux.addActionListener(evt -> {
-                cartesCategoriesLayout.show(cartesCategories, "morceaux");
-                appliquerStyleCategorieActive(btnMorceaux, true);
-                appliquerStyleCategorieActive(btnArtistes, false);
-                appliquerStyleCategorieActive(btnAlbums, false);
-                appliquerStyleCategorieActive(btnPlaylists, false);
-            });
-            btnArtistes.addActionListener(evt -> {
-                cartesCategoriesLayout.show(cartesCategories, "artistes");
-                appliquerStyleCategorieActive(btnMorceaux, false);
-                appliquerStyleCategorieActive(btnArtistes, true);
-                appliquerStyleCategorieActive(btnAlbums, false);
-                appliquerStyleCategorieActive(btnPlaylists, false);
-            });
-            btnAlbums.addActionListener(evt -> {
-                cartesCategoriesLayout.show(cartesCategories, "albums");
-                appliquerStyleCategorieActive(btnMorceaux, false);
-                appliquerStyleCategorieActive(btnArtistes, false);
-                appliquerStyleCategorieActive(btnAlbums, true);
-                appliquerStyleCategorieActive(btnPlaylists, false);
-            });
-            btnPlaylists.addActionListener(evt -> {
-                cartesCategoriesLayout.show(cartesCategories, "playlists");
-                appliquerStyleCategorieActive(btnMorceaux, false);
-                appliquerStyleCategorieActive(btnArtistes, false);
-                appliquerStyleCategorieActive(btnAlbums, false);
-                appliquerStyleCategorieActive(btnPlaylists, true);
-            });
-
             barreCategories.add(btnMorceaux);
             barreCategories.add(btnArtistes);
             barreCategories.add(btnAlbums);
             barreCategories.add(btnPlaylists);
-            barreCategories.setBorder(new EmptyBorder(0, 0, 10, 0));
+            barreCategories.setBorder(new EmptyBorder(0, 0, 14, 0));
+            barreCategories.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             haut.add(barreCategories);
-            contenu.add(haut, BorderLayout.NORTH);
-            contenu.add(cartesCategories, BorderLayout.CENTER);
 
-            String categorieInitiale = "morceaux";
-            if (nbMorceaux == 0 && nbArtistes > 0) {
-                categorieInitiale = "artistes";
-            } else if (nbMorceaux == 0 && nbArtistes == 0 && nbAlbums > 0) {
-                categorieInitiale = "albums";
-            } else if (nbMorceaux == 0 && nbArtistes == 0 && nbAlbums == 0 && nbPlaylists > 0) {
-                categorieInitiale = "playlists";
+            // Vues par catégorie
+            cartesCategories.add(creerVueCategorie(morceauxResultat,
+                    morceau -> new LigneResultat<>(morceau, morceau.getNom(),
+                            formatterArtistes(morceau.getArtistes()), formatterDuree(morceau.getDuree()), true),
+                    this::jouerObjet, this::afficherDetailsObjet,
+                    objet -> basculerMorceauAimeHandler.accept((Morceau) objet),
+                    objet -> estMorceauAimeProvider.apply((Morceau) objet)), "morceaux");
+
+            cartesCategories.add(creerVueCategorie(artistesResultat,
+                    artiste -> new LigneResultat<>(artiste, artiste.getNom(),
+                            artiste.getAlbums() == null ? "0 album" : artiste.getAlbums().size() + " album(s)", "", false),
+                    this::jouerObjet, this::afficherDetailsObjet,
+                    objet -> {}, objet -> false), "artistes");
+
+            cartesCategories.add(creerVueCategorie(albumsResultat,
+                    album -> {
+                        String nomArtiste = album.getArtiste() != null ? album.getArtiste().getNom() : "Inconnu";
+                        String detail = nomArtiste + (album.getAnnee() > 0 ? " — " + album.getAnnee() : "");
+                        return new LigneResultat<>(album, album.getNom(), detail, "", false);
+                    },
+                    this::jouerObjet, this::afficherDetailsObjet,
+                    objet -> {}, objet -> false), "albums");
+
+            cartesCategories.add(creerVueCategorie(playlistsResultat,
+                    playlist -> new LigneResultat<>(playlist, playlist.getNom(),
+                            (playlist.getMorceaux() == null ? 0 : playlist.getMorceaux().size()) + " morceau(x) · " + playlist.getCreation(), "", true),
+                    this::jouerObjet, this::afficherDetailsObjet,
+                    objet -> basculerPlaylistAimeeHandler.accept((Playlist) objet),
+                    objet -> estPlaylistAimeeProvider.apply((Playlist) objet)), "playlists");
+
+            // listeners des onglets
+            JButton[] tousLesBtns = { btnMorceaux, btnArtistes, btnAlbums, btnPlaylists };
+            String[]  toutesCartes = { "morceaux",  "artistes",  "albums",  "playlists" };
+
+            for (int i = 0; i < tousLesBtns.length; i++) {
+                final int idx = i;
+                tousLesBtns[i].addActionListener(evt -> {
+                    cartesCategoriesLayout.show(cartesCategories, toutesCartes[idx]);
+                    for (int j = 0; j < tousLesBtns.length; j++) {
+                        appliquerStyleCategorieActive(tousLesBtns[j], j == idx, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+                    }
+                });
             }
 
-            cartesCategoriesLayout.show(cartesCategories, categorieInitiale);
-            appliquerStyleCategorieActive(btnMorceaux, "morceaux".equals(categorieInitiale));
-            appliquerStyleCategorieActive(btnArtistes, "artistes".equals(categorieInitiale));
-            appliquerStyleCategorieActive(btnAlbums, "albums".equals(categorieInitiale));
-            appliquerStyleCategorieActive(btnPlaylists, "playlists".equals(categorieInitiale));
+            // Catégorie initiale
+            int idxInitial = 0;
+            if (nbMorceaux == 0 && nbArtistes > 0) idxInitial = 1;
+            else if (nbMorceaux == 0 && nbArtistes == 0 && nbAlbums > 0) idxInitial = 2;
+            else if (nbMorceaux == 0 && nbArtistes == 0 && nbAlbums == 0 && nbPlaylists > 0) idxInitial = 3;
+
+            cartesCategoriesLayout.show(cartesCategories, toutesCartes[idxInitial]);
+            for (int j = 0; j < tousLesBtns.length; j++) {
+                appliquerStyleCategorieActive(tousLesBtns[j], j == idxInitial, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            }
+
+            // Assemblage
+            contenu.add(haut,BorderLayout.NORTH);
+            contenu.add(cartesCategories, BorderLayout.CENTER);
 
             fenetreVisite.setPanelCentral(contenu);
         });
+    }
+
+    // ── Bouton catégorie dark ────────────────────────────────────────────────────
+    private JButton creerBoutonCategorie(String texte, Color accent, Color bgCarte, Color textGris, Color border) {
+        JButton btn = new JButton(texte) {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                // Fond arrondi
+                boolean actif = Boolean.TRUE.equals(getClientProperty("actif"));
+                g2.setColor(actif ? accent : bgCarte);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                // Bordure subtile si inactif
+                if (!actif) {
+                    g2.setColor(border);
+                    g2.setStroke(new BasicStroke(1f));
+                    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
+                }
+                // Texte
+                g2.setFont(getFont());
+                g2.setColor(actif ? Color.WHITE : textGris);
+                java.awt.FontMetrics fm = g2.getFontMetrics();
+                int tx = (getWidth() - fm.stringWidth(getText())) / 2;
+                int ty = (getHeight() + fm.getAscent() - fm.getDescent()) / 2;
+                g2.drawString(getText(), tx, ty);
+                g2.dispose();
+            }
+        };
+        btn.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        btn.setPreferredSize(new Dimension(160, 32));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.putClientProperty("actif", false);
+
+        // Hover
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseEntered(java.awt.event.MouseEvent e) { btn.repaint(); }
+            @Override public void mouseExited(java.awt.event.MouseEvent e)  { btn.repaint(); }
+        });
+        return btn;
+    }
+
+    // ── Applique l'état actif/inactif sur un bouton catégorie ───────────────────
+    private void appliquerStyleCategorieActive(JButton btn, boolean actif,
+                                               Color accent, Color bgCarte, Color textGris, Color border) {
+        btn.putClientProperty("actif", actif);
+        btn.repaint();
     } //reuslata rehcerche
    
     public MorceauForm demanderMorceau(){return null;}; //admin ajouter
