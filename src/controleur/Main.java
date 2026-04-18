@@ -46,6 +46,21 @@ public class Main {
 
         if (morceaux.isEmpty()) {
             ScriptPeuplement.main(new String[0]);
+            abonnes.clear();
+            admins.clear();
+            morceaux.clear();
+            playlists.clear();
+            artistes.clear();
+            albums.clear();
+            avis.clear();
+
+            charger(abonnes, "abonnes.ser");
+            charger(admins, "admins.ser");
+            charger(morceaux, "morceaux.ser");
+            charger(playlists, "playlists.ser");
+            charger(artistes, "artistes.ser");
+            charger(albums, "albums.ser");
+            charger(avis, "avis.ser");
         }
 
         initialiser();
