@@ -365,9 +365,9 @@ public class Main {
             }
         } else if (actionChoisie instanceof ConsulterProfil) {
             consulter_profil(utilisateur, vue, catalogue);
-        } else if (actionChoisie instanceof ConsulterLibrairie) {
         } else if (actionChoisie instanceof Recherche) {
-            rechercher(vue, utilisateur, catalogue);
+            Recherche actionRecherche = (Recherche) actionChoisie;
+            rechercher(vue, utilisateur, catalogue, actionRecherche.getFiltreImpose());
         } else if (actionChoisie instanceof ChoisirFiltre) {
             ActionArguments actionArguments = new ActionArguments(vue, utilisateur, catalogue, filtreRechercheCourant);
             new ChoisirFiltre().executer(actionArguments);
@@ -383,8 +383,11 @@ public class Main {
         return;
     }
 
-    public static void rechercher(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
-        Filtre filtre = vue.afficherFiltres();
+    public static void rechercher(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, Filtre filtreImpose) {
+        Filtre filtre = filtreImpose;
+        if (filtre == null) {
+            filtre = vue.afficherFiltres();
+        }
         if (filtre == null) {
             filtre = filtreParDefaut();
         }

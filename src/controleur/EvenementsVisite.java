@@ -32,18 +32,159 @@ public class EvenementsVisite {
     public static void ajouterEvenements(FenetreVisite fenetre, VisiteListener listener, boolean filtreVisible) {
 
         // Barre latérale gauche section librairie listener
-        ajouterBoutonLateral(fenetre.getProfil(), fenetre, listener, CHOIX_PROFIL,true);
-        ajouterBoutonLateral(fenetre.getLibrairie() ,fenetre, listener, CHOIX_PLAYLISTS,true);
-        ajouterBoutonLateral(fenetre.getMenuArtistes(), fenetre, listener, CHOIX_ARTISTES,true);
-        ajouterBoutonLateral(fenetre.getMenuAlbums(),fenetre, listener, CHOIX_ALBUMS, true);
-        ajouterBoutonLateral(fenetre.getMenuMorceaux(),fenetre, listener, CHOIX_MORCEAUX,true);
+        JLabel profil = fenetre.getProfil();
+        if (profil != null) {
+            profil.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) {
+                    fenetre.afficherErreur(new ActionException("À venir"));
+                    listener.onChoix(CHOIX_PROFIL);
+                }
+                @Override public void mouseEntered(MouseEvent e) {
+                    profil.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    profil.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    profil.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        JLabel librairie = fenetre.getLibrairie();
+        if (librairie != null) {
+            librairie.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) {
+                    listener.onChoix(CHOIX_PLAYLISTS);
+                }
+                @Override public void mouseEntered(MouseEvent e) {
+                    librairie.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    librairie.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    librairie.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        JLabel menuArtistes = fenetre.getMenuArtistes();
+        if (menuArtistes != null) {
+            menuArtistes.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) {
+                    listener.onChoix(CHOIX_ARTISTES);
+                }
+                @Override public void mouseEntered(MouseEvent e) {
+                    menuArtistes.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    menuArtistes.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    menuArtistes.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        JLabel menuAlbums = fenetre.getMenuAlbums();
+        if (menuAlbums != null) {
+            menuAlbums.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) {
+                    listener.onChoix(CHOIX_ALBUMS);
+                }
+                @Override public void mouseEntered(MouseEvent e) {
+                    menuAlbums.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    menuAlbums.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    menuAlbums.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        JLabel menuMorceaux = fenetre.getMenuMorceaux();
+        if (menuMorceaux != null) {
+            menuMorceaux.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) {
+                    listener.onChoix(CHOIX_MORCEAUX);
+                }
+                @Override public void mouseEntered(MouseEvent e) {
+                    menuMorceaux.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    menuMorceaux.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    menuMorceaux.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
 
         // arre latérale gauche section decouverte listener
-        ajouterBoutonLateral(fenetre.getParcourir() ,fenetre, listener, CHOIX_PARCOURIR,false);
-        ajouterBoutonLateral(fenetre.getPourVous(),fenetre, listener, CHOIX_POUR_VOUS,false);
-        ajouterBoutonLateral(fenetre.getPopulaire(),fenetre, listener, CHOIX_POPULAIRE,false);
-        ajouterBoutonLateral(fenetre.getRadio(), fenetre, listener, CHOIX_RADIO, false);
-        ajouterBoutonLateral(fenetre.getPodcasts(),fenetre, listener, CHOIX_PODCASTS,false);
+        JLabel parcourir = fenetre.getParcourir();
+        if (parcourir != null) {
+            parcourir.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_PARCOURIR); }
+                @Override public void mouseEntered(MouseEvent e) {
+                    parcourir.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    parcourir.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    parcourir.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        JLabel pourVous = fenetre.getPourVous();
+        if (pourVous != null) {
+            pourVous.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_POUR_VOUS); }
+                @Override public void mouseEntered(MouseEvent e) {
+                    pourVous.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    pourVous.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    pourVous.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        JLabel populaire = fenetre.getPopulaire();
+        if (populaire != null) {
+            populaire.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_POPULAIRE); }
+                @Override public void mouseEntered(MouseEvent e) {
+                    populaire.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    populaire.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    populaire.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        // la radio pffff
+        JLabel radio = fenetre.getRadio();
+        if (radio != null) {
+            radio.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_RADIO); }
+                @Override public void mouseEntered(MouseEvent e) {
+                    radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    radio.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    radio.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+
+        // podscats
+        JLabel podcasts = fenetre.getPodcasts();
+        if (podcasts != null) {
+            podcasts.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_PODCASTS); }
+                @Override public void mouseEntered(MouseEvent e) {
+                    podcasts.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    podcasts.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    podcasts.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
 
         //retour
         fenetre.getBtnRetour().addMouseListener(new MouseAdapter() {
@@ -94,25 +235,6 @@ public class EvenementsVisite {
         });
 
         if (filtreVisible) {passageSouris(fenetre.getPanelFiltre(), fenetre, "filtre");}
-    }
-
-
-    //Ajoute un listener hover + click sur un bouton de la barre latérale et avenir est true, un ActionException "À venir" est affiché au clic.
-    private static void ajouterBoutonLateral(JLabel label, FenetreVisite fenetre, VisiteListener listener, int choix, boolean avenir) {
-        if (label == null) return;
-        label.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                if (avenir) fenetre.afficherErreur(new ActionException("À venir"));
-                listener.onChoix(choix);
-            }
-            @Override public void mouseEntered(MouseEvent e) {
-                label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                label.setForeground(new Color(220, 220, 220)); // éclairci au survol
-            }
-            @Override public void mouseExited(MouseEvent e) {
-                label.setForeground(new Color(160, 160, 160)); // retour couleur normale
-            }
-        });
     }
 
     //surbriller pour + de style et plus lisible

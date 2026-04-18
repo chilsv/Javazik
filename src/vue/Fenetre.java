@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import controleur.EvenementsConnexion;
 import controleur.EvenementsInscription;
@@ -19,7 +18,6 @@ import controleur.EvenementsVisite;
 import controleur.actions.Action;
 import controleur.actions.ActionArguments;
 import controleur.actions.ChoisirFiltre;
-import controleur.actions.ConsulterLibrairie;
 import controleur.actions.ConsulterProfil;
 import controleur.actions.Deconnexion;
 import controleur.actions.MettreAvis;
@@ -54,6 +52,21 @@ public class Fenetre implements InterfaceVue {
     // notification pour faire les erreurs "résevré aux abonnés"
     private JWindow notif;
     private Timer tempsNotif;
+
+    // cstes pour les listeners (définies dans EvenementsVisite)
+    public static final int CHOIX_PROFIL = 1;
+    public static final int CHOIX_PLAYLISTS = 2;
+    public static final int CHOIX_RETOUR = 3;
+    public static final int CHOIX_FILTRE = 4;
+    public static final int CHOIX_LOUPE = 5;
+    public static final int CHOIX_ARTISTES = 6;
+    public static final int CHOIX_ALBUMS = 7;
+    public static final int CHOIX_MORCEAUX = 8;
+    public static final int CHOIX_PARCOURIR = 9;
+    public static final int CHOIX_POUR_VOUS = 10;
+    public static final int CHOIX_POPULAIRE= 11;
+    public static final int CHOIX_RADIO = 12;
+    public static final int CHOIX_PODCASTS = 13;
 
     public Fenetre() {
         frame = new JFrame("Javazic"); //Creation
@@ -204,18 +217,23 @@ public class Fenetre implements InterfaceVue {
             boolean filtreVisible = !(utilisateur instanceof Visiteur); // ça dépend de si c'est un visiteur ou pas
             EvenementsVisite.ajouterEvenements(fenetreVisite, choix -> {
                 synchronized (verrou) {
-                    if (choix == 1) {
+                    if (choix == CHOIX_PROFIL) {
                         fenetreVisite.viderPanelCentral();
                         resultat[0] = new ConsulterProfil();
-                    } else if (choix == 2) {
-                        fenetreVisite.viderPanelCentral();
-                        resultat[0] = new ConsulterLibrairie();
-                    } else if (choix == 3) {
+                    } else if (choix == CHOIX_PLAYLISTS) {
+                        resultat[0] = new Recherche(new Filtre(false, false, false, true, false, new int[] {0, 0}));
+                    } else if (choix == CHOIX_ARTISTES) {
+                        resultat[0] = new Recherche(new Filtre(false, true, false, false, false, new int[] {0, 0}));
+                    } else if (choix == CHOIX_ALBUMS) {
+                        resultat[0] = new Recherche(new Filtre(false, false, true, false, false, new int[] {0, 0}));
+                    } else if (choix == CHOIX_MORCEAUX) {
+                        resultat[0] = new Recherche(new Filtre(true, false, false, false, false, new int[] {0, 0}));
+                    } else if (choix == CHOIX_RETOUR) {
                         fenetreVisite.viderPanelCentral();
                         resultat[0] = new Deconnexion();
-                    } else if (choix == 4) {
+                    } else if (choix == CHOIX_FILTRE) {
                         resultat[0] = new ChoisirFiltre();
-                    } else if (choix == 5) {
+                    } else if (choix == CHOIX_LOUPE) {
                         resultat[0] = new Recherche();
                     } else {
                         resultat[0] = null;
@@ -458,7 +476,7 @@ public class Fenetre implements InterfaceVue {
     }
 
     /* crée visuellement la ligne avec les boutons et infos */
-    private <T extends TypeObjets> JPanel creerLigne(LigneResultat<T> ligne, Runnable actionPlay, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, Supplier<Boolean> aimeActuel) {
+    private <T extends TypeObjets> JPanel creerLigne(LigneResultat<T> ligne, Runnable actionPlay, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, boolean aimeActuel) {
         JPanel lignePanel = new JPanel(new BorderLayout(12, 0)) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -516,17 +534,15 @@ public class Fenetre implements InterfaceVue {
         actions.setAlignmentY(Component.CENTER_ALIGNMENT);
         if (afficherAimer) {
             final JLabel[] aimerLabelRef = new JLabel[1];
-            boolean aimeInitial = aimeActuel != null && Boolean.TRUE.equals(aimeActuel.get());
             String chemin;
-            if (aimeInitial) {
+            if (aimeActuel) {
                 chemin = "assets/aime_true.png";
             } else {
                 chemin = "assets/aime_false.png";
             }
             aimerLabelRef[0] = creerLabelImage(chemin, "aimer", () -> {
                 actionAimer.run();
-                boolean aimeMaj = aimeActuel != null && Boolean.TRUE.equals(aimeActuel.get());
-                mettreIconeAimer(aimerLabelRef[0], aimeMaj);
+                mettreIconeAimer(aimerLabelRef[0], aimeActuel);
             }, 22, 22);
             actions.add(aimerLabelRef[0]);
         }
@@ -556,7 +572,11 @@ public class Fenetre implements InterfaceVue {
         } else {
             for (T objet : objets) {
                 LigneResultat<T> ligne = mapper.apply(objet);
-                Supplier<Boolean> aimeActuel = () -> aimeProvider != null && Boolean.TRUE.equals(aimeProvider.apply(objet));
+                boolean aimeActuel = false;
+                if (aimeProvider != null) {
+                    Boolean aime = aimeProvider.apply(objet);
+                    aimeActuel = Boolean.TRUE.equals(aime);
+                }
                 liste.add(creerLigne(ligne, () -> actionPlay.accept(objet), () -> actionDetails.accept(objet), () -> actionAimer.accept(objet), ligne.peutAimer, aimeActuel));
                 liste.add(Box.createVerticalStrut(4));
             }
@@ -792,7 +812,7 @@ public class Fenetre implements InterfaceVue {
         boutonCommenter.setFocusPainted(false);
         boutonCommenter.setCursor(new Cursor(Cursor.HAND_CURSOR));
         boutonCommenter.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
-        boutonCommenter.addActionListener(evt -> ouvrirDialogueAvis(morceau));
+        boutonCommenter.addActionListener(evt -> commenter(morceau));
 
         enTeteAvis.add(titreAvis, BorderLayout.WEST);
         enTeteAvis.add(boutonCommenter, BorderLayout.EAST);
@@ -864,7 +884,7 @@ public class Fenetre implements InterfaceVue {
         return section;
     }
 
-    private void ouvrirDialogueAvis(Morceau morceau) {
+    private void commenter(Morceau morceau) {
         if (morceau == null) {
             return;
         }

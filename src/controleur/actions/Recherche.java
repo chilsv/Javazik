@@ -4,6 +4,20 @@ import metier.Filtre;
 import metier.ResultatRecherche;
 
 public class Recherche implements Action {
+    private final Filtre filtreImpose;
+
+    public Recherche() {
+        this.filtreImpose = null;
+    }
+
+    public Recherche(Filtre filtreImpose) {
+        this.filtreImpose = filtreImpose;
+    }
+
+    public Filtre getFiltreImpose() {
+        return filtreImpose;
+    }
+
     /**
      * @param arguments vue, utilisateur, catalogue, rechercheForm
      */
