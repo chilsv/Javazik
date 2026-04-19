@@ -1363,6 +1363,7 @@ public class Fenetre implements InterfaceVue {
         return contenu;
     }
 
+
     // faire la section avis
     private JComponent sectionAvis(Morceau morceau) {
         JPanel section = new JPanel(new BorderLayout());
