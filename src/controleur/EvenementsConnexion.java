@@ -14,6 +14,68 @@ public class EvenementsConnexion {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public static void ajouterEvenements(FenetreConnexion fenetre, ConnexionListener listener) {
         JButton btnValider = fenetre.getBtnValider();
         JLabel btnRetour = fenetre.getBtnRetourLabel();
