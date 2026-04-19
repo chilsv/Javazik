@@ -38,6 +38,7 @@ public class Fenetre implements InterfaceVue {
     private Timer timerLecture;
     private JProgressBar barreProgression;
     private JLabel labelTempsLecture;
+    private boolean dejaAjouteHistorique = false; // pour éviter d'ajouter plusieurs fois le même morceau à l'historique
 
     // couleur meme que les autres jpanel
     final Color BG_PRINCIPAL = new Color(26, 26, 26);
@@ -304,6 +305,7 @@ public class Fenetre implements InterfaceVue {
         if (morceauLecture != morceau) {
             progressionSecondes = 0;
             morceauLecture = morceau;
+            dejaAjouteHistorique = false; // on remet à false
         }
 
         // rafraichitr la barre
@@ -483,7 +485,7 @@ public class Fenetre implements InterfaceVue {
     }
 
     private void ajouterHistorique() {
-        if (morceauLecture == null || utilisateur == null) {
+        if (morceauLecture == null || utilisateur == null || dejaAjouteHistorique) {
             return;
         }
         if (progressionSecondes < 10) {
@@ -491,6 +493,8 @@ public class Fenetre implements InterfaceVue {
         }
 
         utilisateur.ajouterHistorique(morceauLecture);
+        dejaAjouteHistorique = true;
+        System.out.println(morceauLecture.getNom() + " ajouté à l'historique");
     }
 
     private JButton boutonSuivant(Morceau morceauCourant) {
@@ -887,13 +891,6 @@ public class Fenetre implements InterfaceVue {
     }
 
     private void jouer(TypeObjets objet) {
-
-        System.out.println("Historique");
-        for (Map.Entry<Morceau, java.time.LocalDateTime> entree : utilisateur.getHistorique().entrySet()) {
-            Morceau historiqueMorceau = entree.getKey();
-            System.out.println(historiqueMorceau.getNom() + " - " + entree.getValue());
-        }
-        
         if (utilisateur instanceof Visiteur && utilisateur.getHistorique().size() >= 5) {
             fenetreVisite.afficherErreur(new ActionException("Abonnez-vous pour écouter plus"));
             return;
