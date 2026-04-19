@@ -497,11 +497,7 @@ public class Fenetre implements InterfaceVue {
                     return;
                 }
 
-                Morceau suivant = Main.retirerFileAttente();
-                if (suivant != null) {
-                    lectureEnPause = false;
-                    afficherLecture(suivant);
-                } else {
+                if (!lireSuivantDepuisFileAttente(false)) {
                     lectureEnPause = true;
                     arreterTimerLecture();
                 }
@@ -549,20 +545,30 @@ public class Fenetre implements InterfaceVue {
         System.out.println(morceauLecture.getNom() + " ajouté à l'historique");
     }
 
-    private JButton boutonSuivant(Morceau morceauCourant) {
+    private JButton boutonSuivant(Morceau morceau) {
         JButton bouton = creerBouton("assets/suivant.png", "Lire le morceau suivant", ">>");
         bouton.setPreferredSize(new Dimension(20, 20));
         bouton.addActionListener(evt -> {
-            Morceau suivant = Main.retirerFileAttente();
-            if (suivant != null) {
-                lectureEnPause = false;
-                afficherLecture(suivant);
-            } else {
+            if (!lireSuivantDepuisFileAttente(true)) {
                 afficherMessage("La file d'attente est vide.");
-                afficherLecture(morceauCourant);
+                afficherLecture(morceau);
             }
         });
         return bouton;
+    }
+
+    private boolean lireSuivantDepuisFileAttente(boolean afficherMessageSiVide) {
+        Morceau suivant = Main.retirerFileAttente();
+        if (suivant == null) {
+            if (afficherMessageSiVide) {
+                afficherMessage("La file d'attente est vide.");
+            }
+            return false;
+        }
+
+        lectureEnPause = false;
+        afficherLecture(suivant);
+        return true;
     }
 
     private JButton creerBouton(String chemin, String texte, String texteSecours) {
@@ -1563,21 +1569,25 @@ public class Fenetre implements InterfaceVue {
         contenu.setBackground(BG_PRINCIPAL);
         contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
 
+        // ── Carte principale scindée en deux ──────────────────────────────────────
         JPanel carte = new JPanel(new BorderLayout(20, 0));
         carte.setBackground(BG_CARTE);
         carte.setBorder(new EmptyBorder(18, 18, 18, 18));
 
+        // ── Partie gauche : image + infos ─────────────────────────────────────────
         JLabel image = new JLabel();
         image.setPreferredSize(new Dimension(180, 180));
         image.setHorizontalAlignment(SwingConstants.CENTER);
         image.setVerticalAlignment(SwingConstants.CENTER);
         image.setForeground(TEXT_GRIS);
 
-        ImageIcon icon = new ImageIcon(morceau.getImage());
-        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
-            Image imageRedimensionnee = icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
-            image.setIcon(new ImageIcon(imageRedimensionnee));
-            image.setText(null);
+        if (morceau.getImage() != null) {
+            ImageIcon icon = new ImageIcon(morceau.getImage());
+            if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+                image.setIcon(new ImageIcon(icon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH)));
+            } else {
+                image.setText("Aucune image");
+            }
         } else {
             image.setText("Aucune image");
         }
@@ -1603,35 +1613,29 @@ public class Fenetre implements InterfaceVue {
         duree.setBorder(new EmptyBorder(6, 0, 0, 0));
         duree.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        String anneeAffichee;
-        if (morceau.getAnnee() > 0) {
-            anneeAffichee = Integer.toString(morceau.getAnnee());
-        } else {
-            anneeAffichee = "Inconnue";
-        }
+        String anneeAffichee = morceau.getAnnee() > 0 ? Integer.toString(morceau.getAnnee()) : "Inconnue";
         JLabel annee = new JLabel("Année : " + anneeAffichee);
         annee.setFont(new Font("SansSerif", Font.PLAIN, 14));
         annee.setForeground(TEXT_GRIS);
         annee.setBorder(new EmptyBorder(6, 0, 0, 0));
         annee.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel jouer = new JLabel(new ImageIcon("assets/play.png"));
+        JLabel jouer = new JLabel();
         ImageIcon playIcon = new ImageIcon("assets/play.png");
-        Image jouerRedimensionnee = playIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-        jouer.setIcon(new ImageIcon(jouerRedimensionnee));
-        jouer.setFont(new Font("SansSerif", Font.BOLD, 13));
+        if (playIcon.getIconWidth() > 0) {
+            jouer.setIcon(new ImageIcon(playIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+        } else {
+            jouer.setText("▶");
+            jouer.setFont(new Font("SansSerif", Font.BOLD, 22));
+        }
         jouer.setForeground(Color.WHITE);
-        jouer.setBackground(ACCENT);
         jouer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jouer.setToolTipText("Lire ce morceau");
-        jouer.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                jouer(morceau);
-            }
-        });
-        jouer.setBorder(BorderFactory.createEmptyBorder(8, 5, 8, 14));
+        jouer.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 14));
         jouer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        jouer.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseClicked(java.awt.event.MouseEvent e) { jouer(morceau); }
+        });
 
         infos.add(nom);
         infos.add(artistes);
@@ -1640,8 +1644,92 @@ public class Fenetre implements InterfaceVue {
         infos.add(Box.createVerticalStrut(10));
         infos.add(jouer);
 
-        carte.add(image, BorderLayout.WEST);
-        carte.add(infos, BorderLayout.CENTER);
+        JPanel gauche = new JPanel(new BorderLayout(16, 0));
+        gauche.setOpaque(false);
+        gauche.add(image, BorderLayout.WEST);
+        gauche.add(infos, BorderLayout.CENTER);
+
+        // ── Partie droite : ajouter à une playlist ────────────────────────────────
+        JPanel panelPlaylists = new JPanel();
+        panelPlaylists.setLayout(new BoxLayout(panelPlaylists, BoxLayout.Y_AXIS));
+        panelPlaylists.setBackground(new Color(40, 40, 40));
+        panelPlaylists.setBorder(new EmptyBorder(10, 14, 10, 14));
+        panelPlaylists.setPreferredSize(new Dimension(220, 0));
+
+        JLabel titreAjout = new JLabel("Ajouter à une playlist");
+        titreAjout.setFont(new Font("SansSerif", Font.BOLD, 13));
+        titreAjout.setForeground(TEXT_BLANC);
+        titreAjout.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titreAjout.setBorder(new EmptyBorder(0, 0, 10, 0));
+        panelPlaylists.add(titreAjout);
+
+        if (!(utilisateur instanceof Abonne)) {
+            JLabel msg = new JLabel("Réservé aux abonnés");
+            msg.setForeground(TEXT_GRIS);
+            msg.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            msg.setAlignmentX(Component.LEFT_ALIGNMENT);
+            panelPlaylists.add(msg);
+        } else {
+            Abonne abonne = (Abonne) utilisateur;
+            ArrayList<Integer> numPlaylists = abonne.getPlaylists();
+
+            if (numPlaylists == null || numPlaylists.isEmpty()) {
+                JLabel vide = new JLabel("Aucune playlist disponible");
+                vide.setForeground(TEXT_GRIS);
+                vide.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                vide.setAlignmentX(Component.LEFT_ALIGNMENT);
+                panelPlaylists.add(vide);
+            } else {
+                for (int numPl : numPlaylists) {
+                    Playlist pl = catalogue.getPlaylist(numPl);
+                    if (pl == null) continue;
+
+                    JPanel lignePl = new JPanel(new BorderLayout(8, 0));
+                    lignePl.setOpaque(false);
+                    lignePl.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+                    lignePl.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    lignePl.setBorder(new EmptyBorder(3, 0, 3, 0));
+
+                    JLabel nomPl = new JLabel(pl.getNom());
+                    nomPl.setForeground(TEXT_BLANC);
+                    nomPl.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+                    JButton btnAjouter = new JButton("+");
+                    btnAjouter.setFont(new Font("SansSerif", Font.BOLD, 13));
+                    btnAjouter.setForeground(TEXT_BLANC);
+                    btnAjouter.setBackground(ACCENT);
+                    btnAjouter.setFocusPainted(false);
+                    btnAjouter.setBorder(BorderFactory.createEmptyBorder(2, 8, 2, 8));
+                    btnAjouter.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    btnAjouter.addActionListener(evt -> {
+                        if (pl.morceauDedans(morceau)) {
+                            afficherErreur(new ActionException("Morceau déjà dans cette playlist"));
+                            return;
+                        }
+                        catalogue.ajouterMorceauPlaylist(morceau, pl.getNum());
+                        btnAjouter.setText("✓");
+                        btnAjouter.setBackground(new Color(40, 160, 80));
+                        btnAjouter.setEnabled(false);
+                    });
+
+                    // si déjà dans la playlist, bouton grisé
+                    if (pl.morceauDedans(morceau)) {
+                        btnAjouter.setText("✓");
+                        btnAjouter.setBackground(new Color(40, 160, 80));
+                        btnAjouter.setEnabled(false);
+                    }
+
+                    lignePl.add(nomPl, BorderLayout.CENTER);
+                    lignePl.add(btnAjouter, BorderLayout.EAST);
+                    panelPlaylists.add(lignePl);
+                }
+            }
+        }
+
+        panelPlaylists.add(Box.createVerticalGlue());
+
+        carte.add(gauche, BorderLayout.CENTER);
+        carte.add(panelPlaylists, BorderLayout.EAST);
 
         contenu.add(carte, BorderLayout.CENTER);
         contenu.add(sectionAvis(morceau), BorderLayout.SOUTH);
