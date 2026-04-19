@@ -692,8 +692,13 @@ public class Fenetre implements InterfaceVue {
             return;
         }
         Abonne abonne = (Abonne) utilisateur;
+
+        Playlist playlistAimes = catalogue.getPlaylist(abonne.getAimes());
+        if (playlistAimes == null) {
+            afficherErreur(new ActionException("Playlist introuvable"));
+            return;
+        }
         if (!abonne.morceauDejaAime(morceau, catalogue)) {
-            
             catalogue.ajouterMorceauPlaylist(morceau, abonne.getAimes());
         } else {
             abonne.retirerMorceauPlaylist(morceau, catalogue, abonne.getAimes());

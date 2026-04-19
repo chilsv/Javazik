@@ -14,7 +14,7 @@ public class AjouterPlaylist implements Action {
         if (!arguments.catalogue.playlistExiste(playlist.getNum())) {
             if (arguments.utilisateur instanceof Abonne) {
                 Abonne abonne = (Abonne) arguments.utilisateur;
-                if (playlist.getNom().equals("Morceaux aimés")) {
+                if (playlist.getNom().equals("Morceaux aimés de " + abonne.getNom())) {
                     abonne.setPlaylistDefaut(playlist.getNum());
                 }
                 abonne.ajouterPlaylist(playlist.getNum());

@@ -107,11 +107,11 @@ public class ImportMusiques {
                 decalage += 10 + frameSize;
             }
 
-            System.out.println("Titre : " + titre);
-            System.out.println("Artistes : " + artistes);
-            System.out.println("Album : " + album);
-            System.out.println("Année : " + annee);
-            System.out.println("Image MIME : " + imageMime);
+            //System.out.println("Titre : " + titre);
+            //System.out.println("Artistes : " + artistes);
+            //System.out.println("Album : " + album);
+            //System.out.println("Année : " + annee);
+            //System.out.println("Image MIME : " + imageMime);
 
             String imagePath = null;
             if (imageBytes != null && imageBytes.length > 0) {
