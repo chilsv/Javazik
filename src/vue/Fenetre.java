@@ -241,7 +241,7 @@ public class Fenetre implements InterfaceVue {
                         else {
                             fenetreVisite.viderPanelCentral();
                             if (utilisateur instanceof Abonne) {
-                                naviguerVers(afficherProfilAbonne((Abonne) utilisateur));// on ne notifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
+                                naviguerVers(afficherProfilAbonne((Abonne) utilisateur));// on ne anotifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
                             }
                             return;
                         }
