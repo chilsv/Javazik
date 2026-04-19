@@ -21,6 +21,16 @@ public abstract class Artiste implements TypeObjets {
         return nom;
     }
 
+
+
+
+
+
+
+
+
+
+
     /**
      * Ajoute un morceau à l'artiste
      */
