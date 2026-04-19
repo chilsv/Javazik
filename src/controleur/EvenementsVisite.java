@@ -117,7 +117,7 @@ public class EvenementsVisite {
         if (parcourir != null) {
             parcourir.addMouseListener(new MouseAdapter() {
                 @Override public void mouseClicked(MouseEvent e) {
-                    fenetre.afficherErreur(new ActionException("À venir"));
+                    //fenetre.afficherErreur(new ActionException("À venir"));
                     listener.onChoix(CHOIX_PARCOURIR);
                 }
                 @Override public void mouseEntered(MouseEvent e) {
@@ -134,7 +134,7 @@ public class EvenementsVisite {
         if (pourVous != null) {
             pourVous.addMouseListener(new MouseAdapter() {
                 @Override public void mouseClicked(MouseEvent e) {
-                    fenetre.afficherErreur(new ActionException("À venir"));
+                    //fenetre.afficherErreur(new ActionException("À venir"));
                     listener.onChoix(CHOIX_POUR_VOUS); }
                 @Override public void mouseEntered(MouseEvent e) {
                     pourVous.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -150,7 +150,7 @@ public class EvenementsVisite {
         if (populaire != null) {
             populaire.addMouseListener(new MouseAdapter() {
                 @Override public void mouseClicked(MouseEvent e) {
-                    fenetre.afficherErreur(new ActionException("À venir"));
+                    //fenetre.afficherErreur(new ActionException("À venir"));
                     listener.onChoix(CHOIX_POPULAIRE);
                 }
                 @Override public void mouseEntered(MouseEvent e) {
