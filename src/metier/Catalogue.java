@@ -94,6 +94,21 @@ public class Catalogue {
         // ajouter la playlist chez son createur
     }
 
+    public void retirerMorceau(Morceau morceau) {
+        morceaux.remove(morceau);
+    }
+
+    public void retirerPlaylist(int numPlaylist) {
+        Playlist playlist = getPlaylist(numPlaylist);
+        if (playlist != null) {
+            playlists.remove(playlist);
+        }
+    }
+
+    public void retirerArtiste(Artiste artiste) {
+        artistes.remove(artiste);
+    }
+
     public void ajouterArtiste(Artiste artiste) {
         artistes.add(artiste);
     }

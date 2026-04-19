@@ -4,7 +4,7 @@ import metier.Abonne;
 
 public class SupprimerUtilisateur implements Action {
     /*
-    * @param arguments : mail, catalogue
+    * @param arguments : mail
     */
     @Override
     public void executer(ActionArguments arguments) {

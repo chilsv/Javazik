@@ -33,6 +33,7 @@ public class ActionArguments {
     public int note;
     public ArrayList<Avis> avis;
     public String mail;
+    public int numPlaylist;
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         this.vue = vue;
@@ -40,9 +41,13 @@ public class ActionArguments {
         this.catalogue = catalogue;
     }
 
-    public ActionArguments(String mail, Catalogue catalogue) {
+    public ActionArguments(String mail) {
         this.mail = mail;
+    }
+
+    public ActionArguments(Catalogue catalogue, int numPlaylist) {
         this.catalogue = catalogue;
+        this.numPlaylist = numPlaylist;
     }
 
     public ActionArguments(InscriptionForm formulaire, Catalogue catalogue, ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Personne utilisateur) {
