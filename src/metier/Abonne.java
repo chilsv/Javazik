@@ -60,7 +60,14 @@ public class Abonne extends Personne {
         if (numPlaylist == playlistDefaut) {
             return false; // on retire pas la playlist par défaut
         }
-        catalogue.getPlaylist(numPlaylist).enleverMorceau(morceau);
+        if (catalogue == null || morceau == null) {
+            return false;
+        }
+        Playlist playlist = catalogue.getPlaylist(numPlaylist);
+        if (playlist == null) {
+            return false;
+        }
+        playlist.enleverMorceau(morceau);
         return true;
     }
 
@@ -71,7 +78,14 @@ public class Abonne extends Personne {
     }
 
     public boolean morceauDejaAime(Morceau morceau, Catalogue catalogue) {
-        return catalogue.getPlaylist(playlistDefaut).morceauDedans(morceau);
+        if (catalogue == null || morceau == null) {
+            return false;
+        }
+        Playlist playlistAimes = catalogue.getPlaylist(playlistDefaut);
+        if (playlistAimes == null) {
+            return false;
+        }
+        return playlistAimes.morceauDedans(morceau);
     }
 
     public boolean playlistDejaSauvegardee(int numPlaylist) {
