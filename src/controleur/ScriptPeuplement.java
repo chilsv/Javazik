@@ -318,10 +318,36 @@ public class ScriptPeuplement {
     }
 
     private static void aimerSiNecessaire(Abonne abonne, Catalogue catalogue, Morceau morceau) {
-        if (morceau == null || abonne.morceauDejaAime(morceau, catalogue)) {
+        if (morceau == null || !assurerPlaylistAimes(abonne, catalogue)) {
+            return;
+        }
+        if (abonne.morceauDejaAime(morceau, catalogue)) {
             return;
         }
         new Aimer().executer(new ActionArguments(null, abonne, catalogue, morceau));
+    }
+
+    private static boolean assurerPlaylistAimes(Abonne abonne, Catalogue catalogue) {
+        if (abonne == null || catalogue == null) {
+            return false;
+        }
+        if (catalogue.getPlaylist(abonne.getAimes()) != null) {
+            return true;
+        }
+
+        try {
+            new AjouterPlaylist().executer(
+                new ActionArguments(
+                    abonne,
+                    catalogue,
+                    new PlaylistForm("Morceaux aimés de " + abonne.getNom(), 0)
+                )
+            );
+        } catch (PlaylistDejaExistanteException ignored) {
+            // idempotent: si deja existante, on continuera avec la playlist retrouvee.
+        }
+
+        return catalogue.getPlaylist(abonne.getAimes()) != null;
     }
 
     private static void simulerEcoute(Abonne abonne, Morceau... morceaux) {

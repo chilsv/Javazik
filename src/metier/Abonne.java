@@ -17,7 +17,7 @@ public class Abonne extends Personne {
     public Abonne(String nom, String mail, String mdp, int num, Catalogue catalogue) {
         super(nom, mail, mdp, num);
         // on ajoute à tous une playlist par défaut, générée par l'"utilisateur 0", l'Admin par défaut
-        PlaylistForm playlistForm = new PlaylistForm("Morceaux aimés", 0);
+        PlaylistForm playlistForm = new PlaylistForm("Morceaux aimés de " + nom, 0);
         try {
             new AjouterPlaylist().executer(new ActionArguments(this, catalogue, playlistForm));
         } catch (PlaylistDejaExistanteException e) {

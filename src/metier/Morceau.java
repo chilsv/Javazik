@@ -10,6 +10,7 @@ public class Morceau implements TypeObjets {
     private int annee;
     private ArrayList<String> genres;
     private String image;
+    private String chemin;
     private float noteMoy;
     private int nbEcoutes = 0;
     private ArrayList<Avis> avis = new ArrayList<Avis>();
@@ -38,6 +39,15 @@ public class Morceau implements TypeObjets {
         this.artistes = new ArrayList<>();
         this.artistes.addAll(artistes);
         this.duree = duree;
+    }
+
+    public Morceau(String titre, Artiste artiste, int duree, String chemin, String image) {
+        this.Titre = titre;
+        this.artistes = new ArrayList<>();
+        this.artistes.add(artiste);
+        this.duree = duree;
+        this.chemin = chemin;
+        this.image = image;
     }
 
     public int getNum() {

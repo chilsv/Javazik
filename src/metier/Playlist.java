@@ -13,7 +13,7 @@ public class Playlist implements TypeObjets {
 
     public Playlist(String nom, ArrayList<Morceau> morceaux, Catalogue catalogue) {
         this.nom = nom;
-        this.morceaux = morceaux;
+        this.morceaux = morceaux == null ? new ArrayList<Morceau>() : morceaux;
         this.num = catalogue.getPlaylists().size() + 1;
         this.dateCreation = LocalDate.now();
     }
@@ -27,7 +27,7 @@ public class Playlist implements TypeObjets {
 
     public Playlist(String nom, ArrayList<Morceau> morceaux, Catalogue catalogue, int numUtilisateur) {
         this.nom = nom;
-        this.morceaux = morceaux;
+        this.morceaux = morceaux == null ? new ArrayList<Morceau>() : morceaux;
         this.numUtilisateur = numUtilisateur;
         this.num = catalogue.getPlaylists().size() + 1;
         this.dateCreation = LocalDate.now();
@@ -51,6 +51,9 @@ public class Playlist implements TypeObjets {
 
     public int getAnnee() {
         // On ne peut dire qu'une playlist a une année, du coup on renvoie celle du morceau n°1
+        if (morceaux == null || morceaux.isEmpty()) {
+            return 0;
+        }
         return morceaux.get(0).getAnnee();
     }
 
