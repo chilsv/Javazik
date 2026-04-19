@@ -675,45 +675,19 @@ public class Fenetre implements InterfaceVue {
             }
         });
     }
-/*
-    public JComponent afficherAlbum(Album album) {
-        JPanel panel = new JPanel();
-        panel.setBackground(BG_PRINCIPAL);
-        JLabel label = new JLabel(album.getNom());
-        label.setForeground(TEXT_BLANC);
-        panel.add(label);
-        return panel;
-    }
 
-    public JComponent afficherPlaylist(Playlist playlist) {
-        JPanel panel = new JPanel();
-        panel.setBackground(BG_PRINCIPAL);
-        JLabel label = new JLabel(playlist.getNom());
-        label.setForeground(TEXT_BLANC);
-        panel.add(label);
-        return panel;
-    }
-
-    public JComponent afficherArtiste(Artiste artiste) {
-        JPanel panel = new JPanel();
-        panel.setBackground(BG_PRINCIPAL);
-        JLabel label = new JLabel(artiste.getNom());
-        label.setForeground(TEXT_BLANC);
-        panel.add(label);
-        return panel;
-    }*/
-
+    //afficher album dans la recerche
     public JComponent afficherAlbum(Album album) {
         JPanel contenu = new JPanel(new BorderLayout());
         contenu.setBackground(BG_PRINCIPAL);
         contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
 
-        // ── Carte d'en-tête ──────────────────────────────────────────────────────
+        // panel pour le texte, o,n mettra dedans le nom le nombre et tt
         JPanel carte = new JPanel(new BorderLayout(20, 0));
         carte.setBackground(BG_CARTE);
         carte.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        // Pochette
+        // Image
         JLabel image = new JLabel();
         image.setPreferredSize(new Dimension(160, 160));
         image.setHorizontalAlignment(SwingConstants.CENTER);
@@ -730,11 +704,13 @@ public class Fenetre implements InterfaceVue {
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
 
+        //reprednre la meme typos
         JLabel nom = new JLabel(album.getNom());
         nom.setFont(new Font("SansSerif", Font.BOLD, 26));
         nom.setForeground(TEXT_BLANC);
         nom.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //nom artiste
         String nomArtiste = album.getArtiste() != null ? album.getArtiste().getNom() : "Inconnu";
         JLabel artiste = new JLabel("Artiste : " + nomArtiste);
         artiste.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -742,6 +718,7 @@ public class Fenetre implements InterfaceVue {
         artiste.setBorder(new EmptyBorder(10, 0, 0, 0));
         artiste.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //annee
         String anneeAffichee = album.getAnnee() > 0 ? String.valueOf(album.getAnnee()) : "Inconnue";
         JLabel annee = new JLabel("Année : " + anneeAffichee);
         annee.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -749,53 +726,55 @@ public class Fenetre implements InterfaceVue {
         annee.setBorder(new EmptyBorder(6, 0, 0, 0));
         annee.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //utiliser la arraylist pour avoir afficher la liste des albums ou dedans y'a la liste des morceaux des albums
         ArrayList<Morceau> morceaux = album.getMorceaux() != null ? album.getMorceaux() : new ArrayList<>();
         int dureeTotal = 0;
         for (Morceau m : morceaux) dureeTotal += m.getDuree();
 
+        //creer les contener
         JLabel nbMorceaux = new JLabel(morceaux.size() + " morceau(x)  ·  " + formatterDuree(dureeTotal));
         nbMorceaux.setFont(new Font("SansSerif", Font.PLAIN, 14));
         nbMorceaux.setForeground(TEXT_GRIS);
         nbMorceaux.setBorder(new EmptyBorder(6, 0, 0, 0));
         nbMorceaux.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //on met tout forme
         infos.add(nom);
         infos.add(artiste);
         infos.add(annee);
         infos.add(nbMorceaux);
-
         carte.add(image, BorderLayout.WEST);
         carte.add(infos, BorderLayout.CENTER);
 
-        // ── Liste des morceaux ───────────────────────────────────────────────────
+        // liste des morceaux
         JLabel titreListe = new JLabel("Morceaux");
         titreListe.setFont(new Font("SansSerif", Font.BOLD, 18));
         titreListe.setForeground(TEXT_BLANC);
         titreListe.setBorder(new EmptyBorder(20, 0, 10, 0));
-
         JComponent listeMorceaux = creerVueMorceaux(morceaux);
-
         JPanel bas = new JPanel(new BorderLayout());
         bas.setOpaque(false);
         bas.add(titreListe, BorderLayout.NORTH);
         bas.add(listeMorceaux, BorderLayout.CENTER);
-
         contenu.add(carte, BorderLayout.NORTH);
         contenu.add(bas, BorderLayout.CENTER);
         return contenu;
     }
 
+
+
+    //afficher les playlist
     public JComponent afficherPlaylist(Playlist playlist) {
         JPanel contenu = new JPanel(new BorderLayout());
         contenu.setBackground(BG_PRINCIPAL);
         contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
 
-        // ── Carte d'en-tête ──────────────────────────────────────────────────────
+        //meme systeme que precedement
         JPanel carte = new JPanel(new BorderLayout(20, 0));
         carte.setBackground(BG_CARTE);
         carte.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        // Pochette
+        //iamge
         JLabel image = new JLabel();
         image.setPreferredSize(new Dimension(160, 160));
         image.setHorizontalAlignment(SwingConstants.CENTER);
@@ -811,22 +790,22 @@ public class Fenetre implements InterfaceVue {
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
-
         JLabel nom = new JLabel(playlist.getNom());
         nom.setFont(new Font("SansSerif", Font.BOLD, 26));
         nom.setForeground(TEXT_BLANC);
         nom.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //utiliser l'arraylist poru recup les morceau des playlist (meme focntionement que albums)
         ArrayList<Morceau> morceaux = playlist.getMorceaux() != null ? playlist.getMorceaux() : new ArrayList<>();
         int dureeTotal = 0;
         for (Morceau m : morceaux) dureeTotal += m.getDuree();
 
+        //meme typos
         JLabel nbMorceaux = new JLabel(morceaux.size() + " morceau(x)  ·  " + formatterDuree(dureeTotal));
         nbMorceaux.setFont(new Font("SansSerif", Font.PLAIN, 14));
         nbMorceaux.setForeground(TEXT_GRIS);
         nbMorceaux.setBorder(new EmptyBorder(10, 0, 0, 0));
         nbMorceaux.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         String dateStr = playlist.getCreation() != null ? formatterDateAvis(playlist.getCreation()) : "Inconnue";
         JLabel dateCreation = new JLabel("Créée le : " + dateStr);
         dateCreation.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -834,42 +813,41 @@ public class Fenetre implements InterfaceVue {
         dateCreation.setBorder(new EmptyBorder(6, 0, 0, 0));
         dateCreation.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //assemblage
         infos.add(nom);
         infos.add(nbMorceaux);
         infos.add(dateCreation);
-
         carte.add(image, BorderLayout.WEST);
         carte.add(infos, BorderLayout.CENTER);
 
-        // ── Liste des morceaux ───────────────────────────────────────────────────
+        //liste des morceaux
         JLabel titreListe = new JLabel("Morceaux");
         titreListe.setFont(new Font("SansSerif", Font.BOLD, 18));
         titreListe.setForeground(TEXT_BLANC);
         titreListe.setBorder(new EmptyBorder(20, 0, 10, 0));
-
         JComponent listeMorceaux = creerVueMorceaux(morceaux);
-
         JPanel bas = new JPanel(new BorderLayout());
         bas.setOpaque(false);
         bas.add(titreListe, BorderLayout.NORTH);
         bas.add(listeMorceaux, BorderLayout.CENTER);
-
         contenu.add(carte, BorderLayout.NORTH);
         contenu.add(bas, BorderLayout.CENTER);
         return contenu;
     }
 
+
+    //afficher Artiste
     public JComponent afficherArtiste(Artiste artiste) {
         JPanel contenu = new JPanel(new BorderLayout());
         contenu.setBackground(BG_PRINCIPAL);
         contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
 
-        // ── Carte d'en-tête ──────────────────────────────────────────────────────
+        // texte
         JPanel carte = new JPanel(new BorderLayout(20, 0));
         carte.setBackground(BG_CARTE);
         carte.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        // Photo
+        // photo de l'artiste (phot de base)
         JLabel image = new JLabel();
         image.setPreferredSize(new Dimension(160, 160));
         image.setHorizontalAlignment(SwingConstants.CENTER);
@@ -885,74 +863,68 @@ public class Fenetre implements InterfaceVue {
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
-
         JLabel nom = new JLabel(artiste.getNom());
         nom.setFont(new Font("SansSerif", Font.BOLD, 26));
         nom.setForeground(TEXT_BLANC);
         nom.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //meme utilsiation de l'arraylist
         ArrayList<Morceau> tousLesMorceaux = artiste.getMorceaux() != null ? artiste.getMorceaux() : new ArrayList<>();
         ArrayList<Album> albums = artiste.getAlbums() != null ? artiste.getAlbums() : new ArrayList<>();
-
         int dureeTotal = 0;
         for (Morceau m : tousLesMorceaux) dureeTotal += m.getDuree();
 
+        //affichage du nombre de morceaux et tt
         JLabel nbMorceaux = new JLabel(tousLesMorceaux.size() + " morceau(x)  ·  " + albums.size() + " album(s)  ·  " + formatterDuree(dureeTotal));
         nbMorceaux.setFont(new Font("SansSerif", Font.PLAIN, 14));
         nbMorceaux.setForeground(TEXT_GRIS);
         nbMorceaux.setBorder(new EmptyBorder(10, 0, 0, 0));
         nbMorceaux.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        //assembalge
         infos.add(nom);
         infos.add(nbMorceaux);
-
         carte.add(image, BorderLayout.WEST);
         carte.add(infos, BorderLayout.CENTER);
-
-        // ── Onglets Albums / Morceaux ────────────────────────────────────────────
         CardLayout ongletLayout = new CardLayout();
         JPanel ongletPanel = new JPanel(ongletLayout);
         ongletPanel.setBackground(BG_PRINCIPAL);
 
-        JButton btnAlbums   = creerBoutonCategorie("Albums (" + albums.size() + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
-        JButton btnMorceaux = creerBoutonCategorie("Morceaux (" + tousLesMorceaux.size() + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
-
-        JPanel barreOnglets = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        //lien entre les afficher
+        JButton btnAlbums = creerBoutonCategorie("Albums (" + albums.size() + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+        JButton btnMorceaux =creerBoutonCategorie("Morceaux (" + tousLesMorceaux.size() + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+        JPanel barreOnglets= new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         barreOnglets.setOpaque(false);
         barreOnglets.setBorder(new EmptyBorder(16, 0, 10, 0));
         barreOnglets.add(btnAlbums);
         barreOnglets.add(btnMorceaux);
 
         // Vue albums de l'artiste (réutilise creerVueAlbums)
-        JComponent vueAlbums   = creerVueAlbums(albums);
-        JComponent vueMorceaux = creerVueMorceaux(tousLesMorceaux);
-
-        ongletPanel.add(vueAlbums,   "albums");
-        ongletPanel.add(vueMorceaux, "morceaux");
-
+        JComponent vueAlbums =creerVueAlbums(albums);
+        JComponent vueMorceaux =creerVueMorceaux(tousLesMorceaux);
+        ongletPanel.add(vueAlbums,"albums");
+        ongletPanel.add(vueMorceaux,"morceaux");
         JButton[] btns   = { btnAlbums, btnMorceaux };
         String[]  cartes = { "albums",  "morceaux"  };
         for (int i = 0; i < btns.length; i++) {
             final int idx = i;
             btns[i].addActionListener(evt -> {
                 ongletLayout.show(ongletPanel, cartes[idx]);
-                for (int j = 0; j < btns.length; j++) {
-                    appliquerStyleCategorieActive(btns[j], j == idx, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
-                }
+                for (int j = 0; j < btns.length; j++) {appliquerStyleCategorieActive(btns[j], j == idx, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);}
             });
         }
         // Onglet Albums actif par défaut
         ongletLayout.show(ongletPanel, "albums");
-        appliquerStyleCategorieActive(btnAlbums,   true,  ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
-        appliquerStyleCategorieActive(btnMorceaux, false, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+        appliquerStyleCategorieActive(btnAlbums,true, ACCENT,BG_CARTE,TEXT_GRIS,BORDER);
+        appliquerStyleCategorieActive(btnMorceaux, false,ACCENT,BG_CARTE,TEXT_GRIS,BORDER);
 
         JPanel bas = new JPanel(new BorderLayout());
         bas.setOpaque(false);
-        bas.add(barreOnglets, BorderLayout.NORTH);
-        bas.add(ongletPanel,  BorderLayout.CENTER);
+        bas.add(barreOnglets,BorderLayout.NORTH);
+        bas.add(ongletPanel,BorderLayout.CENTER);
 
-        contenu.add(carte, BorderLayout.NORTH);
-        contenu.add(bas,   BorderLayout.CENTER);
+        contenu.add(carte,BorderLayout.NORTH);
+        contenu.add(bas,BorderLayout.CENTER);
         return contenu;
     }
 
@@ -1021,7 +993,7 @@ public class Fenetre implements InterfaceVue {
         jouer.setForeground(Color.WHITE);
         jouer.setBackground(ACCENT);
         jouer.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        jouer.setBorder(BorderFactory.createEmptyBorder(8, -10, 8, 14));
+        jouer.setBorder(BorderFactory.createEmptyBorder(8, 5, 8, 14));
         jouer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         infos.add(nom);
