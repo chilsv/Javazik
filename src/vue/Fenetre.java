@@ -76,9 +76,7 @@ public class Fenetre implements InterfaceVue {
     public static final int CHOIX_PARCOURIR = 9;
     public static final int CHOIX_POUR_VOUS = 10;
     public static final int CHOIX_POPULAIRE= 11;
-    public static final int CHOIX_RADIO = 12;
-    public static final int CHOIX_PODCASTS = 13;
-    public static final int CHOIX_ADMIN = 14;
+    public static final int CHOIX_ADMIN = 12;
 
     public Fenetre() {
         frame = new JFrame("Javazic"); //Creation
