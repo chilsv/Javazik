@@ -9,7 +9,7 @@ public class AjouterPlaylist implements Action {
      * @param arguments utilisateur, catalogue, playlistForm
      */
     @Override
-    public void executer(ActionArguments arguments) throws PlaylistDejaExistanteException{   
+    public void executer(ActionArguments arguments) throws PlaylistDejaExistanteException {   
         Playlist playlist = new Playlist(arguments.playlistForm.nom, arguments.playlistForm.morceaux, arguments.catalogue, arguments.playlistForm.numCreateur);
         if (!arguments.catalogue.playlistExiste(playlist.getNum())) {
             if (arguments.utilisateur instanceof Abonne) {

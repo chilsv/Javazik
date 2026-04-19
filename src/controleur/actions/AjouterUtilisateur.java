@@ -1,12 +1,13 @@
-package metier;
+package controleur.actions;
 
 import java.util.ArrayList;
 
 import controleur.Main;
-import controleur.actions.Action;
-import controleur.actions.ActionArguments;
 import controleur.exceptions.UtilisateurDejaCreeException;
 import controleur.formulaires.InscriptionForm;
+import metier.Abonne;
+import metier.Admin;
+import metier.Visiteur;
 
 public class AjouterUtilisateur implements Action {
     /*
