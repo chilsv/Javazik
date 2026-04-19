@@ -624,6 +624,7 @@ public class Fenetre implements InterfaceVue {
         }
         Abonne abonne = (Abonne) utilisateur;
         if (!abonne.morceauDejaAime(morceau, catalogue)) {
+            
             catalogue.ajouterMorceauPlaylist(morceau, abonne.getAimes());
         } else {
             abonne.retirerMorceauPlaylist(morceau, catalogue, abonne.getAimes());
@@ -818,7 +819,11 @@ public class Fenetre implements InterfaceVue {
             }
             aimerLabelRef[0] = creerLabelImage(chemin, "aimer", () -> {
                 actionAimer.run();
-                mettreIconeAimer(aimerLabelRef[0], aimeActuel);
+                if (ligne.objet instanceof Morceau) {
+                    mettreIconeAimer(aimerLabelRef[0], estAime((Morceau) ligne.objet));
+                } else if (ligne.objet instanceof Playlist) {
+                    mettreIconeAimer(aimerLabelRef[0], estAimee((Playlist) ligne.objet));
+                }
             }, 22, 22);
             actions.add(aimerLabelRef[0]);
         }
