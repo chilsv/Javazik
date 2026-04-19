@@ -55,6 +55,7 @@ public class FenetreVisite {
     private final JLabel populaire;
     private final JLabel radio;
     private final JLabel podcasts;
+    private final JLabel btn_retour2;
 
     public FenetreVisite(Fenetre vue) {
         this.vue = vue;
@@ -112,6 +113,8 @@ public class FenetreVisite {
         podcasts = creerLabelMenu(null,"Podcasts",25, 25);
 
         btnRetour = creerLabelMenu("assets/btn_retour.png", "Back", 32, 32);
+        btn_retour2 = creerLabelMenu("assets/btn_retour2.png", "Retour", 32, 32);
+        btn_retour2.setVisible(false); // caché par défaut
 
         // Assemblage de la barre latérale
         bandeSelection.add(Box.createVerticalStrut(20));
@@ -135,8 +138,11 @@ public class FenetreVisite {
         bandeSelection.add(Box.createVerticalGlue()); // pousse btnRetour vers le bas
         bandeSelection.add(creerSeparateur());
         bandeSelection.add(Box.createVerticalStrut(10));
+        bandeSelection.add(btn_retour2);
+        bandeSelection.add(Box.createVerticalStrut(5));
         bandeSelection.add(btnRetour);
         bandeSelection.add(Box.createVerticalStrut(10));
+
 
         //zone centrale ou on va pouvoir afficher les stats, proposition de morceau, playlist ect
         central = new JPanel(new BorderLayout());
@@ -299,6 +305,7 @@ public class FenetreVisite {
     public JLabel getRadio(){ return radio; }
     public JLabel getPodcasts() { return podcasts; }
     public JPanel getLecture() { return lecture; }
+    public JLabel getBtnRetour2() { return btn_retour2; }
 
     // methode publique appelées par EvenementsVisite, je vais changer ca
     // rend le panneau filtre visible
@@ -353,6 +360,7 @@ public class FenetreVisite {
         enleverML(filtre);
         enleverML(barreRecherche);
         enleverML(panelFiltre);
+        enleverML(btn_retour2);
     }
 
     // Vide la zone centrale et réinitialise la barre de recherche
@@ -366,5 +374,13 @@ public class FenetreVisite {
 
     public void afficherErreur(Exception e) {
         vue.afficherErreur(e);
+    }
+
+
+    //lire la fentre actuel
+    public JComponent getPanelCentral() {
+        if (central.getComponentCount() == 0) return null;
+        Component c = central.getComponent(0);
+        return (c instanceof JComponent) ? (JComponent) c : null;
     }
 }

@@ -36,7 +36,7 @@ public class EvenementsVisite {
         if (profil != null) {
             profil.addMouseListener(new MouseAdapter() {
                 @Override public void mouseClicked(MouseEvent e) {
-                    fenetre.afficherErreur(new ActionException("À venir"));
+                    //fenetre.afficherErreur(new ActionException("À venir"));
                     listener.onChoix(CHOIX_PROFIL);
                 }
                 @Override public void mouseEntered(MouseEvent e) {

@@ -39,6 +39,7 @@ public class Fenetre implements InterfaceVue {
     private JProgressBar barreProgression;
     private JLabel labelTempsLecture;
     private boolean dejaAjouteHistorique = false; // pour éviter d'ajouter plusieurs fois le même morceau à l'historique
+    private final java.util.Deque<JComponent> historique_fenetre = new java.util.ArrayDeque<>(); //historiique de PAGE
 
     // couleur meme que les autres jpanel
     final Color BG_PRINCIPAL = new Color(26, 26, 26);
@@ -213,12 +214,37 @@ public class Fenetre implements InterfaceVue {
             afficherPanel("visite", fenetreVisite.getPanel());
             fenetreVisite.reinitialiserEvenements();
 
+            historique_fenetre.clear(); // on vide l'historique à chaque nouvelle session
+            mettreAJourBoutonRetour();
+
+            JLabel btnRetour2 = fenetreVisite.getBtnRetour2();
+            if (btnRetour2 != null) {
+                btnRetour2.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseClicked(java.awt.event.MouseEvent e) {
+                        if (!historique_fenetre.isEmpty()) {
+                            fenetreVisite.setPanelCentral(historique_fenetre.pop());
+                            mettreAJourBoutonRetour();
+                        }
+                    }
+                });
+            }
+
+
             boolean filtreVisible = !(utilisateur instanceof Visiteur); // ça dépend de si c'est un visiteur ou pas
             EvenementsVisite.ajouterEvenements(fenetreVisite, choix -> {
                 synchronized (verrou) {
                     if (choix == CHOIX_PROFIL) {
-                        fenetreVisite.viderPanelCentral();
-                        resultat[0] = new ConsulterProfil();
+                        if (utilisateur instanceof Visiteur){
+                            fenetreVisite.afficherErreur(new ActionException("Vous n'avez pas de compte"));
+                        }
+                        else {
+                            fenetreVisite.viderPanelCentral();
+                            if (utilisateur instanceof Abonne) {
+                                naviguerVers(afficherProfilAbonne((Abonne) utilisateur));// on ne notifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
+                            }
+                            return;
+                        }
                     } else if (choix == CHOIX_PLAYLISTS) {
                         resultat[0] = new Recherche(new Filtre(false, false, false, true, false, new int[] {0, 0}));
                     } else if (choix == CHOIX_ARTISTES) {
@@ -913,21 +939,93 @@ public class Fenetre implements InterfaceVue {
     }
 
     private void afficherDetails(TypeObjets objet) {
-        if (objet == null || fenetreVisite == null) {
-            return;
-        }
+        if (objet == null || fenetreVisite == null) return;
         executerEtAttendre(() -> {
-            System.out.println("Clic sur détails");
-             if (objet instanceof Morceau) {
-                fenetreVisite.setPanelCentral(afficherMorceau((Morceau) objet));
+            if (objet instanceof Morceau) {
+                naviguerVers(afficherMorceau((Morceau) objet));
             } else if (objet instanceof Album) {
-                fenetreVisite.setPanelCentral(afficherAlbum((Album) objet));
+                naviguerVers(afficherAlbum((Album) objet));
             } else if (objet instanceof Playlist) {
-                fenetreVisite.setPanelCentral(afficherPlaylist((Playlist) objet));
+                naviguerVers(afficherPlaylist((Playlist) objet));
             } else if (objet instanceof Artiste) {
-                fenetreVisite.setPanelCentral(afficherArtiste((Artiste) objet));
+                naviguerVers(afficherArtiste((Artiste) objet));
             }
         });
+    }
+
+
+    // nouvelle méthode interne qui retourne le panel
+    private JComponent afficherProfilAbonne(Abonne abonne) {
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        // ── Carte profil ─────────────────────────────────────────────────────────
+        JPanel carte = new JPanel(new BorderLayout(20, 0));
+        carte.setBackground(BG_CARTE);
+        carte.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+        // Avatar placeholder
+        JLabel avatar = new JLabel();
+        avatar.setPreferredSize(new Dimension(100, 100));
+        avatar.setHorizontalAlignment(SwingConstants.CENTER);
+        avatar.setVerticalAlignment(SwingConstants.CENTER);
+        ImageIcon icon = new ImageIcon("assets/profil.png");
+        if (icon.getIconWidth() > 0) {
+            avatar.setIcon(new ImageIcon(icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+        } else {
+            avatar.setText("👤");
+            avatar.setFont(new Font("SansSerif", Font.PLAIN, 48));
+            avatar.setForeground(TEXT_GRIS);
+        }
+
+        // Infos
+        JPanel infos = new JPanel();
+        infos.setOpaque(false);
+        infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
+
+        JLabel nom = new JLabel(abonne.getNom());
+        nom.setFont(new Font("SansSerif", Font.BOLD, 26));
+        nom.setForeground(TEXT_BLANC);
+        nom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel mail = new JLabel("✉  " + abonne.getMail());
+        mail.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        mail.setForeground(TEXT_GRIS);
+        mail.setBorder(new EmptyBorder(10, 0, 0, 0));
+        mail.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel mdp = new JLabel("🔒  ••••••••");
+        mdp.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        mdp.setForeground(TEXT_GRIS);
+        mdp.setBorder(new EmptyBorder(6, 0, 0, 0));
+        mdp.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        int nbPlaylists = abonne.getPlaylists() != null ? abonne.getPlaylists().size() : 0;
+        int nbAvis = abonne.getAvis() != null ? abonne.getAvis().size() : 0;
+
+        JLabel stats = new JLabel(nbPlaylists + " playlist(s)  ·  " + nbAvis + " avis rédigé(s)");
+        stats.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        stats.setForeground(TEXT_GRIS);
+        stats.setBorder(new EmptyBorder(10, 0, 0, 0));
+        stats.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeCom = new JLabel("Abonné");
+        typeCom.setFont(new Font("SansSerif", Font.BOLD, 12));
+        typeCom.setForeground(ACCENT);
+        typeCom.setBorder(new EmptyBorder(8, 0, 0, 0));
+        typeCom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        infos.add(nom);
+        infos.add(mail);
+        infos.add(mdp);
+        infos.add(stats);
+        infos.add(typeCom);
+
+        carte.add(avatar, BorderLayout.WEST);
+        carte.add(infos, BorderLayout.CENTER);
+        contenu.add(carte, BorderLayout.NORTH);
+        return contenu;
     }
 
     //afficher album dans la recerche
@@ -1402,6 +1500,11 @@ public class Fenetre implements InterfaceVue {
 
         executerEtAttendre(() -> {
 
+
+            historique_fenetre.clear(); //clear historique
+            mettreAJourBoutonRetour();
+
+
             //comptage
             int nbMorceaux = (resultat == null || resultat.morceaux == null) ? 0 : resultat.morceaux.size();
             int nbArtistes = (resultat == null || resultat.artistes == null) ? 0 : resultat.artistes.size();
@@ -1717,5 +1820,22 @@ public class Fenetre implements InterfaceVue {
     }
 
     public void afficherUtilisateurs(ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {}
+
+    private void naviguerVers(JComponent nouveauPanel) {
+        JComponent actuel = fenetreVisite.getPanelCentral();
+        if (actuel != null) {
+            historique_fenetre.push(actuel);
+        }
+        mettreAJourBoutonRetour();
+        fenetreVisite.setPanelCentral(nouveauPanel);
+    }
+
+    private void mettreAJourBoutonRetour() {
+        // à appeler après chaque push/pop
+        JLabel btnRetour = fenetreVisite.getBtnRetour2();
+        if (btnRetour != null) {
+            btnRetour.setVisible(!historique_fenetre.isEmpty());
+        }
+    }
 
 }
