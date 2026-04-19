@@ -26,9 +26,7 @@ public class EvenementsVisite {
     public static final int CHOIX_PARCOURIR = 9;
     public static final int CHOIX_POUR_VOUS = 10;
     public static final int CHOIX_POPULAIRE= 11;
-    public static final int CHOIX_RADIO = 12;
-    public static final int CHOIX_PODCASTS = 13;
-    public static final int CHOIX_ADMIN = 14;
+    public static final int CHOIX_ADMIN = 12;
 
     public static void ajouterEvenements(FenetreVisite fenetre, VisiteListener listener, boolean filtreVisible) {
 
@@ -165,41 +163,6 @@ public class EvenementsVisite {
             });
         }
 
-        // la radio pffff
-        JLabel radio = fenetre.getRadio();
-        if (radio != null) {
-            radio.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) {
-                    fenetre.afficherErreur(new ActionException("À venir"));
-                    listener.onChoix(CHOIX_RADIO);
-                }
-                @Override public void mouseEntered(MouseEvent e) {
-                    radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                    radio.setForeground(new Color(220, 220, 220));
-                }
-                @Override public void mouseExited(MouseEvent e) {
-                    radio.setForeground(new Color(160, 160, 160));
-                }
-            });
-        }
-
-        // podscats
-        JLabel podcasts = fenetre.getPodcasts();
-        if (podcasts != null) {
-            podcasts.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) {
-                    fenetre.afficherErreur(new ActionException("À venir"));
-                    listener.onChoix(CHOIX_PODCASTS);
-                }
-                @Override public void mouseEntered(MouseEvent e) {
-                    podcasts.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                    podcasts.setForeground(new Color(220, 220, 220));
-                }
-                @Override public void mouseExited(MouseEvent e) {
-                    podcasts.setForeground(new Color(160, 160, 160));
-                }
-            });
-        }
         
         JLabel btnAdmin = fenetre.getBtnAdmin();
         if (btnAdmin != null && btnAdmin.isVisible()) {

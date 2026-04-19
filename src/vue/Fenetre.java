@@ -2367,6 +2367,8 @@ public class Fenetre implements InterfaceVue {
         }
     }
 
+    //STATISTIQUES
+
     private void ajouterPlaceholder(JTextField champ, String placeholder) {
         champ.setText(placeholder);
         champ.setForeground(Color.GRAY);
