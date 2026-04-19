@@ -35,7 +35,7 @@ public class ActionArguments {
     public String commentaire;
     public int note;
     public ArrayList<Avis> avis;
-    public String mail;
+    public String texte;
     public int numPlaylist;
     public Artiste artistes;
 
@@ -45,13 +45,24 @@ public class ActionArguments {
         this.catalogue = catalogue;
     }
 
-    public ActionArguments(String mail) {
-        this.mail = mail;
+    public ActionArguments(String texte) {
+        this.texte = texte;
+    }
+
+    public ActionArguments(Catalogue catalogue, String texte) {
+        this.catalogue = catalogue;
+        this.texte = texte;
     }
 
     public ActionArguments(Catalogue catalogue, AlbumForm albumForm) {
         this.catalogue = catalogue;
         this.albumForm = albumForm;
+    }
+
+    public ActionArguments(Catalogue catalogue, PlaylistForm playlistForm, Artiste artistes) {
+        this.catalogue = catalogue;
+        this.playlistForm = playlistForm;
+        this.artistes = artistes;
     }
 
     public ActionArguments(Catalogue catalogue, int numPlaylist) {

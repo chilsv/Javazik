@@ -9,7 +9,7 @@ public class SupprimerUtilisateur implements Action {
     @Override
     public void executer(ActionArguments arguments) {
         for (Abonne abonne : arguments.abonnes) {
-            if (abonne.getMail().equals(arguments.mail)) {
+            if (abonne.getMail().equals(arguments.texte)) {
                 arguments.abonnes.remove(abonne);
                 return;
             }

@@ -3,8 +3,19 @@ package controleur;
 import java.util.ArrayList;
 import java.util.List;
 
+import controleur.actions.ActionArguments;
+import controleur.actions.Aimer;
+import controleur.actions.AjouterPlaylist;
+import controleur.actions.AjouterUtilisateur;
+import controleur.exceptions.PlaylistDejaExistanteException;
+import controleur.exceptions.UtilisateurDejaCreeException;
+import controleur.formulaires.InscriptionForm;
+import controleur.formulaires.PlaylistForm;
+import metier.Abonne;
+import metier.Admin;
 import metier.Album;
 import metier.Artiste;
+import metier.Avis;
 import metier.Catalogue;
 import metier.Groupe;
 import metier.Morceau;
@@ -13,15 +24,21 @@ import metier.Solo;
 
 public class ScriptPeuplement {
     public static void main(String[] args) {
+        ArrayList<Abonne> abonnes = new ArrayList<>();
+        ArrayList<Admin> admins = new ArrayList<>();
         ArrayList<Morceau> morceaux = new ArrayList<>();
         ArrayList<Playlist> playlists = new ArrayList<>();
         ArrayList<Artiste> artistes = new ArrayList<>();
         ArrayList<Album> albums = new ArrayList<>();
+        ArrayList<Avis> avis = new ArrayList<>();
 
+        Main.charger(abonnes, "abonnes.ser");
+        Main.charger(admins, "admins.ser");
         Main.charger(morceaux, "morceaux.ser");
         Main.charger(playlists, "playlists.ser");
         Main.charger(artistes, "artistes.ser");
         Main.charger(albums, "albums.ser");
+        Main.charger(avis, "avis.ser");
 
         Catalogue catalogue = new Catalogue(morceaux, playlists, artistes, albums);
 
@@ -115,18 +132,202 @@ public class ScriptPeuplement {
         getOrCreatePlaylist(catalogue, "Rap & RnB", 1, List.of(godsPlan, inMyFeelings, killBill, snooze, raelsan));
         getOrCreatePlaylist(catalogue, "Weekend Playlist", 1, List.of(saveYourTears, takeMyBreath, oneDance, badGuy, fixYou));
 
+        peuplerAbonnesEtUsages(
+            catalogue,
+            abonnes,
+            admins,
+            avis,
+            getLucky,
+            oneMoreTime,
+            blindingLights,
+            killBill,
+            yellow,
+            sante,
+            easyOnMe,
+            fixYou
+        );
+
         ajouterImagesParDefaut(catalogue);
 
+        Main.sauvegarder(abonnes, "abonnes.ser");
+        Main.sauvegarder(admins, "admins.ser");
+        Main.sauvegarder(avis, "avis.ser");
         Main.sauvegarder(catalogue.getMorceaux(), "morceaux.ser");
         Main.sauvegarder(catalogue.getPlaylists(), "playlists.ser");
         Main.sauvegarder(catalogue.getArtistes(), "artistes.ser");
         Main.sauvegarder(catalogue.getAlbums(), "albums.ser");
 
         System.out.println("ajout automatique de");
+        System.out.println(abonnes.size() + " abonnes");
+        System.out.println(admins.size() + " admins");
+        System.out.println(avis.size() + " avis");
         System.out.println(catalogue.getArtistes().size() + " artistes");
         System.out.println(catalogue.getAlbums().size() + " albums");
         System.out.println(catalogue.getMorceaux().size() + " morceaux");
         System.out.println(catalogue.getPlaylists().size() + " playlists");
+    }
+
+    private static void peuplerAbonnesEtUsages(
+        Catalogue catalogue,
+        ArrayList<Abonne> abonnes,
+        ArrayList<Admin> admins,
+        ArrayList<Avis> avis,
+        Morceau getLucky,
+        Morceau oneMoreTime,
+        Morceau blindingLights,
+        Morceau killBill,
+        Morceau yellow,
+        Morceau sante,
+        Morceau easyOnMe,
+        Morceau fixYou
+    ) {
+        Abonne lea = getOrCreateAbonne(catalogue, abonnes, admins, "Lea", "lea@javazik.fr", "lea123");
+        Abonne max = getOrCreateAbonne(catalogue, abonnes, admins, "Max", "max@javazik.fr", "max123");
+        Abonne nina = getOrCreateAbonne(catalogue, abonnes, admins, "Nina", "nina@javazik.fr", "nina123");
+
+        if (lea != null) {
+            simulerEcoute(lea, getLucky, oneMoreTime, blindingLights, yellow);
+            aimerSiNecessaire(lea, catalogue, getLucky);
+            aimerSiNecessaire(lea, catalogue, blindingLights);
+            getOrCreatePlaylistAbonne(catalogue, lea, "Lea - Running", List.of(blindingLights, oneMoreTime, sante));
+            mettreAvisSiAbsent(avis, lea, getLucky, 5, "Toujours un classique qui met de bonne humeur.");
+            mettreAvisSiAbsent(avis, lea, blindingLights, 4, "Hyper efficace pour courir.");
+        }
+
+        if (max != null) {
+            simulerEcoute(max, killBill, yellow, fixYou, blindingLights);
+            aimerSiNecessaire(max, catalogue, killBill);
+            aimerSiNecessaire(max, catalogue, fixYou);
+            getOrCreatePlaylistAbonne(catalogue, max, "Max - Chill Soir", List.of(killBill, yellow, fixYou));
+            mettreAvisSiAbsent(avis, max, killBill, 5, "Le refrain reste en tete toute la journee.");
+            mettreAvisSiAbsent(avis, max, fixYou, 4, "Parfait pour se poser le soir.");
+        }
+
+        if (nina != null) {
+            simulerEcoute(nina, sante, getLucky, easyOnMe, oneMoreTime);
+            aimerSiNecessaire(nina, catalogue, sante);
+            aimerSiNecessaire(nina, catalogue, easyOnMe);
+            getOrCreatePlaylistAbonne(catalogue, nina, "Nina - Mix Daily", List.of(sante, easyOnMe, getLucky));
+            mettreAvisSiAbsent(avis, nina, sante, 4, "Un son super original et entetant.");
+            mettreAvisSiAbsent(avis, nina, easyOnMe, 5, "Voix incroyable, emotion garantie.");
+        }
+    }
+
+    private static void mettreAvisSiAbsent(
+        ArrayList<Avis> avis,
+        Abonne abonne,
+        Morceau morceau,
+        int note,
+        String commentaire
+    ) {
+        if (abonne == null || morceau == null || commentaire == null) {
+            return;
+        }
+
+        for (Avis existant : avis) {
+            if (existant.getAbonne() != null
+                && existant.getMorceau() != null
+                && existant.getAbonne().getMail().equalsIgnoreCase(abonne.getMail())
+                && existant.getMorceau().getNom().equalsIgnoreCase(morceau.getNom())
+                && commentaire.equals(existant.getCommentaire())) {
+                return;
+            }
+        }
+
+        Avis nouvelAvis = new Avis(morceau, abonne, note, commentaire);
+        avis.add(nouvelAvis);
+        morceau.ajouterAvis(nouvelAvis);
+        abonne.ajouterAvis(nouvelAvis);
+    }
+
+    private static Abonne getOrCreateAbonne(
+        Catalogue catalogue,
+        ArrayList<Abonne> abonnes,
+        ArrayList<Admin> admins,
+        String nom,
+        String mail,
+        String mdp
+    ) {
+        for (Abonne abonne : abonnes) {
+            if (abonne.getMail().equalsIgnoreCase(mail)) {
+                return abonne;
+            }
+        }
+
+        ActionArguments arguments = new ActionArguments(
+            new InscriptionForm("abonne", nom, mail, mdp),
+            catalogue,
+            abonnes,
+            admins,
+            null
+        );
+
+        try {
+            new AjouterUtilisateur().executer(arguments);
+        } catch (UtilisateurDejaCreeException ignored) {
+            // idempotent: l'abonne existe deja.
+        }
+
+        if (arguments.utilisateur instanceof Abonne) {
+            return (Abonne) arguments.utilisateur;
+        }
+
+        for (Abonne abonne : abonnes) {
+            if (abonne.getMail().equalsIgnoreCase(mail)) {
+                return abonne;
+            }
+        }
+        return null;
+    }
+
+    private static Playlist getOrCreatePlaylistAbonne(
+        Catalogue catalogue,
+        Abonne abonne,
+        String nom,
+        List<Morceau> morceaux
+    ) {
+        for (Playlist playlist : catalogue.getPlaylists()) {
+            if (playlist.getNom().equalsIgnoreCase(nom)
+                && playlist.getNumUtilisateur() == abonne.getNum()) {
+                if (!abonne.playlistDejaSauvegardee(playlist.getNum())) {
+                    abonne.ajouterPlaylist(playlist.getNum());
+                }
+                return playlist;
+            }
+        }
+
+        try {
+            new AjouterPlaylist().executer(
+                new ActionArguments(
+                    abonne,
+                    catalogue,
+                    new PlaylistForm(nom, new ArrayList<>(morceaux), abonne.getNum())
+                )
+            );
+        } catch (PlaylistDejaExistanteException ignored) {
+            // idempotent: on cherche ensuite la playlist deja existante.
+        }
+
+        for (Playlist playlist : catalogue.getPlaylists()) {
+            if (playlist.getNom().equalsIgnoreCase(nom)
+                && playlist.getNumUtilisateur() == abonne.getNum()) {
+                return playlist;
+            }
+        }
+        return null;
+    }
+
+    private static void aimerSiNecessaire(Abonne abonne, Catalogue catalogue, Morceau morceau) {
+        if (morceau == null || abonne.morceauDejaAime(morceau, catalogue)) {
+            return;
+        }
+        new Aimer().executer(new ActionArguments(null, abonne, catalogue, morceau));
+    }
+
+    private static void simulerEcoute(Abonne abonne, Morceau... morceaux) {
+        for (Morceau morceau : morceaux) {
+            abonne.ajouterHistorique(morceau);
+        }
     }
 
     private static boolean imageVide(String image) {

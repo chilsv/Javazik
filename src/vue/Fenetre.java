@@ -16,10 +16,19 @@ import controleur.EvenementsMenu;
 import controleur.EvenementsVisite;
 import controleur.Main;
 import controleur.actions.Action;
+import controleur.actions.ActionArguments;
+import controleur.actions.AjouterArtiste;
+import controleur.actions.AjouterMorceau;
+import controleur.actions.AjouterPlaylist;
+import controleur.actions.AjouterUtilisateur;
 import controleur.actions.ChoisirFiltre;
 import controleur.actions.ConsulterProfil;
 import controleur.actions.Deconnexion;
 import controleur.actions.Recherche;
+import controleur.actions.SupprimerArtiste;
+import controleur.actions.SupprimerMorceau;
+import controleur.actions.SupprimerPlaylist;
+import controleur.actions.SupprimerUtilisateur;
 import controleur.exceptions.ActionException;
 import controleur.formulaires.*;
 import metier.*;
@@ -1600,7 +1609,7 @@ public class Fenetre implements InterfaceVue {
                 }
                 try {
                     InscriptionForm form = new InscriptionForm("abonne", nomVal, mailVal, mdpVal);
-                    //new AjouterAbonne().executer(new ActionArguments(this, utilisateur, catalogueActuel, form));
+                    //new AjouterUtilisateur().executer(new ActionArguments(catalogue, form, abonnes, admins, utilisateur));
                     champNomAjout.setText("");
                     champMailAjout.setText("");
                     champMdpAjout.setText("");
@@ -1633,7 +1642,7 @@ public class Fenetre implements InterfaceVue {
                     return;
                 }
                 try {
-                    //new SupprimerAbonne().executer(new ActionArguments(this, utilisateur, catalogueActuel,nomVal, mailVal));
+                    new SupprimerUtilisateur().executer(new ActionArguments(mailVal));
                     champMailSuppr.setText("");
                     fenetreVisite.afficherErreur(new ActionException("Abonné supprimé avec succés"));
                 } catch (Exception ex) {
@@ -1721,7 +1730,7 @@ public class Fenetre implements InterfaceVue {
                 try {
                     int duree = Integer.parseInt(dureeStr);
                     MorceauForm form = new MorceauForm(titre, artiste, album.isEmpty() ? null : album, duree);
-                    //new AjouterMorceau().executer(new ActionArguments(catalogueActuel, form));
+                    new AjouterMorceau().executer(new ActionArguments(catalogue, form));
                     champTitreMorceau.setText(""); champArtisteMorceau.setText("");
                     champAlbumMorceau.setText(""); champDureeMorceau.setText("");
                     fenetreVisite.afficherErreur(new ActionException("Morceau ajouté avec succés"));
@@ -1753,12 +1762,13 @@ public class Fenetre implements InterfaceVue {
             btnSupprimerMorceau.addActionListener(evt -> {
                 String nomValTitre = champSupprMorceauTitre.getText().trim();
                 String nomValArttiste = champSupprMorceauArtiste.getText().trim();
+                MorceauForm form = new MorceauForm(nomValTitre, nomValArttiste, null, 0);
                 if (nomValTitre.isEmpty()||nomValArttiste.isEmpty()) {
                     fenetreVisite.afficherErreur(new ActionException("Nom et artiste requis"));
                     return;
                 }
                 try {
-                    //new SupprimerMorceau().executer(new ActionArguments(catalogueActuel, nomVal, null));
+                    new SupprimerMorceau().executer(new ActionArguments(catalogue, form));
                     champSupprMorceauTitre.setText("");
                     fenetreVisite.afficherErreur(new ActionException("Morceau supprimé avec succés"));
                 } catch (Exception ex) {
@@ -1808,7 +1818,7 @@ public class Fenetre implements InterfaceVue {
                 }
                 try {
                     ArtisteForm form = new ArtisteForm(nomVal);
-                    //new AjouterArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    new AjouterArtiste().executer(new ActionArguments(catalogue, form, null));
                     champNomArtiste.setText("");
                     fenetreVisite.afficherErreur(new ActionException("Artiste ajouter avec succés"));
                 } catch (Exception ex) {
@@ -1839,7 +1849,7 @@ public class Fenetre implements InterfaceVue {
                 }
                 try {
                     ArtisteForm form = new ArtisteForm(nomVal);
-                    //new SupprimerArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    new SupprimerArtiste().executer(new ActionArguments(catalogue, nomVal));
                     champSupprArtiste.setText("");
                     fenetreVisite.afficherErreur(new ActionException("Artiste supprimé avec succés"));
                 } catch (Exception ex) {
@@ -1881,8 +1891,8 @@ public class Fenetre implements InterfaceVue {
                     return;
                 }
                 try {
-                    //PlaylistForm form = new PlaylistForm(nomVal);
-                    //new AjouterArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    PlaylistForm form = new PlaylistForm(nomVal, utilisateur.getNum());
+                    new AjouterPlaylist().executer(new ActionArguments(utilisateur, catalogue, form));
                     champNomPlaylist.setText("");
                     fenetreVisite.afficherErreur(new ActionException("Playlist ajouté avec succés"));
                 } catch (Exception ex) {
@@ -1896,24 +1906,23 @@ public class Fenetre implements InterfaceVue {
             sep4.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
             sep4.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JLabel labelSupprPlaylist = new JLabel("Supprimer un artiste");
+            JLabel labelSupprPlaylist = new JLabel("Supprimer une playlist");
             labelSupprPlaylist.setFont(new Font("SansSerif", Font.BOLD, 13));
             labelSupprPlaylist.setForeground(new Color(200, 60, 60));
             labelSupprPlaylist.setAlignmentX(Component.LEFT_ALIGNMENT);
             labelSupprPlaylist.setBorder(new EmptyBorder(10, 0, 6, 0));
 
-            JTextField champSupprPlaylist= creerChampTexte("Nom de la playlist");
-            ajouterPlaceholder(champSupprPlaylist, "Nom de la playlist");
+            JTextField champSupprPlaylist= creerChampTexte("Numéro de la playlist");
+            ajouterPlaceholder(champSupprPlaylist, "Numéro de la playlist");
             JButton btnSupprimerPlaylist = creerBoutonAdmin("Supprimer", new Color(180, 40, 40));
             btnSupprimerPlaylist.addActionListener(evt -> {
-                String nomVal = champSupprPlaylist.getText().trim();
-                if (nomVal.isEmpty()) {
-                    fenetreVisite.afficherErreur(new ActionException("Nom de la playlist requis"));
+                String numPlaylist = champSupprPlaylist.getText().trim();
+                if (numPlaylist.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Numéro de la playlist requis"));
                     return;
                 }
                 try {
-                    //PLaylistForm form = new PLaylistForm(nomVal);
-                    //new SupprimerArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    new SupprimerPlaylist().executer(new ActionArguments(catalogue, Integer.parseInt(numPlaylist)));
                     champSupprPlaylist.setText("");
                     fenetreVisite.afficherErreur(new ActionException("Playlist supprimé avec succés"));
                 } catch (Exception ex) {
