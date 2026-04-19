@@ -1,7 +1,6 @@
-package metier;
+package controleur.actions;
 
-import controleur.actions.Action;
-import controleur.actions.ActionArguments;
+import metier.Abonne;
 
 public class SupprimerUtilisateur implements Action {
     /*
