@@ -1395,6 +1395,13 @@ public class Fenetre implements InterfaceVue {
         jouer.setForeground(Color.WHITE);
         jouer.setBackground(ACCENT);
         jouer.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        jouer.setToolTipText("Lire ce morceau");
+        jouer.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                jouer(morceau);
+            }
+        });
         jouer.setBorder(BorderFactory.createEmptyBorder(8, 5, 8, 14));
         jouer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
