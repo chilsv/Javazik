@@ -49,7 +49,8 @@ public class Statistiques {
         getEcoutes(abonne);
         this.artistePrefere = getArtistePrefere();
         this.morceauPrefere = getMorceauPrefere();
-        this.nbMorceauxAimes = catalogue.getPlaylist(abonne.getAimes()).getMorceaux().size();
+        Playlist playlistAimes = catalogue.getPlaylist(abonne.getAimes());
+        this.nbMorceauxAimes = (playlistAimes != null && playlistAimes.getMorceaux() != null) ? playlistAimes.getMorceaux().size() : 0;
         this.nbPlaylistsAbonne = abonne.getPlaylists().size();
         this.nbAvisAbonne = abonne.getAvis().size();
     }
