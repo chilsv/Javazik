@@ -32,11 +32,25 @@ public class ActionArguments {
     public String commentaire;
     public int note;
     public ArrayList<Avis> avis;
+    public String mail;
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         this.vue = vue;
         this.utilisateur = utilisateur;
         this.catalogue = catalogue;
+    }
+
+    public ActionArguments(String mail, Catalogue catalogue) {
+        this.mail = mail;
+        this.catalogue = catalogue;
+    }
+
+    public ActionArguments(InscriptionForm formulaire, Catalogue catalogue, ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Personne utilisateur) {
+        this.inscriptionForm = formulaire;
+        this.catalogue = catalogue;
+        this.abonnes = abonnes;
+        this.admins = admins;
+        this.utilisateur = utilisateur;
     }
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue, ArrayList<Avis> avis) {

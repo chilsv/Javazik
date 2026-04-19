@@ -74,15 +74,14 @@ public class Main {
 
     public static void initialiser() {
         if (admins.size() == 0) {
+            // des admins de base
             InscriptionForm defautForm = new InscriptionForm("admin", "Admin", "defaut", "", 0);
             InscriptionForm gabForm = new InscriptionForm("admin", "Gab", "gabriel.jamet@edu.ece.fr", "gab", 1);
             InscriptionForm ilanForm = new InscriptionForm("admin", "Ilan", "ilan.bide", "", 2);
-            //InscriptionForm ExAbo = new InscriptionForm("abonne", "Sacha", "a", "a", 3);
             try {
-                inscription(abonnes, admins, catalogue, defautForm);
-                inscription(abonnes, admins, catalogue, gabForm);
-                inscription(abonnes, admins, catalogue, ilanForm);
-                //inscription(abonnes, admins, catalogue, ExAbo);
+                new AjouterUtilisateur().executer(new ActionArguments(defautForm, catalogue, abonnes, admins, null));
+                new AjouterUtilisateur().executer(new ActionArguments(gabForm, catalogue, abonnes, admins, null));
+                new AjouterUtilisateur().executer(new ActionArguments(ilanForm, catalogue, abonnes, admins, null));
             } catch (UtilisateurDejaCreeException e) {}
         }
     }
@@ -170,7 +169,7 @@ public class Main {
     }
 
     public static void ajouterAbonne(Personne utilisateur, ArrayList<Abonne> abonnes) {
-        for (Abonne abonne :abonnes) {
+        for (Abonne abonne : abonnes) {
             if (abonne.getMail().equals(utilisateur.getMail())) {
                 return; // abonné déjà existant
             }
@@ -229,8 +228,9 @@ public class Main {
                         menu(vue, abonnes, admins, catalogue);
                         break;
                     }
-                    Personne utilisateur = inscription(abonnes, admins, catalogue, inscriptionForm);
-                    visiter(utilisateur, vue, abonnes, admins, catalogue);
+                    ActionArguments arguments = new ActionArguments(inscriptionForm, catalogue, abonnes, admins, null);
+                    new AjouterUtilisateur().executer(arguments);
+                    visiter(arguments.utilisateur, vue, abonnes, admins, catalogue);
                 } catch (UtilisateurDejaCreeException e) {
                     vue.afficherErreur(e);
                     menu(vue, abonnes, admins, catalogue);
@@ -243,50 +243,6 @@ public class Main {
                 vue.afficherErreur(new ActionException("Choix invalide."));
                 menu(vue, abonnes, admins, catalogue);
         }
-    }
-
-    public static Personne inscription(ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue, InscriptionForm formulaire) throws UtilisateurDejaCreeException {
-        Personne utilisateur;
-        String nom = formulaire.nom;
-        String mail = formulaire.mail == null ? "" : formulaire.mail.trim();
-        String mdp = formulaire.mdp;
-
-        if (mailDejaPris(mail, abonnes, admins)) {
-            throw new UtilisateurDejaCreeException();
-        }
-
-        if (formulaire.num == -1) {
-            formulaire.num = abonnes.size() + admins.size();
-        }
-
-        switch (formulaire.type) {
-            case "abonne":
-                utilisateur = new Abonne(nom, mail, mdp, formulaire.num, catalogue);
-                ajouterAbonne(utilisateur, abonnes);
-                break;
-            case "admin":
-                utilisateur = new Admin(nom, mail, mdp, formulaire.num);
-                ajouterAdmin(utilisateur, admins);
-                break;
-            default:
-                utilisateur = new Visiteur();
-                break;
-        }
-        return utilisateur;
-    }
-
-    private static boolean mailDejaPris(String mail, ArrayList<Abonne> abonnes, ArrayList<Admin> admins) {
-        for (Abonne abonne : abonnes) {
-            if (abonne.getMail().equalsIgnoreCase(mail)) {
-                return true;
-            }
-        }
-        for (Admin admin : admins) {
-            if (admin.getMail().equalsIgnoreCase(mail)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static void connexion(InterfaceVue vue, ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue, ConnexionForm formulaire) throws UtilisateurIntrouvableException, MdpIncorrectException {

@@ -1780,7 +1780,7 @@ public class Fenetre implements InterfaceVue {
                 liste.add(creerLigne(
                         ligne,
                         new Runnable() { public void run() { afficherDetails(playlist); } },
-                    new Runnable() { public void run() { basculerAime(playlist); } },
+                        new Runnable() { public void run() { basculerAime(playlist); } },
                         true,
                         aimeActuel
                 ));

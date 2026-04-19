@@ -56,8 +56,12 @@ public class Abonne extends Personne {
         playlists.add(numPlaylist);
     }
 
-    public void retirerMorceauPlaylist(Morceau morceau, Catalogue catalogue, int numPlaylist) {
+    public boolean retirerMorceauPlaylist(Morceau morceau, Catalogue catalogue, int numPlaylist) {
+        if (numPlaylist == playlistDefaut) {
+            return false; // on retire pas la playlist par défaut
+        }
         catalogue.getPlaylist(numPlaylist).enleverMorceau(morceau);
+        return true;
     }
 
     public void retirerPlaylist(int numPlaylist) {
