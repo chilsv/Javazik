@@ -28,6 +28,7 @@ public class EvenementsVisite {
     public static final int CHOIX_POPULAIRE= 11;
     public static final int CHOIX_RADIO = 12;
     public static final int CHOIX_PODCASTS = 13;
+    public static final int CHOIX_ADMIN = 14;
 
     public static void ajouterEvenements(FenetreVisite fenetre, VisiteListener listener, boolean filtreVisible) {
 
@@ -196,6 +197,22 @@ public class EvenementsVisite {
                 }
                 @Override public void mouseExited(MouseEvent e) {
                     podcasts.setForeground(new Color(160, 160, 160));
+                }
+            });
+        }
+        
+        JLabel btnAdmin = fenetre.getBtnAdmin();
+        if (btnAdmin != null && btnAdmin.isVisible()) {
+            btnAdmin.addMouseListener(new MouseAdapter() {
+                @Override public void mouseClicked(MouseEvent e) {
+                    listener.onChoix(CHOIX_ADMIN);
+                }
+                @Override public void mouseEntered(MouseEvent e) {
+                    btnAdmin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    btnAdmin.setForeground(new Color(220, 220, 220));
+                }
+                @Override public void mouseExited(MouseEvent e) {
+                    btnAdmin.setForeground(new Color(160, 160, 160));
                 }
             });
         }
