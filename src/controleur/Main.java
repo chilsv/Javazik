@@ -69,7 +69,6 @@ public class Main {
         // Définition de la vue qu'on utilise
         //InterfaceVue vue = new Console();
         InterfaceVue vue = new Fenetre();
-
         menu(vue, abonnes, admins, catalogue);
     }
 

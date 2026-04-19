@@ -295,6 +295,243 @@ public class Fenetre implements InterfaceVue {
         return resultat[0];
     }
 
+    /* barre de lecture à faire */
+    public void afficherLecture(Morceau morceau) {
+        if (fenetreVisite == null) {
+            return;
+        }
+
+        if (morceauLecture != morceau) {
+            progressionSecondes = 0;
+            morceauLecture = morceau;
+        }
+
+        // rafraichitr la barre
+        executerEtAttendre(() -> {
+            JPanel barreLecture = fenetreVisite.getLecture();
+            barreLecture.removeAll();
+            barreLecture.setLayout(new BorderLayout(24, 0));
+            barreLecture.setBorder(new EmptyBorder(10, 16, 10, 16));
+            barreLecture.add(lectureGauche(morceau), BorderLayout.WEST);
+            barreLecture.add(lectureCentre(morceau), BorderLayout.CENTER);
+            barreLecture.add(lectureDroite(morceau), BorderLayout.EAST);
+            barreLecture.setVisible(true);
+            barreLecture.revalidate();
+            barreLecture.repaint();
+
+            mettreAJourAffichageProgression();
+            if (lectureEnPause) {
+                arreterTimerLecture();
+            } else {
+                demarrerTimerLecture();
+            }
+        });
+    }
+
+    private JPanel lectureGauche(Morceau morceau) {
+        JPanel bloc = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        bloc.setOpaque(false);
+
+        JLabel image = new JLabel();
+        image.setPreferredSize(new Dimension(48, 48));
+        ImageIcon icon = new ImageIcon(morceau.getImage());
+        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+            Image imageRedimensionnee = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
+            image.setIcon(new ImageIcon(imageRedimensionnee));
+        } else {
+            image.setIcon(new ImageIcon("assets/logo.png"));
+        }
+        bloc.add(image);
+
+        JPanel texte = new JPanel();
+        texte.setOpaque(false);
+        texte.setLayout(new BoxLayout(texte, BoxLayout.Y_AXIS));
+
+        JLabel titre = new JLabel(morceau.getNom());
+        titre.setForeground(TEXT_BLANC);
+        titre.setFont(new Font("SansSerif", Font.BOLD, 15));
+
+        JLabel artistes = new JLabel(formatterArtistes(morceau.getArtistes()));
+        artistes.setForeground(TEXT_GRIS);
+        artistes.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+        texte.add(titre);
+        texte.add(artistes);
+        bloc.add(texte);
+        return bloc;
+    }
+
+    private JPanel lectureCentre(Morceau morceau) {
+        JPanel bloc = new JPanel();
+        bloc.setLayout(new BoxLayout(bloc, BoxLayout.Y_AXIS));
+        bloc.setOpaque(false);
+        bloc.setBorder(new EmptyBorder(0, 10, 0, 10));
+
+        // boutons pause et suivant
+        JPanel controles = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 0));
+        controles.setOpaque(false);
+        controles.add(boutonPause(morceau));
+        controles.add(boutonSuivant(morceau));
+
+        barreProgression = new JProgressBar(0, Math.max(1, morceau.getDuree()));
+        barreProgression.setStringPainted(false);
+        barreProgression.setBorderPainted(false);
+        barreProgression.setBackground(new Color(60, 60, 60));
+        barreProgression.setForeground(ACCENT);
+        barreProgression.setPreferredSize(new Dimension(320, 6));
+        barreProgression.setMaximumSize(new Dimension(Integer.MAX_VALUE, 6));
+        barreProgression.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel temps = new JPanel(new BorderLayout());
+        temps.setOpaque(false);
+        labelTempsLecture = new JLabel("0:00");
+        labelTempsLecture.setForeground(TEXT_GRIS);
+        labelTempsLecture.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        JLabel fin = new JLabel(formatterDuree(morceau.getDuree()));
+        fin.setForeground(TEXT_GRIS);
+        fin.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        temps.add(labelTempsLecture, BorderLayout.WEST);
+        temps.add(fin, BorderLayout.EAST);
+
+        bloc.add(controles);
+        bloc.add(Box.createVerticalStrut(6));
+        bloc.add(barreProgression);
+        bloc.add(Box.createVerticalStrut(4));
+        bloc.add(temps);
+
+        return bloc;
+    }
+
+    private JPanel lectureDroite(Morceau morceau) {
+        JPanel bloc = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        bloc.setOpaque(false);
+        bloc.setPreferredSize(new Dimension(220, 48));
+
+        ArrayList<Morceau> fileAttente = Main.getFileAttente();
+        bloc.add(fileAttenteLabel(fileAttente));
+        return bloc;
+    }
+
+    private JButton boutonPause(Morceau morceauCourant) {
+        JButton bouton = creerBouton(
+            lectureEnPause ? "assets/play.png" : "assets/pause.png",
+            lectureEnPause ? "Reprendre" : "Pause",
+            lectureEnPause ? "Play" : "Pause"
+        );
+        bouton.setPreferredSize(new Dimension(20, 20));
+        bouton.addActionListener(evt -> {
+            lectureEnPause = !lectureEnPause;
+            afficherLecture(morceauCourant);
+        });
+        return bouton;
+    }
+
+    private void demarrerTimerLecture() {
+        if (morceauLecture == null) {
+            return;
+        }
+        if (timerLecture == null) {
+            timerLecture = new Timer(1000, evt -> {
+                if (lectureEnPause || morceauLecture == null) {
+                    return;
+                }
+                int duree = Math.max(1, morceauLecture.getDuree());
+                if (progressionSecondes < duree) {
+                    progressionSecondes++;
+                    mettreAJourAffichageProgression();
+                    return;
+                }
+
+                Morceau suivant = Main.retirerFileAttente();
+                if (suivant != null) {
+                    lectureEnPause = false;
+                    afficherLecture(suivant);
+                } else {
+                    lectureEnPause = true;
+                    arreterTimerLecture();
+                }
+            });
+        }
+        if (!timerLecture.isRunning()) {
+            timerLecture.start();
+        }
+    }
+
+    /* pour la pause */
+    private void arreterTimerLecture() {
+        if (timerLecture != null && timerLecture.isRunning()) {
+            timerLecture.stop();
+        }
+    }
+
+    private void mettreAJourAffichageProgression() {
+        if (morceauLecture == null) {
+            return;
+        }
+        int duree = Math.max(1, morceauLecture.getDuree());
+        int valeur = Math.min(progressionSecondes, duree);
+        if (barreProgression != null) {
+            barreProgression.setMaximum(duree);
+            barreProgression.setValue(valeur);
+        }
+        if (labelTempsLecture != null) {
+            labelTempsLecture.setText(formatterDuree(valeur));
+        }
+    }
+
+    private JButton boutonSuivant(Morceau morceauCourant) {
+        JButton bouton = creerBouton("assets/suivant.png", "Lire le morceau suivant", ">>");
+        bouton.setPreferredSize(new Dimension(20, 20));
+        bouton.addActionListener(evt -> {
+            Morceau suivant = Main.retirerFileAttente();
+            if (suivant != null) {
+                lectureEnPause = false;
+                afficherLecture(suivant);
+            } else {
+                afficherMessage("La file d'attente est vide.");
+                afficherLecture(morceauCourant);
+            }
+        });
+        return bouton;
+    }
+
+    private JButton creerBouton(String chemin, String texte, String texteSecours) {
+        JButton bouton = new JButton();
+        ImageIcon icon = new ImageIcon(chemin);
+        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+            Image imageRedimensionnee = icon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+            bouton.setIcon(new ImageIcon(imageRedimensionnee));
+            bouton.setText(null);
+        } else {
+            bouton.setIcon(null);
+            bouton.setText(texteSecours);
+            bouton.setForeground(TEXT_GRIS);
+            bouton.setFont(new Font("SansSerif", Font.BOLD, 11));
+        }
+        bouton.setToolTipText(texte);
+        bouton.setFocusPainted(false);
+        bouton.setBorderPainted(false);
+        bouton.setContentAreaFilled(false);
+        bouton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return bouton;
+    }
+
+    /* crée le bouton file d'attente mais j'ai pas encore mis la gestion de file d'attente */
+    private JLabel fileAttenteLabel(ArrayList<Morceau> fileAttente) {
+        ImageIcon icon = new ImageIcon("assets/file_attente.png");
+        JLabel label;
+        if (icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+            Image imageRedimensionnee = icon.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+            label = new JLabel(new ImageIcon(imageRedimensionnee));
+        } else {
+            label = new JLabel("Queue");
+            label.setForeground(TEXT_GRIS);
+            label.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        }
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return label;
+    }
+
     public void afficherMessage(String message) {
     }
 
@@ -675,31 +912,256 @@ public class Fenetre implements InterfaceVue {
         });
     }
 
+    //afficher album dans la recerche
     public JComponent afficherAlbum(Album album) {
-        JPanel panel = new JPanel();
-        panel.setBackground(BG_PRINCIPAL);
-        JLabel label = new JLabel(album.getNom());
-        label.setForeground(TEXT_BLANC);
-        panel.add(label);
-        return panel;
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        // panel pour le texte, o,n mettra dedans le nom le nombre et tt
+        JPanel carte = new JPanel(new BorderLayout(20, 0));
+        carte.setBackground(BG_CARTE);
+        carte.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+        // Image
+        JLabel image = new JLabel();
+        image.setPreferredSize(new Dimension(160, 160));
+        image.setHorizontalAlignment(SwingConstants.CENTER);
+        image.setForeground(TEXT_GRIS);
+        ImageIcon icon = new ImageIcon(album.getImage() != null ? album.getImage() : "");
+        if (icon.getIconWidth() > 0) {
+            image.setIcon(new ImageIcon(icon.getImage().getScaledInstance(160, 160, Image.SCALE_SMOOTH)));
+        } else {
+            image.setText("Aucune image");
+        }
+
+        // Infos texte
+        JPanel infos = new JPanel();
+        infos.setOpaque(false);
+        infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
+
+        //reprednre la meme typos
+        JLabel nom = new JLabel(album.getNom());
+        nom.setFont(new Font("SansSerif", Font.BOLD, 26));
+        nom.setForeground(TEXT_BLANC);
+        nom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //nom artiste
+        String nomArtiste = album.getArtiste() != null ? album.getArtiste().getNom() : "Inconnu";
+        JLabel artiste = new JLabel("Artiste : " + nomArtiste);
+        artiste.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        artiste.setForeground(TEXT_GRIS);
+        artiste.setBorder(new EmptyBorder(10, 0, 0, 0));
+        artiste.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //annee
+        String anneeAffichee = album.getAnnee() > 0 ? String.valueOf(album.getAnnee()) : "Inconnue";
+        JLabel annee = new JLabel("Année : " + anneeAffichee);
+        annee.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        annee.setForeground(TEXT_GRIS);
+        annee.setBorder(new EmptyBorder(6, 0, 0, 0));
+        annee.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //utiliser la arraylist pour avoir afficher la liste des albums ou dedans y'a la liste des morceaux des albums
+        ArrayList<Morceau> morceaux = album.getMorceaux() != null ? album.getMorceaux() : new ArrayList<>();
+        int dureeTotal = 0;
+        for (Morceau m : morceaux) dureeTotal += m.getDuree();
+
+        //creer les contener
+        JLabel nbMorceaux = new JLabel(morceaux.size() + " morceau(x)  ·  " + formatterDuree(dureeTotal));
+        nbMorceaux.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        nbMorceaux.setForeground(TEXT_GRIS);
+        nbMorceaux.setBorder(new EmptyBorder(6, 0, 0, 0));
+        nbMorceaux.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //on met tout forme
+        infos.add(nom);
+        infos.add(artiste);
+        infos.add(annee);
+        infos.add(nbMorceaux);
+        carte.add(image, BorderLayout.WEST);
+        carte.add(infos, BorderLayout.CENTER);
+
+        // liste des morceaux
+        JLabel titreListe = new JLabel("Morceaux");
+        titreListe.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titreListe.setForeground(TEXT_BLANC);
+        titreListe.setBorder(new EmptyBorder(20, 0, 10, 0));
+        JComponent listeMorceaux = creerVueMorceaux(morceaux);
+        JPanel bas = new JPanel(new BorderLayout());
+        bas.setOpaque(false);
+        bas.add(titreListe, BorderLayout.NORTH);
+        bas.add(listeMorceaux, BorderLayout.CENTER);
+        contenu.add(carte, BorderLayout.NORTH);
+        contenu.add(bas, BorderLayout.CENTER);
+        return contenu;
     }
 
+
+
+    //afficher les playlist
     public JComponent afficherPlaylist(Playlist playlist) {
-        JPanel panel = new JPanel();
-        panel.setBackground(BG_PRINCIPAL);
-        JLabel label = new JLabel(playlist.getNom());
-        label.setForeground(TEXT_BLANC);
-        panel.add(label);
-        return panel;
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        //meme systeme que precedement
+        JPanel carte = new JPanel(new BorderLayout(20, 0));
+        carte.setBackground(BG_CARTE);
+        carte.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+        //iamge
+        JLabel image = new JLabel();
+        image.setPreferredSize(new Dimension(160, 160));
+        image.setHorizontalAlignment(SwingConstants.CENTER);
+        image.setForeground(TEXT_GRIS);
+        ImageIcon icon = new ImageIcon(playlist.getImage() != null ? playlist.getImage() : "");
+        if (icon.getIconWidth() > 0) {
+            image.setIcon(new ImageIcon(icon.getImage().getScaledInstance(160, 160, Image.SCALE_SMOOTH)));
+        } else {
+            image.setText("Aucune image");
+        }
+
+        // Infos texte
+        JPanel infos = new JPanel();
+        infos.setOpaque(false);
+        infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
+        JLabel nom = new JLabel(playlist.getNom());
+        nom.setFont(new Font("SansSerif", Font.BOLD, 26));
+        nom.setForeground(TEXT_BLANC);
+        nom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //utiliser l'arraylist poru recup les morceau des playlist (meme focntionement que albums)
+        ArrayList<Morceau> morceaux = playlist.getMorceaux() != null ? playlist.getMorceaux() : new ArrayList<>();
+        int dureeTotal = 0;
+        for (Morceau m : morceaux) dureeTotal += m.getDuree();
+
+        //meme typos
+        JLabel nbMorceaux = new JLabel(morceaux.size() + " morceau(x)  ·  " + formatterDuree(dureeTotal));
+        nbMorceaux.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        nbMorceaux.setForeground(TEXT_GRIS);
+        nbMorceaux.setBorder(new EmptyBorder(10, 0, 0, 0));
+        nbMorceaux.setAlignmentX(Component.LEFT_ALIGNMENT);
+        String dateStr = playlist.getCreation() != null ? formatterDateAvis(playlist.getCreation()) : "Inconnue";
+        JLabel dateCreation = new JLabel("Créée le : " + dateStr);
+        dateCreation.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        dateCreation.setForeground(TEXT_GRIS);
+        dateCreation.setBorder(new EmptyBorder(6, 0, 0, 0));
+        dateCreation.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //assemblage
+        infos.add(nom);
+        infos.add(nbMorceaux);
+        infos.add(dateCreation);
+        carte.add(image, BorderLayout.WEST);
+        carte.add(infos, BorderLayout.CENTER);
+
+        //liste des morceaux
+        JLabel titreListe = new JLabel("Morceaux");
+        titreListe.setFont(new Font("SansSerif", Font.BOLD, 18));
+        titreListe.setForeground(TEXT_BLANC);
+        titreListe.setBorder(new EmptyBorder(20, 0, 10, 0));
+        JComponent listeMorceaux = creerVueMorceaux(morceaux);
+        JPanel bas = new JPanel(new BorderLayout());
+        bas.setOpaque(false);
+        bas.add(titreListe, BorderLayout.NORTH);
+        bas.add(listeMorceaux, BorderLayout.CENTER);
+        contenu.add(carte, BorderLayout.NORTH);
+        contenu.add(bas, BorderLayout.CENTER);
+        return contenu;
     }
 
+
+    //afficher Artiste
     public JComponent afficherArtiste(Artiste artiste) {
-        JPanel panel = new JPanel();
-        panel.setBackground(BG_PRINCIPAL);
-        JLabel label = new JLabel(artiste.getNom());
-        label.setForeground(TEXT_BLANC);
-        panel.add(label);
-        return panel;
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        // texte
+        JPanel carte = new JPanel(new BorderLayout(20, 0));
+        carte.setBackground(BG_CARTE);
+        carte.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+        // photo de l'artiste (phot de base)
+        JLabel image = new JLabel();
+        image.setPreferredSize(new Dimension(160, 160));
+        image.setHorizontalAlignment(SwingConstants.CENTER);
+        image.setForeground(TEXT_GRIS);
+        ImageIcon icon = new ImageIcon(artiste.getImage() != null ? artiste.getImage() : "");
+        if (icon.getIconWidth() > 0) {
+            image.setIcon(new ImageIcon(icon.getImage().getScaledInstance(160, 160, Image.SCALE_SMOOTH)));
+        } else {
+            image.setText("Aucune image");
+        }
+
+        // Infos texte
+        JPanel infos = new JPanel();
+        infos.setOpaque(false);
+        infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
+        JLabel nom = new JLabel(artiste.getNom());
+        nom.setFont(new Font("SansSerif", Font.BOLD, 26));
+        nom.setForeground(TEXT_BLANC);
+        nom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //meme utilsiation de l'arraylist
+        ArrayList<Morceau> tousLesMorceaux = artiste.getMorceaux() != null ? artiste.getMorceaux() : new ArrayList<>();
+        ArrayList<Album> albums = artiste.getAlbums() != null ? artiste.getAlbums() : new ArrayList<>();
+        int dureeTotal = 0;
+        for (Morceau m : tousLesMorceaux) dureeTotal += m.getDuree();
+
+        //affichage du nombre de morceaux et tt
+        JLabel nbMorceaux = new JLabel(tousLesMorceaux.size() + " morceau(x)  ·  " + albums.size() + " album(s)  ·  " + formatterDuree(dureeTotal));
+        nbMorceaux.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        nbMorceaux.setForeground(TEXT_GRIS);
+        nbMorceaux.setBorder(new EmptyBorder(10, 0, 0, 0));
+        nbMorceaux.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        //assembalge
+        infos.add(nom);
+        infos.add(nbMorceaux);
+        carte.add(image, BorderLayout.WEST);
+        carte.add(infos, BorderLayout.CENTER);
+        CardLayout ongletLayout = new CardLayout();
+        JPanel ongletPanel = new JPanel(ongletLayout);
+        ongletPanel.setBackground(BG_PRINCIPAL);
+
+        //lien entre les afficher
+        JButton btnAlbums = creerBoutonCategorie("Albums (" + albums.size() + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+        JButton btnMorceaux =creerBoutonCategorie("Morceaux (" + tousLesMorceaux.size() + ")", ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+        JPanel barreOnglets= new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        barreOnglets.setOpaque(false);
+        barreOnglets.setBorder(new EmptyBorder(16, 0, 10, 0));
+        barreOnglets.add(btnAlbums);
+        barreOnglets.add(btnMorceaux);
+
+        // Vue albums de l'artiste (réutilise creerVueAlbums)
+        JComponent vueAlbums =creerVueAlbums(albums);
+        JComponent vueMorceaux =creerVueMorceaux(tousLesMorceaux);
+        ongletPanel.add(vueAlbums,"albums");
+        ongletPanel.add(vueMorceaux,"morceaux");
+        JButton[] btns   = { btnAlbums, btnMorceaux };
+        String[]  cartes = { "albums",  "morceaux"  };
+        for (int i = 0; i < btns.length; i++) {
+            final int idx = i;
+            btns[i].addActionListener(evt -> {
+                ongletLayout.show(ongletPanel, cartes[idx]);
+                for (int j = 0; j < btns.length; j++) {appliquerStyleCategorieActive(btns[j], j == idx, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);}
+            });
+        }
+        // Onglet Albums actif par défaut
+        ongletLayout.show(ongletPanel, "albums");
+        appliquerStyleCategorieActive(btnAlbums,true, ACCENT,BG_CARTE,TEXT_GRIS,BORDER);
+        appliquerStyleCategorieActive(btnMorceaux, false,ACCENT,BG_CARTE,TEXT_GRIS,BORDER);
+
+        JPanel bas = new JPanel(new BorderLayout());
+        bas.setOpaque(false);
+        bas.add(barreOnglets,BorderLayout.NORTH);
+        bas.add(ongletPanel,BorderLayout.CENTER);
+
+        contenu.add(carte,BorderLayout.NORTH);
+        contenu.add(bas,BorderLayout.CENTER);
+        return contenu;
     }
 
     public JComponent afficherMorceau(Morceau morceau) {
@@ -760,18 +1222,21 @@ public class Fenetre implements InterfaceVue {
         annee.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel jouer = new JLabel(new ImageIcon("assets/play.png"));
+        ImageIcon playIcon = new ImageIcon("assets/play.png");
+        Image jouerRedimensionnee = playIcon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        jouer.setIcon(new ImageIcon(jouerRedimensionnee));
         jouer.setFont(new Font("SansSerif", Font.BOLD, 13));
         jouer.setForeground(Color.WHITE);
         jouer.setBackground(ACCENT);
         jouer.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        jouer.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+        jouer.setBorder(BorderFactory.createEmptyBorder(8, 5, 8, 14));
         jouer.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         infos.add(nom);
         infos.add(artistes);
         infos.add(duree);
         infos.add(annee);
-        infos.add(Box.createVerticalStrut(16));
+        infos.add(Box.createVerticalStrut(10));
         infos.add(jouer);
 
         carte.add(image, BorderLayout.WEST);
