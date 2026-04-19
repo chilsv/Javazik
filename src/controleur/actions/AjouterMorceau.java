@@ -24,3 +24,8 @@ public class AjouterMorceau implements Action {
         return "Ajouter un morceau dans le catalogue";
     }
 }
+
+
+
+
+

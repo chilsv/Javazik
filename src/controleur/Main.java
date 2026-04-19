@@ -174,6 +174,8 @@ public class Main {
                 return; // abonné déjà existant
             }
         }
+
+
         for (Admin admin :admins) {
             if (admin.getMail().equals(utilisateur.getMail())) {
                 return; // admin déjà existant
@@ -188,6 +190,7 @@ public class Main {
             if (abonne.getMail().equals(utilisateur.getMail())) {
                 return; // abonné déjà existant
             }
+
         }
         for (Admin admin :admins) {
             if (admin.getMail().equals(utilisateur.getMail())) {
@@ -212,6 +215,7 @@ public class Main {
                         menu(vue, abonnes, admins, catalogue);
                         break;
                     }
+
                     connexion(vue, abonnes, admins, catalogue, connexionForm);
                 } catch (UtilisateurIntrouvableException e) {
                     vue.afficherErreur(e);
@@ -369,3 +373,7 @@ public class Main {
         }
     }
 }
+
+
+
+

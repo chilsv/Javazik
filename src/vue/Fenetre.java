@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusAdapter;
 
 import controleur.EvenementsConnexion;
 import controleur.EvenementsInscription;
@@ -67,6 +69,7 @@ public class Fenetre implements InterfaceVue {
     public static final int CHOIX_POPULAIRE= 11;
     public static final int CHOIX_RADIO = 12;
     public static final int CHOIX_PODCASTS = 13;
+    public static final int CHOIX_ADMIN = 14;
 
     public Fenetre() {
         frame = new JFrame("Javazic"); //Creation
@@ -82,6 +85,8 @@ public class Fenetre implements InterfaceVue {
 
         frame.setContentPane(pages);
         frame.setVisible(true);
+
+
     }
 
     /*Pour changer la page qui est affichée */
@@ -217,6 +222,11 @@ public class Fenetre implements InterfaceVue {
             historique_fenetre.clear(); // on vide l'historique à chaque nouvelle session
             mettreAJourBoutonRetour();
 
+            JLabel btnAdmin = fenetreVisite.getBtnAdmin();
+            if (btnAdmin != null) {
+                btnAdmin.setVisible(utilisateur instanceof Admin);
+            }
+
             JLabel btnRetour2 = fenetreVisite.getBtnRetour2();
             if (btnRetour2 != null) {
                 btnRetour2.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -231,6 +241,8 @@ public class Fenetre implements InterfaceVue {
             }
 
 
+
+
             boolean filtreVisible = !(utilisateur instanceof Visiteur); // ça dépend de si c'est un visiteur ou pas
             EvenementsVisite.ajouterEvenements(fenetreVisite, choix -> {
                 synchronized (verrou) {
@@ -240,8 +252,8 @@ public class Fenetre implements InterfaceVue {
                         }
                         else {
                             fenetreVisite.viderPanelCentral();
-                            if (utilisateur instanceof Abonne) {
-                                naviguerVers(afficherProfilAbonne((Abonne) utilisateur));// on ne notifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
+                            if (utilisateur instanceof Abonne||utilisateur instanceof Admin) {
+                                naviguerVers(afficherProfilAbonne((Abonne) utilisateur));// on ne anotifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
                             }
                             return;
                         }
@@ -260,6 +272,11 @@ public class Fenetre implements InterfaceVue {
                         resultat[0] = new ChoisirFiltre();
                     } else if (choix == CHOIX_LOUPE) {
                         resultat[0] = new Recherche();
+                    } else if (choix == CHOIX_ADMIN) {
+                        if (utilisateur instanceof Admin) {
+                            afficherProfilAdmin((Admin) utilisateur);
+                        }
+                        return; // on reste dans choisirAction, pas de verrou.notify()
                     } else {
                         resultat[0] = null;
                     }
@@ -634,8 +651,7 @@ public class Fenetre implements InterfaceVue {
     /* peut-être que  */
     public void afficherProfilAbonne(Abonne abonne, Catalogue catalogue){};
 
-    public void afficherProfilAdmin(Admin admin) {
-    }
+
 
     public RechercheForm demanderRecherche(Filtre filtre) {
         return new RechercheForm(fenetreVisite.getBarreRecherche().getText(), filtre);
@@ -1523,6 +1539,458 @@ public class Fenetre implements InterfaceVue {
         return section;
     }
 
+    //afficher le fond de base de admin qui permet de supprimer/ajouter des morceaux/artiste/abonne/playslist
+
+    public void afficherProfilAdmin(Admin admin) {
+        if (fenetreVisite == null) return;
+        executerEtAttendre(() -> {
+            JPanel contenu = new JPanel(new BorderLayout());
+            contenu.setBackground(BG_PRINCIPAL);
+            contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+            // scindée en deux l'ecran pour gestion utilisateur a gaiche et gestion morceau/artiste/Playlist a dorite
+            JPanel gestion = new JPanel(new GridLayout(1, 2, 16, 0));
+            gestion.setOpaque(false);
+            gestion.setBorder(new EmptyBorder(20, 0, 0, 0));
+
+            // colonne gauche gestion des abonnés
+            JPanel colonneAbonnes = new JPanel();
+            colonneAbonnes.setLayout(new BoxLayout(colonneAbonnes, BoxLayout.Y_AXIS));
+            colonneAbonnes.setBackground(BG_CARTE);
+            colonneAbonnes.setBorder(new EmptyBorder(16, 16, 16, 16));
+            JLabel titreAbonnes = new JLabel("Gestion des abonnés");
+            titreAbonnes.setFont(new Font("SansSerif", Font.BOLD, 16));
+            titreAbonnes.setForeground(TEXT_BLANC);
+            titreAbonnes.setAlignmentX(Component.LEFT_ALIGNMENT);
+            titreAbonnes.setBorder(new EmptyBorder(0, 0, 14, 0));
+
+            // Parti champs ajouter abonné
+            JLabel labelAjoutAbonne = new JLabel("Ajouter un abonné");
+            labelAjoutAbonne.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelAjoutAbonne.setForeground(ACCENT);
+            labelAjoutAbonne.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelAjoutAbonne.setBorder(new EmptyBorder(0, 0, 6, 0));
+            JTextField champNomAjout = creerChampTexte("Nom");
+            ajouterPlaceholder(champNomAjout, "Nom");
+            JTextField champMailAjout = creerChampTexte("Mail");
+            ajouterPlaceholder(champMailAjout, "Mail");
+            JTextField champMdpAjout = creerChampTexte("Password");
+            ajouterPlaceholder(champMdpAjout, "Mot de passe");
+
+
+            JButton btnAjouterAbonne = creerBoutonAdmin("Ajouter", ACCENT);
+            btnAjouterAbonne.addActionListener(evt -> {
+                String nomVal = champNomAjout.getText().trim();
+                String mailVal = champMailAjout.getText().trim();
+                String mdpVal = new String(champMdpAjout.getText()).trim();
+                if (nomVal.isEmpty() || mailVal.isEmpty() || mdpVal.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Tous les champs sont requis"));
+                    return;
+                }
+                try {
+                    InscriptionForm form = new InscriptionForm("abonne", nomVal, mailVal, mdpVal);
+                    //new AjouterAbonne().executer(new ActionArguments(this, utilisateur, catalogueActuel, form));
+                    champNomAjout.setText("");
+                    champMailAjout.setText("");
+                    champMdpAjout.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Abonné ajouter avec succés"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            // Séparateur
+            JSeparator sep1 = new JSeparator();
+            sep1.setForeground(BORDER);
+            sep1.setBackground(BORDER);
+            sep1.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+            sep1.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            // Champs supprimer abonné
+            JLabel labelSupprAbonne = new JLabel("Supprimer un abonné");
+            labelSupprAbonne.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelSupprAbonne.setForeground(new Color(200, 60, 60));
+            labelSupprAbonne.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelSupprAbonne.setBorder(new EmptyBorder(10, 0, 6, 0));
+            JTextField champMailSuppr = creerChampTexte("Mail");
+            ajouterPlaceholder(champMailSuppr, "Mail");
+            JButton btnSupprimerAbonne = creerBoutonAdmin("Supprimer", new Color(180, 40, 40));
+            btnSupprimerAbonne.addActionListener(evt -> {
+                String mailVal = champMailSuppr.getText().trim();
+                if (mailVal.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Mail requis"));
+                    return;
+                }
+                try {
+                    //new SupprimerAbonne().executer(new ActionArguments(this, utilisateur, catalogueActuel,nomVal, mailVal));
+                    champMailSuppr.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Abonné supprimé avec succés"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            colonneAbonnes.add(titreAbonnes);
+            colonneAbonnes.add(labelAjoutAbonne);
+            colonneAbonnes.add(champNomAjout);
+            colonneAbonnes.add(Box.createVerticalStrut(6));
+            colonneAbonnes.add(champMailAjout);
+            colonneAbonnes.add(Box.createVerticalStrut(6));
+            colonneAbonnes.add(champMdpAjout);
+            colonneAbonnes.add(Box.createVerticalStrut(8));
+            colonneAbonnes.add(btnAjouterAbonne);
+            colonneAbonnes.add(Box.createVerticalStrut(14));
+            colonneAbonnes.add(sep1);
+            colonneAbonnes.add(labelSupprAbonne);
+            colonneAbonnes.add(Box.createVerticalStrut(6));
+            colonneAbonnes.add(champMailSuppr);
+            colonneAbonnes.add(Box.createVerticalStrut(8));
+            colonneAbonnes.add(btnSupprimerAbonne);
+            colonneAbonnes.add(Box.createVerticalGlue());
+
+            // colonne droite gestion du catalogue
+            JPanel colonneCatalogue = new JPanel();
+            colonneCatalogue.setLayout(new BoxLayout(colonneCatalogue, BoxLayout.Y_AXIS));
+            colonneCatalogue.setBackground(BG_CARTE);
+            colonneCatalogue.setBorder(new EmptyBorder(16, 16, 16, 16));
+            JLabel titreCatalogue = new JLabel("Gestion du catalogue");
+            titreCatalogue.setFont(new Font("SansSerif", Font.BOLD, 16));
+            titreCatalogue.setForeground(TEXT_BLANC);
+            titreCatalogue.setAlignmentX(Component.LEFT_ALIGNMENT);
+            titreCatalogue.setBorder(new EmptyBorder(0, 0, 14, 0));
+
+            // Onglets Morceau/artist/playimist
+            CardLayout ongletCatalogueLayout = new CardLayout();
+            JPanel ongletCatalogue = new JPanel(ongletCatalogueLayout);
+            ongletCatalogue.setOpaque(false);
+            ongletCatalogue.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JButton btnOngletMorceau  = creerBoutonCategorie("Morceau",  ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            JButton btnOngletArtiste  = creerBoutonCategorie("Artiste",  ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            JButton btnOngletPlaylist  = creerBoutonCategorie("Playlist",  ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+
+            JPanel barreCatalogue = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+            barreCatalogue.setOpaque(false);
+            barreCatalogue.setAlignmentX(Component.LEFT_ALIGNMENT);
+            barreCatalogue.add(btnOngletMorceau);
+            barreCatalogue.add(btnOngletArtiste);
+            barreCatalogue.add(btnOngletPlaylist);
+            barreCatalogue.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+
+            // Vue pour ajouter morceau
+            JPanel vueMorceau = new JPanel();
+            vueMorceau.setLayout(new BoxLayout(vueMorceau, BoxLayout.Y_AXIS));
+            vueMorceau.setOpaque(false);
+
+            JLabel labelAjoutMorceau = new JLabel("Ajouter un morceau");
+            labelAjoutMorceau.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelAjoutMorceau.setForeground(ACCENT);
+            labelAjoutMorceau.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelAjoutMorceau.setBorder(new EmptyBorder(8, 0, 6, 0));
+
+            JTextField champTitreMorceau  = creerChampTexte("Titre");
+            ajouterPlaceholder(champTitreMorceau, "Titre");
+            JTextField champArtisteMorceau = creerChampTexte("Artiste");
+            ajouterPlaceholder(champArtisteMorceau, "Artiste");
+            JTextField champAlbumMorceau  = creerChampTexte("Album (optionnel)");
+            ajouterPlaceholder(champAlbumMorceau, "Album (optionnel)");
+            JTextField champDureeMorceau  = creerChampTexte("Durée (secondes)");
+            ajouterPlaceholder(champDureeMorceau, "Durée (secondes)");
+
+            JButton btnAjouterMorceau = creerBoutonAdmin("Ajouter", ACCENT);
+            btnAjouterMorceau.addActionListener(evt -> {
+                String titre  = champTitreMorceau.getText().trim();
+                String artiste = champArtisteMorceau.getText().trim();
+                String album  = champAlbumMorceau.getText().trim();
+                String dureeStr = champDureeMorceau.getText().trim();
+                if (titre.isEmpty() || artiste.isEmpty() || dureeStr.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Titre, artiste et durée requis"));
+                    return;
+                }
+                try {
+                    int duree = Integer.parseInt(dureeStr);
+                    MorceauForm form = new MorceauForm(titre, artiste, album.isEmpty() ? null : album, duree);
+                    //new AjouterMorceau().executer(new ActionArguments(catalogueActuel, form));
+                    champTitreMorceau.setText(""); champArtisteMorceau.setText("");
+                    champAlbumMorceau.setText(""); champDureeMorceau.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Morceau ajouté avec succés"));
+                } catch (NumberFormatException ex) {
+                    fenetreVisite.afficherErreur(new ActionException("Durée invalide"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            JSeparator sep2 = new JSeparator();
+            sep2.setForeground(BORDER);
+            sep2.setBackground(BORDER);
+            sep2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+            sep2.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            //supprimé
+            JLabel labelSupprMorceau = new JLabel("Supprimer un morceau");
+            labelSupprMorceau.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelSupprMorceau.setForeground(new Color(200, 60, 60));
+            labelSupprMorceau.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelSupprMorceau.setBorder(new EmptyBorder(10, 0, 6, 0));
+
+            JTextField champSupprMorceauTitre = creerChampTexte("Nom du morceau");
+            ajouterPlaceholder(champSupprMorceauTitre, "Nom du morceau");
+            JTextField champSupprMorceauArtiste = creerChampTexte("Nom de l'artiste");
+            ajouterPlaceholder(champSupprMorceauArtiste, "Nom de l'artiste");
+            JButton btnSupprimerMorceau = creerBoutonAdmin("Supprimer", new Color(180, 40, 40));
+            btnSupprimerMorceau.addActionListener(evt -> {
+                String nomValTitre = champSupprMorceauTitre.getText().trim();
+                String nomValArttiste = champSupprMorceauArtiste.getText().trim();
+                if (nomValTitre.isEmpty()||nomValArttiste.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Nom et artiste requis"));
+                    return;
+                }
+                try {
+                    //new SupprimerMorceau().executer(new ActionArguments(catalogueActuel, nomVal, null));
+                    champSupprMorceauTitre.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Morceau supprimé avec succés"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            vueMorceau.add(labelAjoutMorceau);
+            vueMorceau.add(champTitreMorceau);
+            vueMorceau.add(Box.createVerticalStrut(6));
+            vueMorceau.add(champArtisteMorceau);
+            vueMorceau.add(Box.createVerticalStrut(6));
+            vueMorceau.add(champAlbumMorceau);
+            vueMorceau.add(Box.createVerticalStrut(6));
+            vueMorceau.add(champDureeMorceau);
+            vueMorceau.add(Box.createVerticalStrut(8));
+            vueMorceau.add(btnAjouterMorceau);
+            vueMorceau.add(Box.createVerticalStrut(14));
+            vueMorceau.add(sep2);
+            vueMorceau.add(labelSupprMorceau);
+            vueMorceau.add(champSupprMorceauTitre);
+            vueMorceau.add(Box.createVerticalStrut(6));
+            vueMorceau.add(champSupprMorceauArtiste);
+            vueMorceau.add(Box.createVerticalStrut(8));
+            vueMorceau.add(btnSupprimerMorceau);
+            vueMorceau.add(Box.createVerticalGlue());
+
+            // sous partie vue artiste
+            JPanel vueArtiste = new JPanel();
+            vueArtiste.setLayout(new BoxLayout(vueArtiste, BoxLayout.Y_AXIS));
+            vueArtiste.setOpaque(false);
+
+            JLabel labelAjoutArtiste = new JLabel("Ajouter un artiste");
+            labelAjoutArtiste.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelAjoutArtiste.setForeground(ACCENT);
+            labelAjoutArtiste.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelAjoutArtiste.setBorder(new EmptyBorder(8, 0, 6, 0));
+
+            JTextField champNomArtiste = creerChampTexte("Nom de l'artiste");
+            ajouterPlaceholder(champNomArtiste, "Nom de l'artiste");
+            JButton btnAjouterArtiste = creerBoutonAdmin("Ajouter", ACCENT);
+            btnAjouterArtiste.addActionListener(evt -> {
+                String nomVal = champNomArtiste.getText().trim();
+                if (nomVal.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Nom de l'artiste requis"));
+                    return;
+                }
+                try {
+                    ArtisteForm form = new ArtisteForm(nomVal);
+                    //new AjouterArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    champNomArtiste.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Artiste ajouter avec succés"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            JSeparator sep3 = new JSeparator();
+            sep3.setForeground(BORDER);
+            sep3.setBackground(BORDER);
+            sep3.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+            sep3.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel labelSupprArtiste = new JLabel("Supprimer un artiste");
+            labelSupprArtiste.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelSupprArtiste.setForeground(new Color(200, 60, 60));
+            labelSupprArtiste.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelSupprArtiste.setBorder(new EmptyBorder(10, 0, 6, 0));
+
+            JTextField champSupprArtiste = creerChampTexte("Nom de l'artiste");
+            ajouterPlaceholder(champSupprArtiste, "Nom de l'artiste");
+            JButton btnSupprimerArtiste = creerBoutonAdmin("Supprimer", new Color(180, 40, 40));
+            btnSupprimerArtiste.addActionListener(evt -> {
+                String nomVal = champSupprArtiste.getText().trim();
+                if (nomVal.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Nom de l'artiste requis"));
+                    return;
+                }
+                try {
+                    ArtisteForm form = new ArtisteForm(nomVal);
+                    //new SupprimerArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    champSupprArtiste.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Artiste supprimé avec succés"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            vueArtiste.add(labelAjoutArtiste);
+            vueArtiste.add(champNomArtiste);
+            vueArtiste.add(Box.createVerticalStrut(8));
+            vueArtiste.add(btnAjouterArtiste);
+            vueArtiste.add(Box.createVerticalStrut(14));
+            vueArtiste.add(sep3);
+            vueArtiste.add(labelSupprArtiste);
+            vueArtiste.add(champSupprArtiste);
+            vueArtiste.add(Box.createVerticalStrut(8));
+            vueArtiste.add(btnSupprimerArtiste);
+            vueArtiste.add(Box.createVerticalGlue());
+
+
+            // sous partie vue playlist
+            JPanel vuePlaylist = new JPanel();
+            vuePlaylist.setLayout(new BoxLayout(vuePlaylist, BoxLayout.Y_AXIS));
+            vuePlaylist.setOpaque(false);
+
+            JLabel labelAjoutPlaylist = new JLabel("Ajouter une playlist");
+            labelAjoutPlaylist.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelAjoutPlaylist.setForeground(ACCENT);
+            labelAjoutPlaylist.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelAjoutPlaylist.setBorder(new EmptyBorder(8, 0, 6, 0));
+
+            JTextField champNomPlaylist = creerChampTexte("Nom de la playlist");
+            ajouterPlaceholder(champNomPlaylist, "Nom de la playlist");
+            JButton btnAjouterPlaylist = creerBoutonAdmin("Ajouter", ACCENT);
+            btnAjouterPlaylist.addActionListener(evt -> {
+                String nomVal = champNomPlaylist.getText().trim();
+                if (nomVal.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Nom de la playlist requis"));
+                    return;
+                }
+                try {
+                    //PlaylistForm form = new PlaylistForm(nomVal);
+                    //new AjouterArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    champNomPlaylist.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Playlist ajouté avec succés"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            JSeparator sep4 = new JSeparator();
+            sep4.setForeground(BORDER);
+            sep4.setBackground(BORDER);
+            sep4.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+            sep4.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel labelSupprPlaylist = new JLabel("Supprimer un artiste");
+            labelSupprPlaylist.setFont(new Font("SansSerif", Font.BOLD, 13));
+            labelSupprPlaylist.setForeground(new Color(200, 60, 60));
+            labelSupprPlaylist.setAlignmentX(Component.LEFT_ALIGNMENT);
+            labelSupprPlaylist.setBorder(new EmptyBorder(10, 0, 6, 0));
+
+            JTextField champSupprPlaylist= creerChampTexte("Nom de la playlist");
+            ajouterPlaceholder(champSupprPlaylist, "Nom de la playlist");
+            JButton btnSupprimerPlaylist = creerBoutonAdmin("Supprimer", new Color(180, 40, 40));
+            btnSupprimerPlaylist.addActionListener(evt -> {
+                String nomVal = champSupprPlaylist.getText().trim();
+                if (nomVal.isEmpty()) {
+                    fenetreVisite.afficherErreur(new ActionException("Nom de la playlist requis"));
+                    return;
+                }
+                try {
+                    //PLaylistForm form = new PLaylistForm(nomVal);
+                    //new SupprimerArtiste().executer(new ActionArguments(catalogueActuel, form));
+                    champSupprPlaylist.setText("");
+                    fenetreVisite.afficherErreur(new ActionException("Playlist supprimé avec succés"));
+                } catch (Exception ex) {
+                    afficherErreur(ex);
+                }
+            });
+
+            vuePlaylist.add(labelAjoutPlaylist);
+            vuePlaylist.add(champNomPlaylist);
+            vuePlaylist.add(Box.createVerticalStrut(8));
+            vuePlaylist.add(btnAjouterPlaylist);
+            vuePlaylist.add(Box.createVerticalStrut(14));
+            vuePlaylist.add(sep3);
+            vuePlaylist.add(labelSupprPlaylist);
+            vuePlaylist.add(champSupprPlaylist);
+            vuePlaylist.add(Box.createVerticalStrut(8));
+            vuePlaylist.add(btnSupprimerPlaylist);
+            vuePlaylist.add(Box.createVerticalGlue());
+
+            ongletCatalogue.add(vueMorceau,"morceau");
+            ongletCatalogue.add(vueArtiste,"artiste");
+            ongletCatalogue.add(vuePlaylist,"playlist");
+
+            // Listeners onglets catalogue
+            JButton[] btnsCatalogue  = { btnOngletMorceau, btnOngletArtiste,  btnOngletPlaylist};
+            String[]  cartesCatalogue = { "morceau", "artiste", "playlist"};
+            for (int i = 0; i < btnsCatalogue.length; i++) {
+                final int idx = i;
+                btnsCatalogue[i].addActionListener(evt -> {
+                    ongletCatalogueLayout.show(ongletCatalogue, cartesCatalogue[idx]);
+                    for (int j = 0; j < btnsCatalogue.length; j++) {
+                        appliquerStyleCategorieActive(btnsCatalogue[j], j == idx, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+                    }
+                });
+            }
+            ongletCatalogueLayout.show(ongletCatalogue, "morceau");
+            appliquerStyleCategorieActive(btnOngletMorceau, true,  ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            appliquerStyleCategorieActive(btnOngletArtiste, false, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+            appliquerStyleCategorieActive(btnOngletPlaylist, false, ACCENT, BG_CARTE, TEXT_GRIS, BORDER);
+
+            colonneCatalogue.add(titreCatalogue);
+            colonneCatalogue.add(barreCatalogue);
+            colonneCatalogue.add(Box.createVerticalStrut(8));
+            colonneCatalogue.add(ongletCatalogue);
+
+            gestion.add(colonneAbonnes);
+            gestion.add(colonneCatalogue);
+
+            contenu.add(gestion, BorderLayout.NORTH);
+
+            naviguerVers(contenu);
+        });
+    }
+
+    //Helpers
+    private JTextField creerChampTexte(String placeholder) {
+        JTextField champ = new JTextField();
+        styliserChamp(champ, placeholder);
+        return champ;
+    }
+
+    private void styliserChamp(JTextField champ, String placeholder) {
+        champ.setBackground(new Color(45, 45, 45));
+        champ.setForeground(TEXT_BLANC);
+        champ.setCaretColor(TEXT_BLANC);
+        champ.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        champ.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(BORDER, 1),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)
+        ));
+        champ.putClientProperty("JTextField.placeholderText", placeholder);
+        champ.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
+        champ.setAlignmentX(Component.LEFT_ALIGNMENT);
+    }
+
+    private JButton creerBoutonAdmin(String texte, Color couleur) {
+        JButton btn = new JButton(texte);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btn.setForeground(TEXT_BLANC);
+        btn.setBackground(couleur);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        btn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        return btn;
+    }
+
     private String formatterDateAvis(LocalDate dateAvis) {
         if (dateAvis == null) {
             return "Inconnue";
@@ -1887,5 +2355,29 @@ public class Fenetre implements InterfaceVue {
             btnRetour.setVisible(!historique_fenetre.isEmpty());
         }
     }
+
+    private void ajouterPlaceholder(JTextField champ, String placeholder) {
+        champ.setText(placeholder);
+        champ.setForeground(Color.GRAY);
+
+        champ.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (champ.getText().equals(placeholder)) {
+                    champ.setText("");
+                    champ.setForeground(Color.BLACK);
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (champ.getText().isEmpty()) {
+                    champ.setText(placeholder);
+                    champ.setForeground(Color.GRAY);
+                }
+            }
+        });
+    }
+
 
 }
