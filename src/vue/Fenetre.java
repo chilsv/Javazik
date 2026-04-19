@@ -519,6 +519,7 @@ public class Fenetre implements InterfaceVue {
         }
 
         utilisateur.ajouterHistorique(morceauLecture);
+        morceauLecture.ajouterEcoute();
         dejaAjouteHistorique = true;
         System.out.println(morceauLecture.getNom() + " ajouté à l'historique");
     }
@@ -1252,8 +1253,8 @@ public class Fenetre implements InterfaceVue {
         barreOnglets.add(btnMorceaux);
 
         // Vue albums de l'artiste (réutilise creerVueAlbums)
-        JComponent vueAlbums =creerVueAlbums(albums);
-        JComponent vueMorceaux =creerVueMorceaux(tousLesMorceaux);
+        JComponent vueAlbums = creerVueAlbums(albums);
+        JComponent vueMorceaux = creerVueMorceaux(tousLesMorceaux);
         ongletPanel.add(vueAlbums,"albums");
         ongletPanel.add(vueMorceaux,"morceaux");
         JButton[] btns   = { btnAlbums, btnMorceaux };
@@ -1521,7 +1522,6 @@ public class Fenetre implements InterfaceVue {
         section.add(scrollAvis, BorderLayout.SOUTH);
         return section;
     }
-
 
     private String formatterDateAvis(LocalDate dateAvis) {
         if (dateAvis == null) {
