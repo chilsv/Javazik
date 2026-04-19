@@ -298,6 +298,7 @@ public class FenetreVisite {
     public JLabel getPopulaire(){ return populaire; }
     public JLabel getRadio(){ return radio; }
     public JLabel getPodcasts() { return podcasts; }
+    public JPanel getLecture() { return lecture; }
 
     // methode publique appelées par EvenementsVisite, je vais changer ca
     // rend le panneau filtre visible

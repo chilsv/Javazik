@@ -153,6 +153,23 @@ public class Main {
         return avis;
     }
 
+    public static void ajouterFileAttente(Morceau morceau) {
+        if (morceau != null) {
+            queue.add(morceau);
+        }
+    }
+
+    public static Morceau retirerFileAttente() {
+        if (queue.isEmpty()) {
+            return null;
+        }
+        return queue.remove(0);
+    }
+
+    public static ArrayList<Morceau> getFileAttente() {
+        return new ArrayList<Morceau>(queue);
+    }
+
     public static void ajouterAbonne(Personne utilisateur, ArrayList<Abonne> abonnes) {
         for (Abonne abonne :abonnes) {
             if (abonne.getMail().equals(utilisateur.getMail())) {

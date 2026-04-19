@@ -6,21 +6,17 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import controleur.EvenementsConnexion;
 import controleur.EvenementsInscription;
 import controleur.EvenementsMenu;
 import controleur.EvenementsVisite;
+import controleur.Main;
 import controleur.actions.Action;
-import controleur.actions.ActionArguments;
 import controleur.actions.ChoisirFiltre;
 import controleur.actions.ConsulterProfil;
 import controleur.actions.Deconnexion;
-import controleur.actions.MettreAvis;
 import controleur.actions.Recherche;
 import controleur.exceptions.ActionException;
 import controleur.formulaires.*;
@@ -35,7 +31,13 @@ public class Fenetre implements InterfaceVue {
     private final Map<String, JPanel> pagesMap; // map pour trouver le panel grâcec à son nom
     private FenetreVisite fenetreVisite;
     private Personne utilisateur;
-    private Catalogue catalogueActuel;
+    private Catalogue catalogue;
+    private boolean lectureEnPause = false; // pause et play
+    private Morceau morceauLecture; // morceau en cours
+    private int progressionSecondes = 0; // le temps depuis qu'on a lancé le morceau
+    private Timer timerLecture;
+    private JProgressBar barreProgression;
+    private JLabel labelTempsLecture;
 
     // couleur meme que les autres jpanel
     final Color BG_PRINCIPAL = new Color(26, 26, 26);
@@ -293,10 +295,6 @@ public class Fenetre implements InterfaceVue {
         return resultat[0];
     }
 
-    /* barre de lecture à faire*/
-    public void afficherLecture(Morceau morceau){
-    };
-
     public void afficherMessage(String message) {
     }
 
@@ -367,7 +365,7 @@ public class Fenetre implements InterfaceVue {
 
     public void configurer(Personne utilisateurActuel, Catalogue catalogue) {
         this.utilisateur = utilisateurActuel;
-        this.catalogueActuel = catalogue;
+        this.catalogue = catalogue;
     }
 
     /* true si le morceau est aimé par abonné */
@@ -376,11 +374,11 @@ public class Fenetre implements InterfaceVue {
             return false;
         }
         Abonne abonne = (Abonne) utilisateur;
-        return abonne.morceauDejaAime(morceau, catalogueActuel);
+        return abonne.morceauDejaAime(morceau, catalogue);
     }
 
     private void basculerAime(Morceau morceau) {
-        if (morceau == null || catalogueActuel == null) {
+        if (morceau == null || catalogue == null) {
             return;
         }
         if (!(utilisateur instanceof Abonne)) {
@@ -388,10 +386,10 @@ public class Fenetre implements InterfaceVue {
             return;
         }
         Abonne abonne = (Abonne) utilisateur;
-        if (!abonne.morceauDejaAime(morceau, catalogueActuel)) {
-            catalogueActuel.ajouterMorceauPlaylist(morceau, abonne.getAimes());
+        if (!abonne.morceauDejaAime(morceau, catalogue)) {
+            catalogue.ajouterMorceauPlaylist(morceau, abonne.getAimes());
         } else {
-            abonne.retirerMorceauPlaylist(morceau, catalogueActuel, abonne.getAimes());
+            abonne.retirerMorceauPlaylist(morceau, catalogue, abonne.getAimes());
         }
     }
 
@@ -569,7 +567,8 @@ public class Fenetre implements InterfaceVue {
         actions.setAlignmentY(Component.CENTER_ALIGNMENT);
         if (ligne.objet instanceof Morceau) {
             actions.add(creerLabelImage("assets/file_attente.png", "ajouter à la file d'attente", () -> {
-                System.out.println("Ajouter à la file d'attente");
+                Main.ajouterFileAttente((Morceau) ligne.objet);
+                afficherMessage("Ajouté à la file d'attente");
             }, 22, 22));
         }
         if (afficherAimer) {
@@ -1183,7 +1182,6 @@ public class Fenetre implements InterfaceVue {
         return scroll;
     }
 
-    // ── Bouton catégorie dark ────────────────────────────────────────────────────
     private JButton creerBoutonCategorie(String texte, Color accent, Color bgCarte, Color textGris, Color border) {
         JButton btn = new JButton(texte) {
             @Override protected void paintComponent(Graphics g) {
@@ -1225,7 +1223,6 @@ public class Fenetre implements InterfaceVue {
         return btn;
     }
 
-    // ── Applique l'état actif/inactif sur un bouton catégorie ───────────────────
     private void appliquerStyleCategorieActive(JButton btn, boolean actif,
                                                Color accent, Color bgCarte, Color textGris, Color border) {
         btn.putClientProperty("actif", actif);
