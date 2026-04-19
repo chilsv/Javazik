@@ -23,7 +23,7 @@ import metier.Playlist;
 import metier.Solo;
 
 public class ScriptPeuplement {
-    public static void main(String[] args) {
+    public ScriptPeuplement() {
         ArrayList<Abonne> abonnes = new ArrayList<>();
         ArrayList<Admin> admins = new ArrayList<>();
         ArrayList<Morceau> morceaux = new ArrayList<>();

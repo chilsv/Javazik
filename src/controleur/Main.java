@@ -45,8 +45,8 @@ public class Main {
         charger(avis, "avis.ser");
 
         if (morceaux.isEmpty()) {
-            ImportMusiques.main(new String[0]);
-            ScriptPeuplement.main(new String[0]);
+            new ImportMusiques();
+            new ScriptPeuplement();
             abonnes.clear();
             admins.clear();
             morceaux.clear();

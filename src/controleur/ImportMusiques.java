@@ -22,7 +22,7 @@ public class ImportMusiques {
     public static ArrayList<Playlist> playlistsImportees = new ArrayList<Playlist>();
     public static Catalogue catalogue;
 
-    public static void main(String[] args) {
+    public ImportMusiques() {
         Main.charger(morceauxImportes, "morceaux.ser");
         Main.charger(playlistsImportees, "playlists.ser");
         Main.charger(artistesImportes, "artistes.ser");
