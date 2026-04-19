@@ -11,6 +11,11 @@ public class EvenementsMenu {
         void onChoix(int choix);
     }
 
+
+
+
+
+
     public static void ajouterEvenements(FenetreMenu fenetre, MenuListener listener) {
         JFrame frame = fenetre.getFrame();
         JLabel btnQuitter = fenetre.getBtnQuitterLabel();
