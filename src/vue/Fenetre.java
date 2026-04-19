@@ -253,7 +253,7 @@ public class Fenetre implements InterfaceVue {
                         else {
                             fenetreVisite.viderPanelCentral();
                             if (utilisateur instanceof Abonne||utilisateur instanceof Admin) {
-                                naviguerVers(afficherProfilAbonne((Abonne) utilisateur));// on ne anotifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
+                                naviguerVers(afficherProfilAbonne(utilisateur));// on ne anotifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
                             }
                             return;
                         }
@@ -972,17 +972,15 @@ public class Fenetre implements InterfaceVue {
 
 
     // nouvelle méthode interne qui retourne le panel
-    private JComponent afficherProfilAbonne(Abonne abonne) {
+    private JComponent afficherProfilAbonne(Personne personne) {
         JPanel contenu = new JPanel(new BorderLayout());
         contenu.setBackground(BG_PRINCIPAL);
         contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
 
-        // profil
         JPanel carte = new JPanel(new BorderLayout(20, 0));
         carte.setBackground(BG_CARTE);
         carte.setBorder(new EmptyBorder(18, 18, 18, 18));
 
-        // Avatar placeholder
         JLabel avatar = new JLabel();
         avatar.setPreferredSize(new Dimension(100, 100));
         avatar.setHorizontalAlignment(SwingConstants.CENTER);
@@ -996,17 +994,16 @@ public class Fenetre implements InterfaceVue {
             avatar.setForeground(TEXT_GRIS);
         }
 
-        // Infos
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
 
-        JLabel nom = new JLabel(abonne.getNom());
+        JLabel nom = new JLabel(personne.getNom());
         nom.setFont(new Font("SansSerif", Font.BOLD, 26));
         nom.setForeground(TEXT_BLANC);
         nom.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel mail = new JLabel("✉  " + abonne.getMail());
+        JLabel mail = new JLabel("✉  " + personne.getMail());
         mail.setFont(new Font("SansSerif", Font.PLAIN, 14));
         mail.setForeground(TEXT_GRIS);
         mail.setBorder(new EmptyBorder(10, 0, 0, 0));
@@ -1018,26 +1015,40 @@ public class Fenetre implements InterfaceVue {
         mdp.setBorder(new EmptyBorder(6, 0, 0, 0));
         mdp.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        int nbPlaylists = abonne.getPlaylists() != null ? abonne.getPlaylists().size() : 0;
-        int nbAvis = abonne.getAvis() != null ? abonne.getAvis().size() : 0;
-
-        JLabel stats = new JLabel(nbPlaylists + " playlist(s)  ·  " + nbAvis + " avis rédigé(s)");
-        stats.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        stats.setForeground(TEXT_GRIS);
-        stats.setBorder(new EmptyBorder(10, 0, 0, 0));
-        stats.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel typeCom = new JLabel("Abonné");
-        typeCom.setFont(new Font("SansSerif", Font.BOLD, 12));
-        typeCom.setForeground(ACCENT);
-        typeCom.setBorder(new EmptyBorder(8, 0, 0, 0));
-        typeCom.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         infos.add(nom);
         infos.add(mail);
         infos.add(mdp);
-        infos.add(stats);
-        infos.add(typeCom);
+
+        // infos spécifiques selon le type
+        if (personne instanceof Abonne) {
+            Abonne abonne = (Abonne) personne;
+            int nbPlaylists = abonne.getPlaylists() != null ? abonne.getPlaylists().size() : 0;
+            int nbAvis = abonne.getAvis() != null ? abonne.getAvis().size() : 0;
+
+            JLabel stats = new JLabel(nbPlaylists + " playlist(s)  ·  " + nbAvis + " avis rédigé(s)");
+            stats.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            stats.setForeground(TEXT_GRIS);
+            stats.setBorder(new EmptyBorder(10, 0, 0, 0));
+            stats.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JLabel typeLabel = new JLabel("Abonné");
+            typeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            typeLabel.setForeground(ACCENT);
+            typeLabel.setBorder(new EmptyBorder(8, 0, 0, 0));
+            typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            infos.add(stats);
+            infos.add(typeLabel);
+
+        } else if (personne instanceof Admin) {
+            JLabel typeLabel = new JLabel("Administrateur");
+            typeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+            typeLabel.setForeground(ACCENT);
+            typeLabel.setBorder(new EmptyBorder(8, 0, 0, 0));
+            typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            infos.add(typeLabel);
+        }
 
         carte.add(avatar, BorderLayout.WEST);
         carte.add(infos, BorderLayout.CENTER);
