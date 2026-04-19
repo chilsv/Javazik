@@ -12,6 +12,8 @@ public class EvenementsConnexion {
         void onChoix(int choix);
     }
 
+
+
     public static void ajouterEvenements(FenetreConnexion fenetre, ConnexionListener listener) {
         JButton btnValider = fenetre.getBtnValider();
         JLabel btnRetour = fenetre.getBtnRetourLabel();
@@ -43,3 +45,7 @@ public class EvenementsConnexion {
     }
 
 }
+
+
+
+
