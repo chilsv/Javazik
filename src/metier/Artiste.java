@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public abstract class Artiste implements TypeObjets {
     private int num;
     private String nom;
+    private float note;
+    private int nbEcoutes = 0;
     private String image;
     private ArrayList<Morceau> morceaux = new ArrayList<Morceau>();
     private ArrayList<Album> albums = new ArrayList<Album>();
@@ -24,6 +26,12 @@ public abstract class Artiste implements TypeObjets {
      */
     public void ajouterMorceau(Morceau morceau) {
         morceaux.add(morceau);
+        // on met à jour la note moyenne de l'artiste
+        float sommeNotes = 0;
+        for (Morceau m : morceaux) {
+            sommeNotes += m.getNoteMoy();
+        }
+        this.note = sommeNotes / morceaux.size();
     }
 
     /**
@@ -81,5 +89,17 @@ public abstract class Artiste implements TypeObjets {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public float getNoteMoy() {
+        return note;
+    }
+
+    public int getNbEcoutes() {
+        return nbEcoutes;
+    }
+
+    public void ajouterEcoute() {
+        nbEcoutes++;
     }
 }

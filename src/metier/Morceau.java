@@ -11,6 +11,7 @@ public class Morceau implements TypeObjets {
     private ArrayList<String> genres;
     private String image;
     private float noteMoy;
+    private int nbEcoutes = 0;
     private ArrayList<Avis> avis = new ArrayList<Avis>();
 
     public Morceau(String titre, Artiste artiste) {
@@ -100,5 +101,16 @@ public class Morceau implements TypeObjets {
 
     public float getNoteMoy() {
         return noteMoy;
+    }
+
+    public int getNbEcoutes() {
+        return nbEcoutes;
+    }
+
+    public void ajouterEcoute() {
+        for (Artiste artiste : artistes) {
+            artiste.ajouterEcoute();
+        }
+        nbEcoutes++;
     }
 }

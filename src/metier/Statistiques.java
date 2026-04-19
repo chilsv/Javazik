@@ -12,11 +12,15 @@ public class Statistiques {
     public int nbArtistes;
     public int nbPlaylists;
     public int nbAvis;
+    public Morceau morceauLePlusJoue;
+    public Morceau morceauLeMieuxNote;
+    public Artiste artisteLePlusJoue;
+    public Artiste artisteLeMieuxNote;
 
     // stats perso
     public Abonne abonne;
-    public Map<Morceau, Integer> ecoutes = new HashMap<>();
-    public Map<Artiste, Integer> ecoutesArtistes = new HashMap<>();
+    public Map<Morceau, Integer> ecoutes = new HashMap<Morceau, Integer>();
+    public Map<Artiste, Integer> ecoutesArtistes = new HashMap<Artiste, Integer>();
     public int nbMorceauxAimes;
     public int nbPlaylistsAbonne;
     public int nbAvisAbonne;
@@ -25,6 +29,7 @@ public class Statistiques {
     public int nbMorceauxJoues;
     public int nbMorceauPrefJoues;
     public int nbArtistePrefJoues;
+    public int tempsEcouteTotal = 0;
 
     /* constructeurs stats généralzes */
     public Statistiques(Catalogue catalogue, ArrayList<Abonne> abonnes, ArrayList<Avis> avis) {
@@ -33,6 +38,9 @@ public class Statistiques {
         this.nbPlaylists = catalogue.getPlaylists().size();
         this.nbArtistes = catalogue.getArtistes().size();
         this.nbAvis = avis.size();
+        getMeilleuresNotes(catalogue);
+        this.morceauLePlusJoue = getMorceauPlusJoue(catalogue);
+        this.artisteLePlusJoue = getArtistePlusJoue(catalogue);
     }
 
     /* constructeurs stats perso */
@@ -44,14 +52,13 @@ public class Statistiques {
         this.nbMorceauxAimes = catalogue.getPlaylist(abonne.getAimes()).getMorceaux().size();
         this.nbPlaylistsAbonne = abonne.getPlaylists().size();
         this.nbAvisAbonne = abonne.getAvis().size();
-        //this.nbMorceauxJoues = abonne.getNbMorceauxJoues();
-        //this.nbMorceauPrefJoues = abonne.getNbMorceauPrefJoues();
-        //this.nbArtistePrefJoues = abonne.getNbArtistePrefJoues();
     }
 
     public void getEcoutes(Abonne abonne) {
         Map<Morceau, LocalDateTime> historique = abonne.getHistorique();
         for (Morceau morceau : historique.keySet()) {
+            nbMorceauxJoues++;
+            tempsEcouteTotal += morceau.getDuree();
             ArrayList<Artiste> artistes = morceau.getArtistes();
             // on ajoute une écoute pour le morceau
             if (ecoutes.containsKey(morceau)) {
@@ -80,6 +87,7 @@ public class Statistiques {
                 artistePrefere = artiste;
             }
         }
+        nbArtistePrefJoues = maxEcoutes;
         return artistePrefere;
     }
 
@@ -92,6 +100,46 @@ public class Statistiques {
                 morceauPrefere = morceau;
             }
         }
+        nbMorceauPrefJoues = maxEcoutes;
         return morceauPrefere;
+    }
+
+    public void getMeilleuresNotes(Catalogue catalogue) {
+        float maxNoteMorceau = 0;
+        float maxNoteArtiste = 0;
+        for (Morceau morceau : catalogue.getMorceaux()) {
+            if (morceau.getNoteMoy() > maxNoteMorceau) {
+                maxNoteMorceau = morceau.getNoteMoy();
+                morceauLeMieuxNote = morceau;
+            }
+        }
+        for (Artiste artiste : catalogue.getArtistes()) {
+            if (artiste.getNoteMoy() > maxNoteArtiste) {
+                maxNoteArtiste = artiste.getNoteMoy();
+                artisteLeMieuxNote = artiste;
+            }
+        }
+    }
+
+    public Morceau getMorceauPlusJoue(Catalogue catalogue) {
+        int maxEcoutes = 0;
+        for (Morceau morceau : catalogue.getMorceaux()) {
+            if (morceau.getNbEcoutes() > maxEcoutes) {
+                maxEcoutes = morceau.getNbEcoutes();
+                morceauLePlusJoue = morceau;
+            }
+        }
+        return morceauLePlusJoue;
+    }
+
+    public Artiste getArtistePlusJoue(Catalogue catalogue) {
+        int maxEcoutes = 0;
+        for (Artiste artiste : catalogue.getArtistes()) {
+            if (artiste.getNbEcoutes() > maxEcoutes) {
+                maxEcoutes = artiste.getNbEcoutes();
+                artisteLePlusJoue = artiste;
+            }
+        }
+        return artisteLePlusJoue;
     }
 }
