@@ -18,6 +18,13 @@ public class Console implements InterfaceVue {
         System.out.println("Bienvenue dans Javazic !");
     }
 
+    private String formatterNomPlaylist(Playlist playlist) {
+        if (playlist == null) {
+            return "Playlist";
+        }
+        return "#" + playlist.getNum() + " - " + playlist.getNom();
+    }
+
     private String lireTexte(String invite) {
         Scanner saisie = new Scanner(System.in);
         System.out.print(invite);
@@ -51,9 +58,6 @@ public class Console implements InterfaceVue {
         String entree = saisie.nextLine();
         try {
             int choix = Integer.parseInt(entree);
-            if (choix < 1 || choix > actions.size()) {
-                return null;
-            }
             return actions.get(choix - 1);
         } catch (NumberFormatException e) {
             return null;
@@ -166,7 +170,7 @@ public class Console implements InterfaceVue {
         System.out.println("-".repeat(40));
         System.out.println("Playlists :");
         for (Playlist playlist : resultat.playlists) {
-            System.out.println("- " + playlist.getNom());
+            System.out.println("- " + formatterNomPlaylist(playlist));
         }
     }
 
@@ -238,7 +242,7 @@ public class Console implements InterfaceVue {
             int numPlaylist = abonne.getPlaylists().get(i);
             Playlist playlist = catalogue.getPlaylist(numPlaylist);
             if (playlist != null) {
-                System.out.println("- " + playlist.getNom());
+                System.out.println("- " + formatterNomPlaylist(playlist));
             }
         }
     }

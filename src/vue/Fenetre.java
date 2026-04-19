@@ -1008,6 +1008,13 @@ public class Fenetre implements InterfaceVue {
         return String.format("%d:%02d", minutes, reste);
     }
 
+    private String formatterNomPlaylist(Playlist playlist) {
+        if (playlist == null) {
+            return "Playlist";
+        }
+        return "#" + playlist.getNum() + " - " + playlist.getNom();
+    }
+
     private Morceau premierMorceau(Album album) {
         if (album == null || album.getMorceaux() == null || album.getMorceaux().isEmpty()) {
             return null;
@@ -1221,7 +1228,7 @@ public class Fenetre implements InterfaceVue {
 
                 LigneResultat<Playlist> ligne = new LigneResultat<>(
                     pl,
-                    pl.getNom(),
+                    formatterNomPlaylist(pl),
                     nbMorceauxPl + " morceau(x)  ·  " + formatterDuree(dureePl),
                     "",
                     false
@@ -1426,7 +1433,7 @@ public class Fenetre implements InterfaceVue {
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
-        JLabel nom = new JLabel(playlist.getNom());
+        JLabel nom = new JLabel(formatterNomPlaylist(playlist));
         nom.setFont(new Font("SansSerif", Font.BOLD, 26));
         nom.setForeground(TEXT_BLANC);
         nom.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -1690,7 +1697,7 @@ public class Fenetre implements InterfaceVue {
                     lignePl.setAlignmentX(Component.LEFT_ALIGNMENT);
                     lignePl.setBorder(new EmptyBorder(3, 0, 3, 0));
 
-                    JLabel nomPl = new JLabel(pl.getNom());
+                    JLabel nomPl = new JLabel(formatterNomPlaylist(pl));
                     nomPl.setForeground(TEXT_BLANC);
                     nomPl.setFont(new Font("SansSerif", Font.PLAIN, 12));
 
@@ -2624,7 +2631,7 @@ public class Fenetre implements InterfaceVue {
         } else {
             for (final Playlist playlist : playlistsResultat) {
                 String detail = (playlist.getMorceaux() == null ? 0 : playlist.getMorceaux().size()) + " morceau(x) · " + playlist.getCreation();
-                LigneResultat<Playlist> ligne = new LigneResultat<>(playlist, playlist.getNom(), detail, "", true);
+                LigneResultat<Playlist> ligne = new LigneResultat<>(playlist, formatterNomPlaylist(playlist), detail, "", true);
                 boolean aimeActuel = estAimee(playlist);
                 liste.add(creerLigne(
                         ligne,
