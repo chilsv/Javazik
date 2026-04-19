@@ -567,6 +567,11 @@ public class Fenetre implements InterfaceVue {
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 18));
         actions.setOpaque(false);
         actions.setAlignmentY(Component.CENTER_ALIGNMENT);
+        if (ligne.objet instanceof Morceau) {
+            actions.add(creerLabelImage("assets/file_attente.png", "ajouter à la file d'attente", () -> {
+                System.out.println("Ajouter à la file d'attente");
+            }, 22, 22));
+        }
         if (afficherAimer) {
             final JLabel[] aimerLabelRef = new JLabel[1];
             String chemin;
