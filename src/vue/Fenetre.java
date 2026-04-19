@@ -325,6 +325,7 @@ public class Fenetre implements InterfaceVue {
             } else {
                 demarrerTimerLecture();
             }
+
         });
     }
 
@@ -439,6 +440,7 @@ public class Fenetre implements InterfaceVue {
                 if (progressionSecondes < duree) {
                     progressionSecondes++;
                     mettreAJourAffichageProgression();
+                    ajouterHistorique();
                     return;
                 }
 
@@ -464,9 +466,9 @@ public class Fenetre implements InterfaceVue {
         }
     }
 
-    private void mettreAJourAffichageProgression() {
+    private float mettreAJourAffichageProgression() {
         if (morceauLecture == null) {
-            return;
+            return 0;
         }
         int duree = Math.max(1, morceauLecture.getDuree());
         int valeur = Math.min(progressionSecondes, duree);
@@ -477,6 +479,18 @@ public class Fenetre implements InterfaceVue {
         if (labelTempsLecture != null) {
             labelTempsLecture.setText(formatterDuree(valeur));
         }
+        return (float)valeur / (float)duree; // on utilise le temps de lecture pour ajouter à l'historique
+    }
+
+    private void ajouterHistorique() {
+        if (morceauLecture == null || utilisateur == null) {
+            return;
+        }
+        if (progressionSecondes < 10) {
+            return;
+        }
+
+        utilisateur.ajouterHistorique(morceauLecture);
     }
 
     private JButton boutonSuivant(Morceau morceauCourant) {
@@ -747,7 +761,7 @@ public class Fenetre implements InterfaceVue {
     }
 
     /* crée visuellement la ligne avec les boutons et infos */
-    private <T extends TypeObjets> JPanel creerLigne(LigneResultat<T> ligne, Runnable actionPlay, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, boolean aimeActuel) {
+    private <T extends TypeObjets> JPanel creerLigne(LigneResultat<T> ligne, Runnable actionDetails, Runnable actionAimer, boolean afficherAimer, boolean aimeActuel) {
         JPanel lignePanel = new JPanel(new BorderLayout(12, 0)) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -765,7 +779,7 @@ public class Fenetre implements InterfaceVue {
         lignePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // bouton play
-        JLabel play = creerLabelImage("assets/play.png", "play", actionPlay, 22, 22);
+        JLabel play = creerLabelImage("assets/play.png", "play", () -> jouer(ligne.objet), 22, 22);
         JLabel vignette = creerVignetteObjet(ligne.objet);
         //play.setAlignmentY(Component.CENTER_ALIGNMENT);
         vignette.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -873,29 +887,31 @@ public class Fenetre implements InterfaceVue {
     }
 
     private void jouer(TypeObjets objet) {
+
+        System.out.println("Historique");
+        for (Map.Entry<Morceau, java.time.LocalDateTime> entree : utilisateur.getHistorique().entrySet()) {
+            Morceau historiqueMorceau = entree.getKey();
+            System.out.println(historiqueMorceau.getNom() + " - " + entree.getValue());
+        }
+        
+        if (utilisateur instanceof Visiteur && utilisateur.getHistorique().size() >= 5) {
+            fenetreVisite.afficherErreur(new ActionException("Abonnez-vous pour écouter plus"));
+            return;
+        }
+
+        Morceau morceau = null;
         if (objet instanceof Morceau) {
-            afficherLecture((Morceau) objet);
+            morceau = (Morceau) objet;
         } else if (objet instanceof Album) {
-            Morceau morceau = premierMorceau((Album) objet);
-            if (morceau != null) {
-                afficherLecture(morceau);
-            } else {
-                afficherMessage("Cet album ne contient aucun morceau.");
-            }
+            morceau = premierMorceau((Album) objet);
         } else if (objet instanceof Playlist) {
-            Morceau morceau = premierMorceau((Playlist) objet);
-            if (morceau != null) {
-                afficherLecture(morceau);
-            } else {
-                afficherMessage("Cette playlist ne contient aucun morceau.");
-            }
+            morceau = premierMorceau((Playlist) objet);
         } else if (objet instanceof Artiste) {
-            Morceau morceau = premierMorceau((Artiste) objet);
-            if (morceau != null) {
-                afficherLecture(morceau);
-            } else {
-                afficherMessage("Aucun morceau disponible pour cet artiste.");
-            }
+            morceau = premierMorceau((Artiste) objet);
+        }
+
+        if (morceau != null) {
+            afficherLecture(morceau);
         }
     }
 
@@ -1518,7 +1534,6 @@ public class Fenetre implements InterfaceVue {
                 boolean aimeActuel = estAime(morceau);
                 liste.add(creerLigne(
                         ligne,
-                        new Runnable() { public void run() { jouer(morceau); } },
                         new Runnable() { public void run() { afficherDetails(morceau); } },
                     new Runnable() { public void run() { basculerAime(morceau); } },
                         true,
@@ -1550,7 +1565,6 @@ public class Fenetre implements InterfaceVue {
                 LigneResultat<Artiste> ligne = new LigneResultat<>(artiste, artiste.getNom(), detail, "", false);
                 liste.add(creerLigne(
                         ligne,
-                        new Runnable() { public void run() { jouer(artiste); } },
                         new Runnable() { public void run() { afficherDetails(artiste); } },
                         new Runnable() { public void run() {} },
                         false,
@@ -1583,7 +1597,6 @@ public class Fenetre implements InterfaceVue {
                 LigneResultat<Album> ligne = new LigneResultat<>(album, album.getNom(), detail, "", false);
                 liste.add(creerLigne(
                         ligne,
-                        new Runnable() { public void run() { jouer(album); } },
                         new Runnable() { public void run() { afficherDetails(album); } },
                         new Runnable() { public void run() {} },
                         false,
@@ -1616,7 +1629,6 @@ public class Fenetre implements InterfaceVue {
                 boolean aimeActuel = estAimee(playlist);
                 liste.add(creerLigne(
                         ligne,
-                        new Runnable() { public void run() { jouer(playlist); } },
                         new Runnable() { public void run() { afficherDetails(playlist); } },
                     new Runnable() { public void run() { basculerAime(playlist); } },
                         true,

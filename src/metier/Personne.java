@@ -2,8 +2,11 @@ package metier;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import controleur.actions.Action;
 import vue.InterfaceVue;
@@ -15,7 +18,7 @@ public abstract class Personne implements Serializable {
     private int num;
     private LocalDate date_creation;
     private final ArrayList<Action> actions = new ArrayList<Action>();
-    private ArrayList<Integer> historique = new ArrayList<Integer>();
+    private Map<Morceau, LocalDateTime> historique = new HashMap<Morceau, LocalDateTime>();
 
     /**
      * Pour l'instanciation d'un Visiteur
@@ -71,12 +74,15 @@ public abstract class Personne implements Serializable {
         return mdp;
     }
 
-    public ArrayList<Integer> getHistorique() {
+    public Map<Morceau, LocalDateTime> getHistorique() {
         return historique;
     }
 
-    public void ajouterHistorique(int numMorceau) {
-        historique.add(numMorceau);
+    public void ajouterHistorique(Morceau morceau) {
+        if (morceau == null) {
+            return;
+        }
+        historique.put(morceau, LocalDateTime.now());
     }
 
     public int getAge() {
