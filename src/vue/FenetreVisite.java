@@ -53,8 +53,6 @@ public class FenetreVisite {
     private final JLabel parcourir;
     private final JLabel pourVous;
     private final JLabel populaire;
-    private final JLabel radio;
-    private final JLabel podcasts;
     private final JLabel btn_retour2;
     private final JLabel btn_admin;
 
@@ -110,8 +108,6 @@ public class FenetreVisite {
         parcourir = creerLabelMenu(null,"Parcourir",25, 25);
         pourVous = creerLabelMenu(null,"Pour vous",25, 25);
         populaire = creerLabelMenu(null,"Populaire",25, 25);
-        radio = creerLabelMenu(null,"Radio",25, 25);
-        podcasts = creerLabelMenu(null,"Podcasts",25, 25);
 
         btnRetour = creerLabelMenu("assets/btn_retour.png", "Back", 32, 32);
         btn_retour2 = creerLabelMenu("assets/btn_retour2.png", "Retour", 32, 32);
@@ -136,8 +132,6 @@ public class FenetreVisite {
         bandeSelection.add(parcourir);
         bandeSelection.add(pourVous);
         bandeSelection.add(populaire);
-        bandeSelection.add(radio);
-        bandeSelection.add(podcasts);
         bandeSelection.add(Box.createVerticalGlue()); // pousse btnRetour vers le bas
         bandeSelection.add(creerSeparateur());
         bandeSelection.add(Box.createVerticalStrut(10));
@@ -307,8 +301,6 @@ public class FenetreVisite {
     public JLabel getParcourir(){ return parcourir; }
     public JLabel getPourVous(){ return pourVous; }
     public JLabel getPopulaire(){ return populaire; }
-    public JLabel getRadio(){ return radio; }
-    public JLabel getPodcasts() { return podcasts; }
     public JPanel getLecture() { return lecture; }
     public JLabel getBtnRetour2() { return btn_retour2; }
     public JLabel getBtnAdmin() { return btn_admin; }

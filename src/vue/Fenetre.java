@@ -254,16 +254,8 @@ public class Fenetre implements InterfaceVue {
             EvenementsVisite.ajouterEvenements(fenetreVisite, choix -> {
                 synchronized (verrou) {
                     if (choix == CHOIX_PROFIL) {
-                        if (utilisateur instanceof Visiteur){
-                            fenetreVisite.afficherErreur(new ActionException("Vous n'avez pas de compte"));
-                        }
-                        else {
-                            fenetreVisite.viderPanelCentral();
-                            if (utilisateur instanceof Abonne||utilisateur instanceof Admin) {
-                                naviguerVers(afficherProfilAbonne(utilisateur));// on ne anotifie pas le verrou, on reste sur la page, important, on ne sort pas de choisirAction
-                            }
-                            return;
-                        }
+                        naviguerVers(afficherProfilAbonne(utilisateur));
+                        return;
                     } else if (choix == CHOIX_PLAYLISTS) {
                         resultat[0] = new Recherche(new Filtre(false, false, false, true, false, new int[] {0, 0}));
                     } else if (choix == CHOIX_ARTISTES) {
@@ -279,6 +271,15 @@ public class Fenetre implements InterfaceVue {
                         resultat[0] = new ChoisirFiltre();
                     } else if (choix == CHOIX_LOUPE) {
                         resultat[0] = new Recherche();
+                    } else if (choix == CHOIX_PARCOURIR) {
+                        naviguerVers(afficherParcourir());
+                        return;
+                    } else if (choix == CHOIX_POPULAIRE) {
+                        naviguerVers(afficherPopulaire());
+                        return;
+                    } else if (choix == CHOIX_POUR_VOUS) {
+                        naviguerVers(afficherPourVous());
+                        return;
                     } else if (choix == CHOIX_ADMIN) {
                         if (utilisateur instanceof Admin) {
                             afficherProfilAdmin((Admin) utilisateur);
@@ -980,6 +981,20 @@ public class Fenetre implements InterfaceVue {
 
     // nouvelle méthode interne qui retourne le panel
     private JComponent afficherProfilAbonne(Personne personne) {
+        if (!(utilisateur instanceof Abonne)) {
+            // visiteur : on affiche un message d'invitation
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.setBackground(BG_PRINCIPAL);
+            panel.setBorder(new EmptyBorder(40, 40, 40, 40));
+            JLabel msg = new JLabel("Connectez-vous pour accéder à vos information personnels");
+            msg.setForeground(TEXT_GRIS);
+            msg.setFont(new Font("SansSerif", Font.PLAIN, 15));
+            msg.setHorizontalAlignment(SwingConstants.CENTER);
+            panel.add(msg, BorderLayout.CENTER);
+            fenetreVisite.afficherErreur(new ActionException("Vous n'avez pas de compte"));
+            return panel;
+        }
+
         JPanel contenu = new JPanel(new BorderLayout());
         contenu.setBackground(BG_PRINCIPAL);
         contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
@@ -1430,22 +1445,47 @@ public class Fenetre implements InterfaceVue {
         ));
         champCommentaire.putClientProperty("JTextField.placeholderText", "Votre commentaire...");
 
-        // Sélecteur de note 1-5
+        // Sélecteur etoiel fait par chatgpt de note 1-5
+        final int[] noteSelectionnee = {5};
         JPanel panelNote = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
         panelNote.setOpaque(false);
+
         JLabel labelNote = new JLabel("Note :");
         labelNote.setForeground(TEXT_GRIS);
         labelNote.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        SpinnerNumberModel modeleNote = new SpinnerNumberModel(5, 1, 5, 1);
-        JSpinner spinnerNote = new JSpinner(modeleNote);
-        spinnerNote.setBackground(new Color(45, 45, 45));
-        spinnerNote.setForeground(TEXT_BLANC);
-        spinnerNote.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        spinnerNote.setPreferredSize(new Dimension(55, 28));
-        ((JSpinner.DefaultEditor) spinnerNote.getEditor()).getTextField().setBackground(new Color(45, 45, 45));
-        ((JSpinner.DefaultEditor) spinnerNote.getEditor()).getTextField().setForeground(TEXT_BLANC);
         panelNote.add(labelNote);
-        panelNote.add(spinnerNote);
+
+        JLabel[] etoiles = new JLabel[5];
+        for (int i = 0; i < 5; i++) {
+            final int index = i;
+            etoiles[i] = new JLabel("★");
+            etoiles[i].setFont(new Font("SansSerif", Font.PLAIN, 20));
+            etoiles[i].setForeground(ACCENT); // toutes allumées par défaut (note = 5)
+            etoiles[i].setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            etoiles[i].addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent e) {
+                    noteSelectionnee[0] = index + 1;
+                    for (int j = 0; j < 5; j++) {
+                        etoiles[j].setForeground(j <= index ? ACCENT : new Color(70, 70, 70));
+                    }
+                }
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    for (int j = 0; j < 5; j++) {
+                        etoiles[j].setForeground(j <= index ? TEXT_BLANC : new Color(70, 70, 70));
+                    }
+                }
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    for (int j = 0; j < 5; j++) {
+                        etoiles[j].setForeground(j < noteSelectionnee[0] ? ACCENT : new Color(70, 70, 70));
+                    }
+                }
+            });
+            panelNote.add(etoiles[i]);
+        }
 
         JButton boutonEnvoyer = new JButton("Envoyer");
         boutonEnvoyer.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -1537,12 +1577,12 @@ public class Fenetre implements InterfaceVue {
                 afficherErreur(new ActionException("Le commentaire ne peut pas être vide"));
                 return;
             }
-            int note = (int) spinnerNote.getValue();
+            int note = noteSelectionnee[0];
             Avis nouvelAvis = new Avis(morceau, (Abonne) utilisateur, note, texte);
             morceau.getAvis().add(nouvelAvis);
             ((Abonne) utilisateur).ajouterAvis(nouvelAvis);
             champCommentaire.setText("");
-            spinnerNote.setValue(5);
+            //spinnerNote.setValue(5);
             rafraichirListe.run();
         });
 
@@ -2375,6 +2415,284 @@ public class Fenetre implements InterfaceVue {
     }
 
     //STATISTIQUES
+    //methodes pour les stast de clacul
+    private ArrayList<Avis> tousLesAvis() {
+        ArrayList<Avis> avis = new ArrayList<>();
+        if (catalogue == null) return avis;
+        for (Morceau m : catalogue.getMorceaux()) {
+            if (m.getAvis() != null) avis.addAll(m.getAvis());
+        }
+        return avis;
+    }
+
+    private ArrayList<Morceau> morceauxAleatoires(int nb) {
+        ArrayList<Morceau> tous = new ArrayList<>(catalogue.getMorceaux());
+        java.util.Collections.shuffle(tous);
+        return new ArrayList<>(tous.subList(0, Math.min(nb, tous.size())));
+    }
+
+    private ArrayList<Morceau> morceauxParArtiste(Artiste artiste) {
+        if (artiste == null) return new ArrayList<>();
+        return artiste.getMorceaux() != null ? artiste.getMorceaux() : new ArrayList<>();
+    }
+
+    // page parcourir, genreationn de son aleatoire
+    public JComponent afficherParcourir() {
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        JLabel titre = new JLabel("Parcourir");
+        titre.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titre.setForeground(TEXT_BLANC);
+        titre.setBorder(new EmptyBorder(0, 0, 16, 0));
+
+        JLabel sousTitre = new JLabel("Une sélection aléatoire pour vous");
+        sousTitre.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        sousTitre.setForeground(TEXT_GRIS);
+        sousTitre.setBorder(new EmptyBorder(0, 0, 16, 0));
+
+        JPanel haut = new JPanel();
+        haut.setLayout(new BoxLayout(haut, BoxLayout.Y_AXIS));
+        haut.setOpaque(false);
+        haut.add(titre);
+        haut.add(sousTitre);
+
+        ArrayList<Morceau> selection = morceauxAleatoires(20);
+        JComponent liste = creerVueMorceaux(selection);
+
+        contenu.add(haut, BorderLayout.NORTH);
+        contenu.add(liste, BorderLayout.CENTER);
+        return contenu;
+    }
+
+    // page populaire stats de tout les utilisateur avec un classement des son les plus ecouté et plusieurs stats
+    public JComponent afficherPopulaire() {
+        if (catalogue == null) return new JPanel();
+
+        ArrayList<Avis> avis = tousLesAvis();
+        // abonnes : on collecte depuis les playlists, approximation avec liste vide si indispo
+        Statistiques stats = new Statistiques(catalogue, new ArrayList<>(), avis);
+
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        // haut de tete
+        JLabel titre = new JLabel("Populaire en ce moment");
+        titre.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titre.setForeground(TEXT_BLANC);
+        titre.setBorder(new EmptyBorder(0, 0, 4, 0));
+
+        JPanel haut = new JPanel();
+        haut.setLayout(new BoxLayout(haut, BoxLayout.Y_AXIS));
+        haut.setOpaque(false);
+        haut.add(titre);
+        haut.add(Box.createVerticalStrut(14));
+
+        // Cartes stats globales
+        JPanel carteStats = new JPanel(new GridLayout(1, 4, 12, 0));
+        carteStats.setOpaque(false);
+        carteStats.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+
+        carteStats.add(creerCarteStatGlobale("Morceaux", String.valueOf(stats.nbMorceaux)));
+        carteStats.add(creerCarteStatGlobale("Artistes", String.valueOf(stats.nbArtistes)));
+        carteStats.add(creerCarteStatGlobale("Playlists", String.valueOf(stats.nbPlaylists)));
+        carteStats.add(creerCarteStatGlobale("Avis", String.valueOf(stats.nbAvis)));
+
+        haut.add(carteStats);
+        haut.add(Box.createVerticalStrut(20));
+
+        // Top morceaux (triés par nb écoutes)
+        JLabel titreMorceaux = new JLabel("Morceaux les plus écoutés");
+        titreMorceaux.setFont(new Font("SansSerif", Font.BOLD, 16));
+        titreMorceaux.setForeground(TEXT_BLANC);
+        titreMorceaux.setBorder(new EmptyBorder(0, 0, 10, 0));
+        haut.add(titreMorceaux);
+
+        ArrayList<Morceau> topMorceaux = new ArrayList<>(catalogue.getMorceaux());
+        topMorceaux.sort((a, b) -> b.getNbEcoutes() - a.getNbEcoutes());
+        ArrayList<Morceau> top10 = new ArrayList<>(topMorceaux.subList(0, Math.min(10, topMorceaux.size())));
+
+
+        // Morceau + artiste le mieux noté en banner
+        JPanel bannerNotes = new JPanel(new GridLayout(1, 2, 12, 0));
+        bannerNotes.setOpaque(false);
+        bannerNotes.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+        if (stats.morceauLeMieuxNote != null) {
+            bannerNotes.add(creerCarteMise("Morceau le mieux noté", stats.morceauLeMieuxNote.getNom(), String.format("%.1f / 5", stats.morceauLeMieuxNote.getNoteMoy())));
+        }
+        if (stats.artisteLeMieuxNote != null) {
+            bannerNotes.add(creerCarteMise("Artiste le mieux noté", stats.artisteLeMieuxNote.getNom(), String.format("%.1f / 5", stats.artisteLeMieuxNote.getNoteMoy())));
+        }
+
+        JPanel centre = new JPanel(new BorderLayout());
+        centre.setOpaque(false);
+
+        JPanel avantListe = new JPanel();
+        avantListe.setLayout(new BoxLayout(avantListe, BoxLayout.Y_AXIS));
+        avantListe.setOpaque(false);
+        avantListe.add(bannerNotes);
+        avantListe.add(Box.createVerticalStrut(16));
+
+        centre.add(avantListe, BorderLayout.NORTH);
+        centre.add(creerVueMorceaux(top10), BorderLayout.CENTER);
+
+        contenu.add(haut, BorderLayout.NORTH);
+        contenu.add(centre, BorderLayout.CENTER);
+        return contenu;
+    }
+
+
+
+    //page pour vous avec toutes les stats personels
+    public JComponent afficherPourVous() {
+        if (!(utilisateur instanceof Abonne)) {
+            // visiteur : on affiche un message d'invitation
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.setBackground(BG_PRINCIPAL);
+            panel.setBorder(new EmptyBorder(40, 40, 40, 40));
+            JLabel msg = new JLabel("Connectez-vous pour accéder à vos recommandations personnalisées");
+            msg.setForeground(TEXT_GRIS);
+            msg.setFont(new Font("SansSerif", Font.PLAIN, 15));
+            msg.setHorizontalAlignment(SwingConstants.CENTER);
+            panel.add(msg, BorderLayout.CENTER);
+            fenetreVisite.afficherErreur(new ActionException("Vous n'avez pas de compte"));
+            return panel;
+        }
+
+        Abonne abonne = (Abonne) utilisateur;
+        Statistiques stats = new Statistiques(abonne, catalogue);
+
+        JPanel contenu = new JPanel(new BorderLayout());
+        contenu.setBackground(BG_PRINCIPAL);
+        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+        // panel des stats perso
+        JPanel haut = new JPanel();
+        haut.setLayout(new BoxLayout(haut, BoxLayout.Y_AXIS));
+        haut.setOpaque(false);
+
+        JLabel titre = new JLabel("Pour vous, " + abonne.getNom());
+        titre.setFont(new Font("SansSerif", Font.BOLD, 22));
+        titre.setForeground(TEXT_BLANC);
+        titre.setBorder(new EmptyBorder(0, 0, 14, 0));
+        haut.add(titre);
+
+
+
+        // cartes chiffres perso
+        JPanel carteStats = new JPanel(new GridLayout(1, 4, 12, 0));
+        carteStats.setOpaque(false);
+        carteStats.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+
+        String tempsFormate = formatterDuree(stats.tempsEcouteTotal);
+        carteStats.add(creerCarteStatGlobale("Temps écouté", tempsFormate));
+        carteStats.add(creerCarteStatGlobale("Morceaux joués", String.valueOf(stats.nbMorceauxJoues)));
+        carteStats.add(creerCarteStatGlobale("Playlists", String.valueOf(stats.nbPlaylistsAbonne)));
+        carteStats.add(creerCarteStatGlobale("Avis rédigés", String.valueOf(stats.nbAvisAbonne)));
+
+        haut.add(carteStats);
+        haut.add(Box.createVerticalStrut(14));
+
+        // Artiste et morceau préférés
+        JPanel bannerPref = new JPanel(new GridLayout(1, 2, 12, 0));
+        bannerPref.setOpaque(false);
+        bannerPref.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
+        if (stats.artistePrefere != null) {
+            bannerPref.add(creerCarteMise("🎤 Artiste préféré", stats.artistePrefere.getNom(), stats.nbArtistePrefJoues + " écoute(s)"));
+        }
+        if (stats.morceauPrefere != null) {
+            bannerPref.add(creerCarteMise("🎵 Morceau préféré", stats.morceauPrefere.getNom(), stats.nbMorceauPrefJoues + " écoute(s)"));
+        }
+        haut.add(bannerPref);
+        haut.add(Box.createVerticalStrut(20));
+
+        // Recommandations basées sur l'artiste préféré
+        JLabel titreReco = new JLabel("Recommandés pour vous");
+        titreReco.setFont(new Font("SansSerif", Font.BOLD, 16));
+        titreReco.setForeground(TEXT_BLANC);
+        titreReco.setBorder(new EmptyBorder(0, 0, 10, 0));
+        haut.add(titreReco);
+
+        // morceaux de l'artiste préféré + complétion aléatoire jusqu'à 15
+        ArrayList<Morceau> recos = new ArrayList<>();
+        if (stats.artistePrefere != null) {
+            recos.addAll(morceauxParArtiste(stats.artistePrefere));
+        }
+        if (recos.size() < 15) {
+            ArrayList<Morceau> aleatoires = morceauxAleatoires(15);
+            for (Morceau m : aleatoires) {
+                if (!recos.contains(m) && recos.size() < 15) {
+                    recos.add(m);
+                }
+            }
+        }
+
+        titre.setHorizontalAlignment(SwingConstants.CENTER);
+        titre.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        titreReco.setHorizontalAlignment(SwingConstants.CENTER);
+        titreReco.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+
+        contenu.add(haut, BorderLayout.NORTH);
+        contenu.add(creerVueMorceaux(recos), BorderLayout.CENTER);
+        return contenu;
+    }
+
+
+    //methode charter graphique  visuels stats
+    private JPanel creerCarteStatGlobale(String label, String valeur) {
+        JPanel carte = new JPanel();
+        carte.setLayout(new BoxLayout(carte, BoxLayout.Y_AXIS));
+        carte.setBackground(BG_CARTE);
+        carte.setBorder(new EmptyBorder(12, 14, 12, 14));
+
+        JLabel lblValeur = new JLabel(valeur);
+        lblValeur.setFont(new Font("SansSerif", Font.BOLD, 22));
+        lblValeur.setForeground(ACCENT);
+        lblValeur.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel lblLabel = new JLabel(label);
+        lblLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        lblLabel.setForeground(TEXT_GRIS);
+        lblLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblLabel.setBorder(new EmptyBorder(4, 0, 0, 0));
+
+        carte.add(lblValeur);
+        carte.add(lblLabel);
+        return carte;
+    }
+
+    private JPanel creerCarteMise(String label, String nom, String detail) {
+        JPanel carte = new JPanel();
+        carte.setLayout(new BoxLayout(carte, BoxLayout.Y_AXIS));
+        carte.setBackground(new Color(40, 50, 70));
+        carte.setBorder(new EmptyBorder(12, 14, 12, 14));
+
+        JLabel lblLabel = new JLabel(label);
+        lblLabel.setFont(new Font("SansSerif", Font.BOLD, 11));
+        lblLabel.setForeground(TEXT_GRIS);
+        lblLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel lblNom = new JLabel(nom);
+        lblNom.setFont(new Font("SansSerif", Font.BOLD, 15));
+        lblNom.setForeground(TEXT_BLANC);
+        lblNom.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblNom.setBorder(new EmptyBorder(4, 0, 0, 0));
+
+        JLabel lblDetail = new JLabel(detail);
+        lblDetail.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        lblDetail.setForeground(ACCENT);
+        lblDetail.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblDetail.setBorder(new EmptyBorder(3, 0, 0, 0));
+
+        carte.add(lblLabel);
+        carte.add(lblNom);
+        carte.add(lblDetail);
+        return carte;
+    }
 
     private void ajouterPlaceholder(JTextField champ, String placeholder) {
         champ.setText(placeholder);
