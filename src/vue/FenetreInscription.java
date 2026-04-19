@@ -50,7 +50,7 @@ public class FenetreInscription {
             protected void paintComponent(Graphics g) {
                 Graphics2D carteForme = (Graphics2D) g.create();
                 carteForme.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                carteForme.setColor(new Color(20, 28, 58, 210));
+                carteForme.setColor(new Color(20, 28, 58));
                 carteForme.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
                 carteForme.dispose();
             }
@@ -120,7 +120,7 @@ public class FenetreInscription {
 
 
     private void styliserChamp(JTextField champ, String placeholder) {
-        champ.setBackground(new Color(40, 50, 80, 200));
+        champ.setBackground(new Color(40, 48, 78));
         champ.setCaretColor(Color.WHITE);
         champ.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         champ.setBorder(new CompoundBorder(
@@ -152,7 +152,7 @@ public class FenetreInscription {
     }
 
     private void styliserChampPassword(JPasswordField champ, String placeholder) {
-        champ.setBackground(new Color(40, 50, 80, 200));
+        champ.setBackground(new Color(40, 48, 78));
         champ.setCaretColor(Color.WHITE);
         champ.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         champ.setBorder(new CompoundBorder(

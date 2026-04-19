@@ -43,7 +43,7 @@ public class FenetreConnexion {
                 Graphics2D carteForme = (Graphics2D) g.create();
                 carteForme.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); //lisse les bords -> + style
                 // Fond semi-transparent bleu-noir pour + de style
-                carteForme.setColor(new Color(20, 28, 58, 210));  //couleur
+                carteForme.setColor(new Color(20, 28, 58));  //couleur
                 carteForme.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18); //rectangle plus coin arrondie a 18
                 carteForme.dispose();
             }
@@ -116,19 +116,19 @@ public class FenetreConnexion {
         //ajouter la carte sur le fond
         backgroundLabel.add(card);
 
+
     }
 
     //fonction fait avec chat wallah j'arrivais pas
     private void styliserChamp(JTextField champ, String placeholder) {
         // Style visuel
-        champ.setBackground(new Color(40, 50, 80, 200));
+        champ.setBackground(new Color(40, 48, 78));
         champ.setCaretColor(Color.WHITE);
         champ.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         champ.setBorder(new CompoundBorder(
                 new LineBorder(new Color(80, 100, 160), 1, true),
                 new EmptyBorder(0, 12, 0, 12)
         ));
-        champ.setOpaque(true);
 
         // État initial : placeholder affiché en gris
         champ.setText(placeholder);
@@ -157,7 +157,7 @@ public class FenetreConnexion {
 
     private void styliserChampPassword(JPasswordField champ, String placeholder) {
         // Style visuel
-        champ.setBackground(new Color(40, 50, 80, 200));
+        champ.setBackground(new Color(40, 48, 78));
         champ.setCaretColor(Color.WHITE);
         champ.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         champ.setBorder(new CompoundBorder(
