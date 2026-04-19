@@ -15,7 +15,20 @@ import controleur.EvenementsInscription;
 import controleur.EvenementsMenu;
 import controleur.EvenementsVisite;
 import controleur.Main;
-import controleur.actions.*;
+import controleur.actions.Action;
+import controleur.actions.ActionArguments;
+import controleur.actions.AjouterArtiste;
+import controleur.actions.AjouterMorceau;
+import controleur.actions.AjouterPlaylist;
+import controleur.actions.AjouterUtilisateur;
+import controleur.actions.ChoisirFiltre;
+import controleur.actions.ConsulterProfil;
+import controleur.actions.Deconnexion;
+import controleur.actions.Recherche;
+import controleur.actions.SupprimerArtiste;
+import controleur.actions.SupprimerMorceau;
+import controleur.actions.SupprimerPlaylist;
+import controleur.actions.SupprimerUtilisateur;
 import controleur.exceptions.ActionException;
 import controleur.formulaires.*;
 import metier.*;
@@ -971,104 +984,245 @@ public class Fenetre implements InterfaceVue {
     }
 
 
-    // nouvelle méthode interne qui retourne le panel
     private JComponent afficherProfilAbonne(Personne personne) {
-        if (!(utilisateur instanceof Abonne)) {
-            // visiteur : on affiche un message d'invitation
-            JPanel panel = new JPanel(new BorderLayout());
-            panel.setBackground(BG_PRINCIPAL);
-            panel.setBorder(new EmptyBorder(40, 40, 40, 40));
-            JLabel msg = new JLabel("Connectez-vous pour accéder à vos information personnels");
-            msg.setForeground(TEXT_GRIS);
-            msg.setFont(new Font("SansSerif", Font.PLAIN, 15));
-            msg.setHorizontalAlignment(SwingConstants.CENTER);
-            panel.add(msg, BorderLayout.CENTER);
-            fenetreVisite.afficherErreur(new ActionException("Vous n'avez pas de compte"));
-            return panel;
-        }
-
-        JPanel contenu = new JPanel(new BorderLayout());
-        contenu.setBackground(BG_PRINCIPAL);
-        contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
-
-        JPanel carte = new JPanel(new BorderLayout(20, 0));
-        carte.setBackground(BG_CARTE);
-        carte.setBorder(new EmptyBorder(18, 18, 18, 18));
-
-        JLabel avatar = new JLabel();
-        avatar.setPreferredSize(new Dimension(100, 100));
-        avatar.setHorizontalAlignment(SwingConstants.CENTER);
-        avatar.setVerticalAlignment(SwingConstants.CENTER);
-        ImageIcon icon = new ImageIcon("assets/profil.png");
-        if (icon.getIconWidth() > 0) {
-            avatar.setIcon(new ImageIcon(icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
-        } else {
-            avatar.setText("👤");
-            avatar.setFont(new Font("SansSerif", Font.PLAIN, 48));
-            avatar.setForeground(TEXT_GRIS);
-        }
-
-        JPanel infos = new JPanel();
-        infos.setOpaque(false);
-        infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
-
-        JLabel nom = new JLabel(personne.getNom());
-        nom.setFont(new Font("SansSerif", Font.BOLD, 26));
-        nom.setForeground(TEXT_BLANC);
-        nom.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel mail = new JLabel("✉  " + personne.getMail());
-        mail.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        mail.setForeground(TEXT_GRIS);
-        mail.setBorder(new EmptyBorder(10, 0, 0, 0));
-        mail.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JLabel mdp = new JLabel("🔒  ••••••••");
-        mdp.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        mdp.setForeground(TEXT_GRIS);
-        mdp.setBorder(new EmptyBorder(6, 0, 0, 0));
-        mdp.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        infos.add(nom);
-        infos.add(mail);
-        infos.add(mdp);
-
-        // infos spécifiques selon le type
-        if (personne instanceof Abonne) {
-            Abonne abonne = (Abonne) personne;
-            int nbPlaylists = abonne.getPlaylists() != null ? abonne.getPlaylists().size() : 0;
-            int nbAvis = abonne.getAvis() != null ? abonne.getAvis().size() : 0;
-
-            JLabel stats = new JLabel(nbPlaylists + " playlist(s)  ·  " + nbAvis + " avis rédigé(s)");
-            stats.setFont(new Font("SansSerif", Font.PLAIN, 13));
-            stats.setForeground(TEXT_GRIS);
-            stats.setBorder(new EmptyBorder(10, 0, 0, 0));
-            stats.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            JLabel typeLabel = new JLabel("Abonné");
-            typeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-            typeLabel.setForeground(ACCENT);
-            typeLabel.setBorder(new EmptyBorder(8, 0, 0, 0));
-            typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            infos.add(stats);
-            infos.add(typeLabel);
-
-        } else if (personne instanceof Admin) {
-            JLabel typeLabel = new JLabel("Administrateur");
-            typeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
-            typeLabel.setForeground(ACCENT);
-            typeLabel.setBorder(new EmptyBorder(8, 0, 0, 0));
-            typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            infos.add(typeLabel);
-        }
-
-        carte.add(avatar, BorderLayout.WEST);
-        carte.add(infos, BorderLayout.CENTER);
-        contenu.add(carte, BorderLayout.NORTH);
-        return contenu;
+    if (!(utilisateur instanceof Abonne)) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(BG_PRINCIPAL);
+        panel.setBorder(new EmptyBorder(40, 40, 40, 40));
+        JLabel msg = new JLabel("Connectez-vous pour accéder à vos informations personnelles");
+        msg.setForeground(TEXT_GRIS);
+        msg.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        msg.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(msg, BorderLayout.CENTER);
+        fenetreVisite.afficherErreur(new ActionException("Vous n'avez pas de compte"));
+        return panel;
     }
+
+    Abonne abonne = (Abonne) utilisateur;
+
+    JPanel contenu = new JPanel(new BorderLayout());
+    contenu.setBackground(BG_PRINCIPAL);
+    contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
+
+    // Carte profil
+    JPanel carte = new JPanel(new BorderLayout(20, 0));
+    carte.setBackground(BG_CARTE);
+    carte.setBorder(new EmptyBorder(18, 18, 18, 18));
+
+    JLabel avatar = new JLabel();
+    avatar.setPreferredSize(new Dimension(100, 100));
+    avatar.setHorizontalAlignment(SwingConstants.CENTER);
+    avatar.setVerticalAlignment(SwingConstants.CENTER);
+    ImageIcon icon = new ImageIcon("assets/profil.png");
+    if (icon.getIconWidth() > 0) {
+        avatar.setIcon(new ImageIcon(icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+    } else {
+        avatar.setText("👤");
+        avatar.setFont(new Font("SansSerif", Font.PLAIN, 48));
+        avatar.setForeground(TEXT_GRIS);
+    }
+
+    JPanel infos = new JPanel();
+    infos.setOpaque(false);
+    infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
+
+    JLabel nom = new JLabel(personne.getNom());
+    nom.setFont(new Font("SansSerif", Font.BOLD, 26));
+    nom.setForeground(TEXT_BLANC);
+    nom.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    JLabel mail = new JLabel("✉  " + personne.getMail());
+    mail.setFont(new Font("SansSerif", Font.PLAIN, 14));
+    mail.setForeground(TEXT_GRIS);
+    mail.setBorder(new EmptyBorder(10, 0, 0, 0));
+    mail.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    JLabel mdp = new JLabel("🔒  ••••••••");
+    mdp.setFont(new Font("SansSerif", Font.PLAIN, 14));
+    mdp.setForeground(TEXT_GRIS);
+    mdp.setBorder(new EmptyBorder(6, 0, 0, 0));
+    mdp.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    infos.add(nom);
+    infos.add(mail);
+    infos.add(mdp);
+
+    if (personne instanceof Abonne) {
+        int nbPlaylists = abonne.getPlaylists() != null ? abonne.getPlaylists().size() : 0;
+        int nbAvis = abonne.getAvis() != null ? abonne.getAvis().size() : 0;
+
+        JLabel stats = new JLabel(nbPlaylists + " playlist(s)  ·  " + nbAvis + " avis rédigé(s)");
+        stats.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        stats.setForeground(TEXT_GRIS);
+        stats.setBorder(new EmptyBorder(10, 0, 0, 0));
+        stats.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel typeLabel = new JLabel("Abonné");
+        typeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        typeLabel.setForeground(ACCENT);
+        typeLabel.setBorder(new EmptyBorder(8, 0, 0, 0));
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        infos.add(stats);
+        infos.add(typeLabel);
+    } else if (personne instanceof Admin) {
+        JLabel typeLabel = new JLabel("Administrateur");
+        typeLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        typeLabel.setForeground(ACCENT);
+        typeLabel.setBorder(new EmptyBorder(8, 0, 0, 0));
+        typeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infos.add(typeLabel);
+    }
+
+    carte.add(avatar, BorderLayout.WEST);
+    carte.add(infos, BorderLayout.CENTER);
+    contenu.add(carte, BorderLayout.NORTH);
+
+    //  Section playlists
+    JPanel sectionPlaylists = new JPanel(new BorderLayout());
+    sectionPlaylists.setOpaque(false);
+    sectionPlaylists.setBorder(new EmptyBorder(20, 0, 0, 0));
+
+    JLabel titrePlaylists = new JLabel("Mes playlists");
+    titrePlaylists.setFont(new Font("SansSerif", Font.BOLD, 18));
+    titrePlaylists.setForeground(TEXT_BLANC);
+    titrePlaylists.setBorder(new EmptyBorder(0, 0, 12, 0));
+
+    //  Formulaire création 
+    JPanel formulaireCreation = new JPanel(new BorderLayout(8, 0));
+    formulaireCreation.setOpaque(false);
+    formulaireCreation.setBorder(new EmptyBorder(0, 0, 14, 0));
+
+    JTextField champNomPlaylist = new JTextField();
+    styliserChamp(champNomPlaylist, "Nom de la nouvelle playlist...");
+
+    JButton btnCreerPlaylist = creerBoutonAdmin("+ Créer", ACCENT);
+
+    formulaireCreation.add(champNomPlaylist, BorderLayout.CENTER);
+    formulaireCreation.add(btnCreerPlaylist, BorderLayout.EAST);
+
+    // Liste playlists 
+    JPanel listePlaylists = new JPanel();
+    listePlaylists.setLayout(new BoxLayout(listePlaylists, BoxLayout.Y_AXIS));
+    listePlaylists.setBackground(BG_PRINCIPAL);
+
+    // on déclare le runnable dans un tableau pour pouvoir le référencer dans ses propres lambdas
+    Runnable[] rafraichirRef = new Runnable[1];
+    rafraichirRef[0] = () -> {
+        listePlaylists.removeAll();
+
+        ArrayList<Integer> numPlaylists = abonne.getPlaylists();
+        if (numPlaylists == null || numPlaylists.isEmpty()) {
+            JLabel vide = new JLabel("Aucune playlist pour l'instant.");
+            vide.setForeground(TEXT_GRIS);
+            vide.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            vide.setAlignmentX(Component.LEFT_ALIGNMENT);
+            listePlaylists.add(vide);
+        } else {
+            for (int numPl : numPlaylists) {
+                Playlist pl = catalogue.getPlaylist(numPl);
+                if (pl == null) continue;
+
+                int nbMorceauxPl = pl.getMorceaux() != null ? pl.getMorceaux().size() : 0;
+                int dureePl = 0;
+                if (pl.getMorceaux() != null) {
+                    for (Morceau m : pl.getMorceaux()) dureePl += m.getDuree();
+                }
+
+                LigneResultat<Playlist> ligne = new LigneResultat<>(
+                    pl,
+                    pl.getNom(),
+                    nbMorceauxPl + " morceau(x)  ·  " + formatterDuree(dureePl),
+                    "",
+                    false
+                );
+
+                JPanel lignePanel = creerLigne(
+                    ligne,
+                    () -> afficherDetails(pl),
+                    () -> {},
+                    false,
+                    false
+                );
+
+                boolean estDefaut = numPl == abonne.getAimes();
+                if (!estDefaut) {
+                    JButton btnSuppr = new JButton("✕");
+                    btnSuppr.setFont(new Font("SansSerif", Font.BOLD, 12));
+                    btnSuppr.setForeground(new Color(200, 60, 60));
+                    btnSuppr.setBackground(new Color(50, 50, 50));
+                    btnSuppr.setFocusPainted(false);
+                    btnSuppr.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+                    btnSuppr.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    btnSuppr.addActionListener(evt -> {
+                        try {
+                            ActionArguments args = new ActionArguments(utilisateur, catalogue);
+                            args.playlist = pl;
+                            new SupprimerPlaylist().executer(args);
+                            abonne.retirerPlaylist(pl.getNum());
+                            rafraichirRef[0].run();
+                        } catch (Exception ex) {
+                            afficherErreur(ex);
+                        }
+                    });
+                    JPanel wrapSuppr = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 18));
+                    wrapSuppr.setOpaque(false);
+                    wrapSuppr.add(btnSuppr);
+                    lignePanel.add(wrapSuppr, BorderLayout.EAST);
+                } else {
+                    JLabel badge = new JLabel("♥ Par défaut");
+                    badge.setFont(new Font("SansSerif", Font.BOLD, 11));
+                    badge.setForeground(ACCENT);
+                    JPanel wrapBadge = new JPanel(new FlowLayout(FlowLayout.RIGHT, 6, 22));
+                    wrapBadge.setOpaque(false);
+                    wrapBadge.add(badge);
+                    lignePanel.add(wrapBadge, BorderLayout.EAST);
+                }
+
+                listePlaylists.add(lignePanel);
+                listePlaylists.add(Box.createVerticalStrut(4));
+            }
+        }
+        listePlaylists.revalidate();
+        listePlaylists.repaint();
+    };
+
+    // Listener création
+    btnCreerPlaylist.addActionListener(evt -> {
+        String nomPl = champNomPlaylist.getText().trim();
+        if (nomPl.isEmpty()) {
+            afficherErreur(new ActionException("Le nom ne peut pas être vide"));
+            return;
+        }
+        try {
+            PlaylistForm form = new PlaylistForm(nomPl, utilisateur.getNum());
+            new AjouterPlaylist().executer(new ActionArguments(utilisateur, catalogue, form));
+            champNomPlaylist.setText("");
+            rafraichirRef[0].run();
+        } catch (Exception ex) {
+            afficherErreur(ex);
+        }
+    });
+
+    // Remplissage initial
+    rafraichirRef[0].run();
+
+    JScrollPane scrollPlaylists = new JScrollPane(listePlaylists);
+    scrollPlaylists.setBorder(BorderFactory.createEmptyBorder());
+    scrollPlaylists.getViewport().setBackground(BG_PRINCIPAL);
+    scrollPlaylists.getVerticalScrollBar().setUnitIncrement(16);
+
+    JPanel entete = new JPanel(new BorderLayout());
+    entete.setOpaque(false);
+    entete.add(titrePlaylists, BorderLayout.NORTH);
+    entete.add(formulaireCreation, BorderLayout.CENTER);
+
+    sectionPlaylists.add(entete, BorderLayout.NORTH);
+    sectionPlaylists.add(scrollPlaylists, BorderLayout.CENTER);
+
+    contenu.add(sectionPlaylists, BorderLayout.CENTER);
+    return contenu;
+}
 
     //afficher album dans la recerche
     public JComponent afficherAlbum(Album album) {
@@ -1154,8 +1308,6 @@ public class Fenetre implements InterfaceVue {
         contenu.add(bas, BorderLayout.CENTER);
         return contenu;
     }
-
-
 
     //afficher les playlist
     public JComponent afficherPlaylist(Playlist playlist) {
