@@ -2,7 +2,6 @@ package controleur.actions;
 
 import controleur.exceptions.ActionException;
 import metier.Visiteur;
-
 public class ChoisirFiltre implements Action {
     @Override
     /**
@@ -30,3 +29,35 @@ public class ChoisirFiltre implements Action {
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
