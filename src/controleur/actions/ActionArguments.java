@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import controleur.formulaires.*;
 import metier.Abonne;
 import metier.Admin;
+import metier.Album;
+import metier.Artiste;
 import metier.Avis;
 import metier.Catalogue;
 import metier.Morceau;
@@ -25,6 +27,7 @@ public class ActionArguments {
     public RechercheForm rechercheForm;
     public InscriptionForm inscriptionForm;
     public ArtisteForm artisteForm;
+    public AlbumForm albumForm;
     public MorceauForm morceauForm;
     public String nomMorceau;
     public Morceau morceauTrouve;
@@ -34,6 +37,7 @@ public class ActionArguments {
     public ArrayList<Avis> avis;
     public String mail;
     public int numPlaylist;
+    public Artiste artistes;
 
     public ActionArguments(InterfaceVue vue, Personne utilisateur, Catalogue catalogue) {
         this.vue = vue;
@@ -43,6 +47,11 @@ public class ActionArguments {
 
     public ActionArguments(String mail) {
         this.mail = mail;
+    }
+
+    public ActionArguments(Catalogue catalogue, AlbumForm albumForm) {
+        this.catalogue = catalogue;
+        this.albumForm = albumForm;
     }
 
     public ActionArguments(Catalogue catalogue, int numPlaylist) {
@@ -89,9 +98,10 @@ public class ActionArguments {
         this.catalogue = catalogue;
     }
 
-    public ActionArguments(Catalogue catalogue, ArtisteForm artisteForm) {
+    public ActionArguments(Catalogue catalogue, ArtisteForm artisteForm, Artiste artistes) {
         this.catalogue = catalogue;
         this.artisteForm = artisteForm;
+        this.artistes = artistes;
     }
 
     public ActionArguments(Catalogue catalogue, MorceauForm morceauForm) {

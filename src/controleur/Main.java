@@ -293,7 +293,7 @@ public class Main {
         } else if (actionChoisie instanceof Quitter) {
             new Quitter().executer(new ActionArguments(vue, utilisateur, catalogue));
         } else if (actionChoisie instanceof AjouterArtiste) {
-            new AjouterArtiste().executer(new ActionArguments(catalogue, vue.demanderArtiste()));
+            new AjouterArtiste().executer(new ActionArguments(catalogue, vue.demanderArtiste(), null));
         } else if (actionChoisie instanceof AjouterMorceau) {
             new AjouterMorceau().executer(new ActionArguments(catalogue, vue.demanderMorceau()));
         } else if (actionChoisie instanceof AjouterPlaylist) {
