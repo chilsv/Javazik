@@ -15,6 +15,7 @@ public abstract class Personne implements Serializable {
     private int num;
     private LocalDate date_creation;
     private final ArrayList<Action> actions = new ArrayList<Action>();
+    private ArrayList<Integer> historique = new ArrayList<Integer>();
 
     /**
      * Pour l'instanciation d'un Visiteur
@@ -68,6 +69,14 @@ public abstract class Personne implements Serializable {
 
     public String getMdp() {
         return mdp;
+    }
+
+    public ArrayList<Integer> getHistorique() {
+        return historique;
+    }
+
+    public void ajouterHistorique(int numMorceau) {
+        historique.add(numMorceau);
     }
 
     public int getAge() {

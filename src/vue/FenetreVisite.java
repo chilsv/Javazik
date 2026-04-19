@@ -41,7 +41,7 @@ public class FenetreVisite {
 
     // Boutons sur la barre latérale gauche de choix
     private final JLabel profil;
-    private final JLabel librairie;
+    private final JLabel menuPlaylists;
     private final JLabel menuArtistes;
     private final JLabel menuAlbums;
     private final JLabel menuMorceaux;
@@ -99,7 +99,7 @@ public class FenetreVisite {
         JLabel labelLibrary = creerLabelTitre("LIBRAIRIE");
         profil = creerLabelMenu("assets/profil.png","Votre compte",25, 25); //32 est la taille du coté du carre de l'image
         menuArtistes = creerLabelMenu("assets/playlists.png","Artistes",25, 25);
-        librairie = creerLabelMenu("assets/librairie.png","Playlists",25, 25);
+        menuPlaylists = creerLabelMenu("assets/librairie.png","Playlists",25, 25);
         menuAlbums = creerLabelMenu("assets/songs.png","Albums",25, 25);
         menuMorceaux = creerLabelMenu("assets/songs.png","Morceaux",25, 25);
 
@@ -120,7 +120,7 @@ public class FenetreVisite {
         bandeSelection.add(creerSeparateur());
         bandeSelection.add(labelLibrary);
         bandeSelection.add(profil);
-        bandeSelection.add(librairie);
+        bandeSelection.add(menuPlaylists);
         bandeSelection.add(menuArtistes);
         bandeSelection.add(menuAlbums);
         bandeSelection.add(menuMorceaux);
@@ -283,7 +283,7 @@ public class FenetreVisite {
     public void setFrame(JFrame f){ this.frame = f; }
     public JPanel getPanel(){ return panel; }
     public JLabel getProfil(){ return profil; }
-    public JLabel getLibrairie() { return librairie; }
+    public JLabel getMenuPlaylists() { return menuPlaylists; }
     public JLabel getMenuArtistes() { return menuArtistes; }
     public JLabel getMenuAlbums() { return menuAlbums; }
     public JLabel getMenuMorceaux() { return menuMorceaux; }
@@ -343,7 +343,10 @@ public class FenetreVisite {
 
     public void reinitialiserEvenements() {
         enleverML(profil);
-        enleverML(librairie);
+        enleverML(menuPlaylists);
+        enleverML(menuArtistes);
+        enleverML(menuAlbums);
+        enleverML(menuMorceaux);
         enleverML(btnRetour);
         enleverML(loupe);
         enleverML(filtre);

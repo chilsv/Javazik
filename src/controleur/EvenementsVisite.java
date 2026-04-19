@@ -49,18 +49,18 @@ public class EvenementsVisite {
             });
         }
 
-        JLabel librairie = fenetre.getLibrairie();
-        if (librairie != null) {
-            librairie.addMouseListener(new MouseAdapter() {
+        JLabel menuPlaylists = fenetre.getMenuPlaylists();
+        if (menuPlaylists != null) {
+            menuPlaylists.addMouseListener(new MouseAdapter() {
                 @Override public void mouseClicked(MouseEvent e) {
                     listener.onChoix(CHOIX_PLAYLISTS);
                 }
                 @Override public void mouseEntered(MouseEvent e) {
-                    librairie.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                    librairie.setForeground(new Color(220, 220, 220));
+                    menuPlaylists.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    menuPlaylists.setForeground(new Color(220, 220, 220));
                 }
                 @Override public void mouseExited(MouseEvent e) {
-                    librairie.setForeground(new Color(160, 160, 160));
+                    menuPlaylists.setForeground(new Color(160, 160, 160));
                 }
             });
         }
@@ -117,7 +117,10 @@ public class EvenementsVisite {
         JLabel parcourir = fenetre.getParcourir();
         if (parcourir != null) {
             parcourir.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_PARCOURIR); }
+                @Override public void mouseClicked(MouseEvent e) {
+                    fenetre.afficherErreur(new ActionException("À venir"));
+                    listener.onChoix(CHOIX_PARCOURIR);
+                }
                 @Override public void mouseEntered(MouseEvent e) {
                     parcourir.setCursor(new Cursor(Cursor.HAND_CURSOR));
                     parcourir.setForeground(new Color(220, 220, 220));
@@ -131,7 +134,9 @@ public class EvenementsVisite {
         JLabel pourVous = fenetre.getPourVous();
         if (pourVous != null) {
             pourVous.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_POUR_VOUS); }
+                @Override public void mouseClicked(MouseEvent e) {
+                    fenetre.afficherErreur(new ActionException("À venir"));
+                    listener.onChoix(CHOIX_POUR_VOUS); }
                 @Override public void mouseEntered(MouseEvent e) {
                     pourVous.setCursor(new Cursor(Cursor.HAND_CURSOR));
                     pourVous.setForeground(new Color(220, 220, 220));
@@ -145,7 +150,10 @@ public class EvenementsVisite {
         JLabel populaire = fenetre.getPopulaire();
         if (populaire != null) {
             populaire.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_POPULAIRE); }
+                @Override public void mouseClicked(MouseEvent e) {
+                    fenetre.afficherErreur(new ActionException("À venir"));
+                    listener.onChoix(CHOIX_POPULAIRE);
+                }
                 @Override public void mouseEntered(MouseEvent e) {
                     populaire.setCursor(new Cursor(Cursor.HAND_CURSOR));
                     populaire.setForeground(new Color(220, 220, 220));
@@ -160,7 +168,10 @@ public class EvenementsVisite {
         JLabel radio = fenetre.getRadio();
         if (radio != null) {
             radio.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_RADIO); }
+                @Override public void mouseClicked(MouseEvent e) {
+                    fenetre.afficherErreur(new ActionException("À venir"));
+                    listener.onChoix(CHOIX_RADIO);
+                }
                 @Override public void mouseEntered(MouseEvent e) {
                     radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
                     radio.setForeground(new Color(220, 220, 220));
@@ -175,7 +186,10 @@ public class EvenementsVisite {
         JLabel podcasts = fenetre.getPodcasts();
         if (podcasts != null) {
             podcasts.addMouseListener(new MouseAdapter() {
-                @Override public void mouseClicked(MouseEvent e) { listener.onChoix(CHOIX_PODCASTS); }
+                @Override public void mouseClicked(MouseEvent e) {
+                    fenetre.afficherErreur(new ActionException("À venir"));
+                    listener.onChoix(CHOIX_PODCASTS);
+                }
                 @Override public void mouseEntered(MouseEvent e) {
                     podcasts.setCursor(new Cursor(Cursor.HAND_CURSOR));
                     podcasts.setForeground(new Color(220, 220, 220));

@@ -306,40 +306,7 @@ public class Main {
     public static void visiter(Personne utilisateur, InterfaceVue vue, ArrayList<Abonne> abonnes, ArrayList<Admin> admins, Catalogue catalogue) {
         if (vue instanceof Fenetre) {
             Fenetre fenetre = (Fenetre) vue;
-            if (utilisateur instanceof Abonne) {
-                Abonne abonne = (Abonne) utilisateur;
-                fenetre.configurerActionsResultats(
-                    morceau -> {
-                        if (morceau == null) {
-                            return;
-                        }
-                        if (!abonne.morceauDejaAime(morceau, catalogue)) {
-                            catalogue.ajouterMorceauPlaylist(morceau, abonne.getAimes());
-                        } else {
-                            abonne.retirerMorceauPlaylist(morceau, catalogue, abonne.getAimes());
-                        }
-                    },
-                    morceau -> morceau != null && abonne.morceauDejaAime(morceau, catalogue),
-                    playlist -> {
-                        if (playlist == null) {
-                            return;
-                        }
-                        if (!abonne.playlistDejaSauvegardee(playlist.getNum())) {
-                            abonne.ajouterPlaylist(playlist.getNum());
-                        } else {
-                            abonne.retirerPlaylist(playlist.getNum());
-                        }
-                    },
-                    playlist -> playlist != null && abonne.playlistDejaSauvegardee(playlist.getNum())
-                );
-            } else {
-                fenetre.configurerActionsResultats(
-                    morceau -> vue.afficherErreur(new ActionException("Réservé aux abonnés")),
-                    morceau -> false,
-                    playlist -> vue.afficherErreur(new ActionException("Réservé aux abonnés")),
-                    playlist -> false
-                );
-            }
+            fenetre.configurer(utilisateur, catalogue);
         }
         // on récupère l'action choisie
         Action actionChoisie = vue.choisirAction(utilisateur.getAccueil(vue), utilisateur);

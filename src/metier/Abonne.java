@@ -8,7 +8,6 @@ import controleur.formulaires.PlaylistForm;
 import vue.InterfaceVue;
 
 public class Abonne extends Personne {
-    private ArrayList<Integer> historique = new ArrayList<Integer>();
     private int playlistDefaut; // Playlist des morceaux aimés créée par défaut
     private ArrayList<Integer> playlists = new ArrayList<Integer>(); // playlists sauvegardées par l'abonné
     private ArrayList<Avis> avis = new ArrayList<Avis>();
@@ -41,14 +40,6 @@ public class Abonne extends Personne {
         return actions;
     }
 
-    public ArrayList<Integer> getHistorique() {
-        return historique;
-    }
-
-    public void ajouterHistorique(int numMorceau) {
-        historique.add(numMorceau);
-    }
-
     public ArrayList<Integer> getPlaylists() {
         return playlists;
     }
@@ -71,7 +62,7 @@ public class Abonne extends Personne {
 
     public void retirerPlaylist(int numPlaylist) {
         if (playlists.contains(numPlaylist)) {
-            playlists.remove(numPlaylist);
+            playlists.remove(Integer.valueOf(numPlaylist));
         }
     }
 
