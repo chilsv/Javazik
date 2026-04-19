@@ -598,8 +598,92 @@ public class Fenetre implements InterfaceVue {
             label.setForeground(TEXT_GRIS);
             label.setFont(new Font("SansSerif", Font.PLAIN, 12));
         }
+        label.setToolTipText("Afficher la file d'attente");
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        final JPopupMenu menuFile = new JPopupMenu();
+        menuFile.setBorder(BorderFactory.createLineBorder(BORDER));
+        menuFile.setFocusable(false);
+
+        final Timer fermetureDifferee = new Timer(220, evt -> menuFile.setVisible(false));
+        fermetureDifferee.setRepeats(false);
+
+        label.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                fermetureDifferee.stop();
+                rafraichirMenuFileAttente(menuFile);
+                if (!menuFile.isVisible()) {
+                    int y = -menuFile.getPreferredSize().height - 6;
+                    menuFile.show(label, -220, y);
+                }
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                fermetureDifferee.restart();
+            }
+        });
+
+        menuFile.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                fermetureDifferee.stop();
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                fermetureDifferee.restart();
+            }
+        });
+
         return label;
+    }
+
+    private void rafraichirMenuFileAttente(JPopupMenu menuFile) {
+        menuFile.removeAll();
+
+        ArrayList<Morceau> fileAttente = Main.getFileAttente();
+        JPanel contenu = new JPanel();
+        contenu.setLayout(new BoxLayout(contenu, BoxLayout.Y_AXIS));
+        contenu.setBackground(BG_CARTE);
+        contenu.setBorder(new EmptyBorder(8, 10, 8, 10));
+
+        JLabel titre = new JLabel("File d'attente");
+        titre.setFont(new Font("SansSerif", Font.BOLD, 13));
+        titre.setForeground(TEXT_BLANC);
+        titre.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contenu.add(titre);
+        contenu.add(Box.createVerticalStrut(8));
+
+        if (fileAttente == null || fileAttente.isEmpty()) {
+            JLabel vide = new JLabel("Aucun morceau en attente");
+            vide.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            vide.setForeground(TEXT_GRIS);
+            vide.setAlignmentX(Component.LEFT_ALIGNMENT);
+            contenu.add(vide);
+        } else {
+            int limite = Math.min(8, fileAttente.size());
+            for (int i = 0; i < limite; i++) {
+                Morceau morceau = fileAttente.get(i);
+                JLabel ligne = new JLabel((i + 1) + ". " + morceau.getNom());
+                ligne.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                ligne.setForeground(TEXT_BLANC);
+                ligne.setAlignmentX(Component.LEFT_ALIGNMENT);
+                contenu.add(ligne);
+                contenu.add(Box.createVerticalStrut(4));
+            }
+            if (fileAttente.size() > limite) {
+                JLabel reste = new JLabel("+" + (fileAttente.size() - limite) + " autre(s)...");
+                reste.setFont(new Font("SansSerif", Font.PLAIN, 11));
+                reste.setForeground(TEXT_GRIS);
+                reste.setAlignmentX(Component.LEFT_ALIGNMENT);
+                contenu.add(reste);
+            }
+        }
+
+        menuFile.add(contenu);
+        menuFile.pack();
     }
 
     public void afficherMessage(String message) {
