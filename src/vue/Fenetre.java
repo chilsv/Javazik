@@ -960,7 +960,7 @@ public class Fenetre implements InterfaceVue {
         contenu.setBackground(BG_PRINCIPAL);
         contenu.setBorder(new EmptyBorder(20, 24, 24, 24));
 
-        // ── Carte profil ─────────────────────────────────────────────────────────
+        // profil
         JPanel carte = new JPanel(new BorderLayout(20, 0));
         carte.setBackground(BG_CARTE);
         carte.setBorder(new EmptyBorder(18, 18, 18, 18));
@@ -1363,7 +1363,8 @@ public class Fenetre implements InterfaceVue {
         return contenu;
     }
 
-    /* fait en partie avec de l'ia, j'y arrivais pas... */
+
+    // faire la section avis
     private JComponent sectionAvis(Morceau morceau) {
         JPanel section = new JPanel(new BorderLayout());
         section.setOpaque(false);
@@ -1376,102 +1377,151 @@ public class Fenetre implements InterfaceVue {
         titreAvis.setFont(new Font("SansSerif", Font.BOLD, 18));
         titreAvis.setForeground(TEXT_BLANC);
         titreAvis.setBorder(new EmptyBorder(0, 0, 10, 0));
-
-        JButton boutonCommenter = new JButton("Commenter");
-        boutonCommenter.setFont(new Font("SansSerif", Font.BOLD, 12));
-        boutonCommenter.setForeground(TEXT_BLANC);
-        boutonCommenter.setBackground(new Color(60, 60, 60));
-        boutonCommenter.setFocusPainted(false);
-        boutonCommenter.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        boutonCommenter.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
-        boutonCommenter.addActionListener(evt -> commenter(morceau));
-
         enTeteAvis.add(titreAvis, BorderLayout.WEST);
-        enTeteAvis.add(boutonCommenter, BorderLayout.EAST);
 
+        // formulaire de commentaire, recuperer clavier
+        JPanel formulaire = new JPanel(new BorderLayout(8, 0));
+        formulaire.setOpaque(false);
+        formulaire.setBorder(new EmptyBorder(0, 0, 12, 0));
+
+        JTextField champCommentaire = new JTextField();
+        champCommentaire.setBackground(new Color(45, 45, 45));
+        champCommentaire.setForeground(TEXT_BLANC);
+        champCommentaire.setCaretColor(TEXT_BLANC);
+        champCommentaire.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        champCommentaire.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(BORDER, 1),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)
+        ));
+        champCommentaire.putClientProperty("JTextField.placeholderText", "Votre commentaire...");
+
+        // Sélecteur de note 1-5
+        JPanel panelNote = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        panelNote.setOpaque(false);
+        JLabel labelNote = new JLabel("Note :");
+        labelNote.setForeground(TEXT_GRIS);
+        labelNote.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        SpinnerNumberModel modeleNote = new SpinnerNumberModel(5, 1, 5, 1);
+        JSpinner spinnerNote = new JSpinner(modeleNote);
+        spinnerNote.setBackground(new Color(45, 45, 45));
+        spinnerNote.setForeground(TEXT_BLANC);
+        spinnerNote.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        spinnerNote.setPreferredSize(new Dimension(55, 28));
+        ((JSpinner.DefaultEditor) spinnerNote.getEditor()).getTextField().setBackground(new Color(45, 45, 45));
+        ((JSpinner.DefaultEditor) spinnerNote.getEditor()).getTextField().setForeground(TEXT_BLANC);
+        panelNote.add(labelNote);
+        panelNote.add(spinnerNote);
+
+        JButton boutonEnvoyer = new JButton("Envoyer");
+        boutonEnvoyer.setFont(new Font("SansSerif", Font.BOLD, 12));
+        boutonEnvoyer.setForeground(TEXT_BLANC);
+        boutonEnvoyer.setBackground(ACCENT);
+        boutonEnvoyer.setFocusPainted(false);
+        boutonEnvoyer.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        boutonEnvoyer.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+
+        JPanel droiteFormulaire = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        droiteFormulaire.setOpaque(false);
+        droiteFormulaire.add(panelNote);
+        droiteFormulaire.add(boutonEnvoyer);
+
+        formulaire.add(champCommentaire, BorderLayout.CENTER);
+        formulaire.add(droiteFormulaire, BorderLayout.EAST);
+
+        // liste avis
         JPanel listeAvis = new JPanel();
         listeAvis.setLayout(new BoxLayout(listeAvis, BoxLayout.Y_AXIS));
         listeAvis.setBackground(BG_CARTE);
         listeAvis.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        ArrayList<Avis> avisMorceau = null;
-        if (morceau.getAvis() != null) {
-            avisMorceau = morceau.getAvis();
-        }
+        // méthode locale pour rafraîchir la liste
+        Runnable rafraichirListe = () -> {
+            listeAvis.removeAll();
+            ArrayList<Avis> avisMorceau = morceau.getAvis();
+            if (avisMorceau == null || avisMorceau.isEmpty()) {
+                JLabel vide = new JLabel("Soyez le premier à commenter !");
+                vide.setForeground(TEXT_GRIS);
+                vide.setFont(new Font("SansSerif", Font.PLAIN, 13));
+                vide.setAlignmentX(Component.LEFT_ALIGNMENT);
+                listeAvis.add(vide);
+            } else {
+                for (Avis avis : avisMorceau) {
+                    JPanel carteAvis = new JPanel();
+                    carteAvis.setLayout(new BoxLayout(carteAvis, BoxLayout.Y_AXIS));
+                    carteAvis.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    carteAvis.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+                    carteAvis.setBackground(new Color(45, 45, 45));
+                    carteAvis.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        if (avisMorceau == null || avisMorceau.isEmpty()) {
-            JLabel vide = new JLabel("Soyez le premier à commenter !");
-            vide.setForeground(TEXT_GRIS);
-            vide.setFont(new Font("SansSerif", Font.PLAIN, 13));
-            vide.setAlignmentX(Component.LEFT_ALIGNMENT);
-            listeAvis.add(vide);
-        } else {
-            for (Avis avis : avisMorceau) {
-                JPanel carteAvis = new JPanel();
-                carteAvis.setLayout(new BoxLayout(carteAvis, BoxLayout.Y_AXIS));
-                carteAvis.setAlignmentX(Component.LEFT_ALIGNMENT);
-                carteAvis.setBackground(new Color(45, 45, 45));
-                carteAvis.setBorder(new EmptyBorder(10, 10, 10, 10));
+                    JLabel lblUtilisateur = new JLabel(avis.getAbonne().getNom());
+                    lblUtilisateur.setForeground(TEXT_BLANC);
+                    lblUtilisateur.setFont(new Font("SansSerif", Font.BOLD, 13));
+                    lblUtilisateur.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-                JLabel utilisateur = new JLabel(avis.getAbonne().getNom());
-                utilisateur.setForeground(TEXT_BLANC);
-                utilisateur.setFont(new Font("SansSerif", Font.BOLD, 13));
-                utilisateur.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    JLabel lblDate = new JLabel("ajouté le " + formatterDateAvis(avis.getDate()));
+                    lblDate.setForeground(TEXT_GRIS);
+                    lblDate.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                    lblDate.setBorder(new EmptyBorder(4, 0, 0, 0));
+                    lblDate.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-                JLabel date = new JLabel("ajouté le " + formatterDateAvis(avis.getDate()));
-                date.setForeground(TEXT_GRIS);
-                date.setFont(new Font("SansSerif", Font.PLAIN, 12));
-                date.setBorder(new EmptyBorder(4, 0, 0, 0));
-                date.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    JLabel lblCommentaire = new JLabel("\" " + avis.getCommentaire() + " \"");
+                    lblCommentaire.setForeground(TEXT_BLANC);
+                    lblCommentaire.setFont(new Font("SansSerif", Font.PLAIN, 13));
+                    lblCommentaire.setBorder(new EmptyBorder(6, 0, 0, 0));
+                    lblCommentaire.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-                JLabel commentaire = new JLabel("\" " + avis.getCommentaire() + " \"");
-                commentaire.setForeground(TEXT_BLANC);
-                commentaire.setFont(new Font("SansSerif", Font.PLAIN, 13));
-                commentaire.setBorder(new EmptyBorder(6, 0, 0, 0));
-                commentaire.setAlignmentX(Component.LEFT_ALIGNMENT);
+                    JLabel lblNote = new JLabel("Note : " + avis.getNote() + "/5");
+                    lblNote.setForeground(ACCENT);
+                    lblNote.setFont(new Font("SansSerif", Font.BOLD, 13));
+                    lblNote.setBorder(new EmptyBorder(6, 0, 0, 0));
+                    lblNote.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-                JLabel note = new JLabel("Note : " + avis.getNote() + "/5");
-                note.setForeground(TEXT_BLANC);
-                note.setFont(new Font("SansSerif", Font.PLAIN, 13));
-                note.setBorder(new EmptyBorder(6, 0, 0, 0));
-                note.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                carteAvis.add(utilisateur);
-                carteAvis.add(date);
-                carteAvis.add(commentaire);
-                carteAvis.add(note);
-
-                listeAvis.add(carteAvis);
-                listeAvis.add(Box.createVerticalStrut(8));
+                    carteAvis.add(lblUtilisateur);
+                    carteAvis.add(lblDate);
+                    carteAvis.add(lblCommentaire);
+                    carteAvis.add(lblNote);
+                    listeAvis.add(carteAvis);
+                    listeAvis.add(Box.createVerticalStrut(8));
+                }
             }
-        }
+            listeAvis.revalidate();
+            listeAvis.repaint();
+        };
+
+        // Remplissage initial
+        rafraichirListe.run();
+
+        // Listener du bouton envoyer
+        boutonEnvoyer.addActionListener(evt -> {
+            if (!(utilisateur instanceof Abonne)) {
+                afficherErreur(new ActionException("Réservé aux abonnés"));
+                return;
+            }
+            String texte = champCommentaire.getText().trim();
+            if (texte.isEmpty()) {
+                afficherErreur(new ActionException("Le commentaire ne peut pas être vide"));
+                return;
+            }
+            int note = (int) spinnerNote.getValue();
+            Avis nouvelAvis = new Avis(morceau, (Abonne) utilisateur, note, texte);
+            morceau.getAvis().add(nouvelAvis);
+            ((Abonne) utilisateur).ajouterAvis(nouvelAvis);
+            champCommentaire.setText("");
+            spinnerNote.setValue(5);
+            rafraichirListe.run();
+        });
 
         JScrollPane scrollAvis = new JScrollPane(listeAvis);
         scrollAvis.setBorder(BorderFactory.createEmptyBorder());
         scrollAvis.getViewport().setBackground(BG_CARTE);
-        scrollAvis.setPreferredSize(new Dimension(100, 220));
+        scrollAvis.setPreferredSize(new Dimension(100, 200));
 
         section.add(enTeteAvis, BorderLayout.NORTH);
-        section.add(scrollAvis, BorderLayout.CENTER);
+        section.add(formulaire, BorderLayout.CENTER);
+        section.add(scrollAvis, BorderLayout.SOUTH);
         return section;
     }
 
-    private void commenter(Morceau morceau) {
-        if (morceau == null) {
-            return;
-        }
-        if (!(utilisateur instanceof Abonne)) {
-            afficherErreur(new ActionException("Réservé aux abonnés"));
-            return;
-        }
-
-        // implémenter
-
-        //new MettreAvis().executer(new ActionArguments(utilisateur, morceau, commentaire, note));
-        if (fenetreVisite != null) {
-            fenetreVisite.setPanelCentral(afficherMorceau(morceau));
-        }
-    }
 
     private String formatterDateAvis(LocalDate dateAvis) {
         if (dateAvis == null) {
