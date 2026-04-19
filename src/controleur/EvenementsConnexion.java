@@ -19,12 +19,6 @@ public class EvenementsConnexion {
         JButton btnValider = fenetre.getBtnValider();
         JLabel btnRetour = fenetre.getBtnRetourLabel();
 
-
-
-
-
-
-
         // Valider → choix 1
         btnValider.addMouseListener(new MouseAdapter() {
             @Override
