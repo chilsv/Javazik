@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
-public class FenetreConnexion {
+public class FenetreConnexion  {
     private static final String PLACEHOLDER_MAIL = "Mail";
     private static final String PLACEHOLDER_MDP = "Mot de passe";
 
@@ -17,9 +17,9 @@ public class FenetreConnexion {
     private final JButton btnValider;
     private final JLabel btnRetourLabel;
 
-    public FenetreConnexion() {
+    public FenetreConnexion()  {
 
-        panel = new JPanel(null);
+        panel = new JPanel (null);
         panel.setPreferredSize(new Dimension(Ecran.LONGUEUR, Ecran.HAUTEUR));
 
         // Background
@@ -37,7 +37,7 @@ public class FenetreConnexion {
         int CarteY = (Ecran.HAUTEUR - carteLargeur) / 2;  // centré verticalement
 
         //Creation d'une carte ou l'on va afficher nom d'utilisateur password bouton valider et retour
-        JPanel card = new JPanel(null) { //mettre le panel a NULL pour pouvoir placer les elemnts nous meme avec des coordoones
+        JPanel card = new JPanel(null)  { //mettre le panell a NULL pour pouvoir placer les elemnts nous meme avec des coordoones
             @Override
             protected void paintComponent(Graphics g) {  //methode pour changer de forme couleur un composant
                 Graphics2D carteForme = (Graphics2D) g.create();
@@ -72,7 +72,7 @@ public class FenetreConnexion {
         styliserChampPassword(champMdp, PLACEHOLDER_MDP);//ce qu'il y'a ecrit dans le champs a remplir avec un efocntion defini en dessous
 
         // creation du bouton se connecter
-        btnValider = new JButton("Se connecter") {
+        btnValider = new JButton("Se connecter ")  {
             @Override
             protected void paintComponent(Graphics g) { //changement de forme couleur comme tout a l'heure
                 Graphics2D BoutonForme = (Graphics2D) g.create();
@@ -121,6 +121,7 @@ public class FenetreConnexion {
 
     //fonction fait avec chat wallah j'arrivais pas
     private void styliserChamp(JTextField champ, String placeholder) {
+
         // Style visuel
         champ.setBackground(new Color(40, 48, 78));
         champ.setCaretColor(Color.WHITE);
@@ -135,8 +136,9 @@ public class FenetreConnexion {
         champ.setForeground(new Color(160, 160, 180));
 
         // Comportement au focus
-        champ.addFocusListener(new FocusAdapter() {
+        champ.addFocusListener(new FocusAdapter()  {
             @Override
+
             public void focusGained(FocusEvent e) {
                 // L'utilisateur clique dans le champ
                 if (champ.getText().equals(placeholder)) {
@@ -149,13 +151,13 @@ public class FenetreConnexion {
                 // L'utilisateur clique ailleurs
                 if (champ.getText().isEmpty()) {
                     champ.setText(placeholder);               // remet le placeholder
-                    champ.setForeground(new Color(160, 160, 180)); // remet le gris
+                    champ.setForeground(new Color(160, 160, 180));  // remet le gris
                 }
             }
         });
     }
 
-    private void styliserChampPassword(JPasswordField champ, String placeholder) {
+    private void styliserChampPassword(JPasswordField champ, String placeholder)  {
         // Style visuel
         champ.setBackground(new Color(40, 48, 78));
         champ.setCaretColor(Color.WHITE);
